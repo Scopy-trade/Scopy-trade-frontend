@@ -1,5 +1,5 @@
-import BrandingPanel from "@/components/auth/BrandingPanel";
-import RegisterForm from "@/components/auth/RegisterForm";
+import BrandingPanel from "@/components/auth/register/BrandingPanel";
+import RegisterForm from "@/components/auth/register/RegisterForm";
 
 export const metadata = {
   title: "Register | SCopyTrade",

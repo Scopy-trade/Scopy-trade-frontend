@@ -20,6 +20,8 @@ export default function BrandingPanel() {
           fill
           className="object-cover"
           unoptimized
+          loading="eager"
+          fetchPriority="high"
         />
       </div>
 
