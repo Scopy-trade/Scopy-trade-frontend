@@ -18,7 +18,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "SCopyTrade",
-  description: "Institutional-grade copy trading infrastructure",
+  description: "Institutional-grade copy trading infrastructure.",
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-@theme inline {
-  /* ── Colours ── */
+@theme {
+  /* ── Colors ── */
   --color-surface: #0b1326;
   --color-surface-dim: #0b1326;
   --color-surface-bright: #31394d;
@@ -11,16 +11,16 @@
   --color-surface-container-high: #222a3d;
   --color-surface-container-highest: #2d3449;
   --color-surface-variant: #2d3449;
+  --color-surface-tint: #b6c4ff;
 
-  --color-background: #0b1326;
-  --color-on-background: #dae2fd;
   --color-on-surface: #dae2fd;
   --color-on-surface-variant: #c5c6ce;
+  --color-on-background: #dae2fd;
 
   --color-primary: #b6c4ff;
+  --color-primary-container: #002371;
   --color-primary-fixed: #dce1ff;
   --color-primary-fixed-dim: #b6c4ff;
-  --color-primary-container: #002371;
   --color-on-primary: #05297a;
   --color-on-primary-container: #768ee3;
   --color-on-primary-fixed: #00164e;
@@ -28,18 +28,18 @@
   --color-inverse-primary: #4059aa;
 
   --color-secondary: #4edea3;
+  --color-secondary-container: #00a572;
   --color-secondary-fixed: #6ffbbe;
   --color-secondary-fixed-dim: #4edea3;
-  --color-secondary-container: #00a572;
   --color-on-secondary: #003824;
   --color-on-secondary-container: #00311f;
   --color-on-secondary-fixed: #002113;
   --color-on-secondary-fixed-variant: #005236;
 
   --color-tertiary: #ffb2b9;
+  --color-tertiary-container: #5d001b;
   --color-tertiary-fixed: #ffdadc;
   --color-tertiary-fixed-dim: #ffb2b9;
-  --color-tertiary-container: #5d001b;
   --color-on-tertiary: #67001f;
   --color-on-tertiary-container: #ec667a;
   --color-on-tertiary-fixed: #400010;
@@ -50,47 +50,57 @@
   --color-on-error: #690005;
   --color-on-error-container: #ffdad6;
 
+  --color-background: #0b1326;
   --color-outline: #8f9098;
   --color-outline-variant: #44474d;
-
   --color-inverse-surface: #dae2fd;
   --color-inverse-on-surface: #283044;
-  --color-surface-tint: #b6c4ff;
 
-  /* ── Font families ── */
+  /* ── Border Radius ── */
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  /* ── Fonts ── */
   --font-headline: "Manrope", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-label: "Inter", sans-serif;
 }
 
-/* ─── Base ─────────────────────────────────────────────────────────── */
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   color-scheme: dark;
 }
 
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-surface-container-lowest);
+  background-color: var(--color-background);
   color: var(--color-on-surface);
+  font-family: var(--font-body);
   min-height: 100vh;
 }
 
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
+.brand-logo {
   font-family: var(--font-headline);
 }
 
-/* ─── Reusable utility classes ──────────────────────────────────────── */
+/* ── Glass panel utility ── */
 .glass-panel {
   background: rgba(49, 57, 77, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
+/* ── Gradient text ── */
 .text-gradient {
   background: linear-gradient(to right, #4edea3, #00a572);
   -webkit-background-clip: text;
@@ -98,6 +108,16 @@ h6 {
   background-clip: text;
 }
 
+/* ── Button gradient ── */
 .button-gradient {
   background: linear-gradient(to bottom right, #4edea3, #00a572);
+}
+
+/* ── Progress bar gradient ── */
+.progress-gradient {
+  background: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
 }

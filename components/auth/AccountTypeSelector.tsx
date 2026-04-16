@@ -1,71 +1,67 @@
 "use client";
 
+import { useState } from "react";
 import { RiUser3Line, RiBuildingLine } from "react-icons/ri";
 
-export type AccountType = "individual" | "institutional";
+type AccountType = "individual" | "institutional";
 
-interface Props {
+interface AccountTypeSelectorProps {
   value: AccountType;
   onChange: (value: AccountType) => void;
 }
 
-const options: { value: AccountType; label: string; icon: React.ReactNode }[] =
-  [
-    {
-      value: "individual",
-      label: "Individual",
-      icon: <RiUser3Line style={{ fontSize: "1.5rem" }} />,
-    },
-    {
-      value: "institutional",
-      label: "Institutional",
-      icon: <RiBuildingLine style={{ fontSize: "1.5rem" }} />,
-    },
-  ];
+const options: {
+  value: AccountType;
+  label: string;
+  Icon: React.ElementType;
+}[] = [
+  { value: "individual", label: "Individual", Icon: RiUser3Line },
+  { value: "institutional", label: "Institutional", Icon: RiBuildingLine },
+];
 
-export default function AccountTypeSelector({ value, onChange }: Props) {
+export default function AccountTypeSelector({
+  value,
+  onChange,
+}: AccountTypeSelectorProps) {
   return (
-    <div className="space-y-4">
-      <label
-        className="text-xs font-bold uppercase tracking-widest"
-        style={{ color: "#c5c6ce" }}
-      >
+    <div className="space-y-3">
+      <label className="text-xs font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)]">
         Account Category
       </label>
       <div className="grid grid-cols-2 gap-4">
-        {options.map((opt) => {
-          const selected = value === opt.value;
+        {options.map(({ value: optVal, label, Icon }) => {
+          const isSelected = value === optVal;
           return (
-            <label key={opt.value} className="cursor-pointer">
+            <label key={optVal} className="relative group cursor-pointer">
               <input
                 type="radio"
                 name="acc_type"
-                value={opt.value}
-                checked={selected}
-                onChange={() => onChange(opt.value)}
+                value={optVal}
+                checked={isSelected}
+                onChange={() => onChange(optVal)}
                 className="sr-only"
               />
               <div
-                className="p-4 transition-all duration-300"
-                style={{
-                  borderRadius: "0.75rem",
-                  border: selected
-                    ? "1px solid #4edea3"
-                    : "1px solid rgba(68,71,77,0.3)",
-                  backgroundColor: selected
-                    ? "rgba(78,222,163,0.05)"
-                    : "#171f33",
-                }}
+                className={`
+                  p-4 rounded-xl border transition-all duration-300
+                  bg-[var(--color-surface-container)]
+                  ${
+                    isSelected
+                      ? "border-[var(--color-secondary)] bg-[var(--color-secondary)]/5"
+                      : "border-[var(--color-outline-variant)]/10 hover:border-[var(--color-secondary)]/40"
+                  }
+                `}
               >
                 <div className="flex flex-col items-center text-center gap-2">
-                  <span style={{ color: selected ? "#4edea3" : "#c5c6ce" }}>
-                    {opt.icon}
-                  </span>
-                  <span
-                    className="text-sm font-bold"
-                    style={{ color: "#dae2fd" }}
-                  >
-                    {opt.label}
+                  <Icon
+                    className={`text-2xl transition-colors ${
+                      isSelected
+                        ? "text-[var(--color-secondary)]"
+                        : "text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-secondary)]"
+                    }`}
+                  />
+                  <span className="text-sm font-bold text-[var(--color-on-surface)]">
+                    {label}
                   </span>
                 </div>
               </div>
