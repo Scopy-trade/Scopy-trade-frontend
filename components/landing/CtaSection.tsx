@@ -30,7 +30,7 @@ export default function CtaSection() {
               href="/register"
               className="px-10 py-5 bg-[var(--color-secondary)] text-[var(--color-on-secondary)] font-bold rounded-xl shadow-xl shadow-[var(--color-secondary)]/30 active:scale-95 transition-transform hover:opacity-90"
             >
-              Launch Terminal
+              Register
             </Link>
             <button className="px-10 py-5 bg-[var(--color-on-primary-fixed)] text-[var(--color-primary-fixed)] font-bold rounded-xl border border-[var(--color-primary)]/30 hover:bg-[var(--color-on-primary-fixed)]/80 transition-all">
               Read Documentation

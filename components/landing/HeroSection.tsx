@@ -61,10 +61,10 @@ export default function HeroSection() {
               href="/register"
               className="px-8 py-4 bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary-container)] text-[var(--color-on-secondary)] font-bold rounded-lg shadow-lg shadow-[var(--color-secondary)]/20 hover:opacity-90 transition-all active:scale-95"
             >
-              Get Started
+              Register
             </Link>
             <button className="px-8 py-4 bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface)] font-semibold rounded-lg border border-[var(--color-outline-variant)]/20 hover:bg-[var(--color-surface-bright)] transition-all">
-              View Signals
+              Login
             </button>
           </div>
 
