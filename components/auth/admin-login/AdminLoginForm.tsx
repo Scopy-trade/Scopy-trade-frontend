@@ -25,7 +25,7 @@ export default function AdminLoginForm() {
     setIsLoading(true);
 
     try {
-      await authAPI.login({ email, password });
+      await authAPI.adminLogin({ email, password });
       window.location.href = "/admin/dashboard";
     } catch (err: any) {
       console.error("Admin login error:", err);

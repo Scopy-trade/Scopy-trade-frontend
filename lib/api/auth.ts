@@ -22,6 +22,12 @@ export interface User {
   lastName?: string;
 }
 
+export interface Admin {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 class AuthAPI {
   private async request<T>(
     endpoint: string,
@@ -61,7 +67,6 @@ class AuthAPI {
       body: JSON.stringify(data),
     });
 
-    // Store user info based on backend response
     const user: User = {
       email: data.email,
       firstName: data.firstName,
@@ -100,14 +105,52 @@ class AuthAPI {
     }
   }
 
+  async adminLogin(credentials: LoginCredentials): Promise<Admin> {
+    const response = await this.request<any>("/admin/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+
+    const admin: Admin = { email: credentials.email };
+    localStorage.setItem("admin", JSON.stringify(admin));
+    localStorage.setItem("adminEmail", credentials.email);
+
+    return response.admin || admin;
+  }
+
+  async adminLogout(): Promise<void> {
+    try {
+      await this.request("/admin/auth/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Admin logout error:", error);
+    } finally {
+      localStorage.removeItem("admin");
+      localStorage.removeItem("adminEmail");
+    }
+  }
+
   isAuthenticated(): boolean {
     return !!localStorage.getItem("user");
+  }
+
+  isAdminAuthenticated(): boolean {
+    return !!localStorage.getItem("admin");
   }
 
   getUser(): User | null {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       return JSON.parse(userStr);
+    }
+    return null;
+  }
+
+  getAdmin(): Admin | null {
+    const adminStr = localStorage.getItem("admin");
+    if (adminStr) {
+      return JSON.parse(adminStr);
     }
     return null;
   }
