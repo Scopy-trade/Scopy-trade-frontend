@@ -15,6 +15,7 @@
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
+    "@swc/core": "^1.15.32",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
