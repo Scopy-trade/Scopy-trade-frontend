@@ -5,6 +5,7 @@ const API_BASE_URL =
 export interface LoginCredentials {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface RegisterData {
@@ -13,13 +14,29 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
+  role: UserRole;
   accessCode?: string;
 }
 
+export type UserRole = "CopyTrader" | "Pro Trader";
+
 export interface User {
+  id?: string;
+  _id?: string;
   email: string;
   firstName?: string;
   lastName?: string;
+  role?: UserRole;
+  traderID?: string;
+}
+
+interface AuthResponse {
+  status?: string;
+  message?: string;
+  user?: User;
+  data?: {
+    user?: User;
+  };
 }
 
 class AuthAPI {
@@ -27,7 +44,7 @@ class AuthAPI {
     endpoint: string,
     options?: RequestInit,
   ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +57,7 @@ class AuthAPI {
       let errorMessage = `Request failed: ${response.status}`;
       try {
         const error = await response.json();
-        errorMessage = error.message || errorMessage;
+        errorMessage = error.message || error.error || errorMessage;
       } catch (e) {
         errorMessage = response.statusText || errorMessage;
       }
@@ -56,7 +73,7 @@ class AuthAPI {
   }
 
   async register(data: RegisterData): Promise<User> {
-    const response = await this.request<any>("/auth/register", {
+    const response = await this.request<AuthResponse>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -66,25 +83,53 @@ class AuthAPI {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
+      role: data.role,
     };
 
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("userEmail", data.email);
 
-    return response.user || user;
+    const responseUser = response.data?.user || response.user;
+    const storedUser = responseUser || user;
+    localStorage.setItem("user", JSON.stringify(storedUser));
+
+    return storedUser;
   }
 
   async login(credentials: LoginCredentials): Promise<User> {
-    const response = await this.request<any>("/auth/login", {
+    const response = await this.request<AuthResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
 
-    const user: User = { email: credentials.email };
+    const user: User = response.data?.user ||
+      response.user || { email: credentials.email };
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("userEmail", credentials.email);
 
     return response.user || user;
+  }
+
+  async getPostLoginRedirect(user: User): Promise<string> {
+    if (user.role === "Pro Trader") {
+      return "/professional-dashboard";
+    }
+
+    if (user.role === "CopyTrader") {
+      try {
+        const response = await this.getUserExchangeConnections();
+        const connections = Array.isArray(response?.connections)
+          ? response.connections
+          : [];
+
+        return connections.length > 0 ? "/dashboard" : "/onboarding";
+      } catch (error) {
+        console.error("Exchange connection check failed:", error);
+        return "/onboarding";
+      }
+    }
+
+    return "/dashboard";
   }
 
   async logout(): Promise<void> {

@@ -11,9 +11,11 @@ import {
   RiEyeCloseLine,
   RiCheckboxCircleLine,
   RiCloseCircleLine,
+  RiLineChartLine,
+  RiUserFollowLine,
 } from "react-icons/ri";
 import PartnerLogos from "./PartnerLogos";
-import { authAPI } from "@/lib/api/auth";
+import { authAPI, UserRole } from "@/lib/api/auth";
 
 interface PasswordRequirement {
   label: string;
@@ -31,6 +33,7 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState<UserRole>("CopyTrader");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -126,15 +129,17 @@ export default function RegisterForm() {
 
     try {
       const registerData = {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-        confirmPassword: confirmPassword,
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+        role,
       };
 
       await authAPI.register(registerData);
-      window.location.href = "/dashboard";
+      window.location.href =
+        role === "Pro Trader" ? "/professional-dashboard" : "/onboarding";
     } catch (err: any) {
       console.error("Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
@@ -256,6 +261,67 @@ export default function RegisterForm() {
                   disabled:opacity-50 disabled:cursor-not-allowed
                 "
               />
+            </div>
+          </div>
+
+          {/* Account role */}
+          <div className="group">
+            <label className="block text-xs font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-2">
+              Account Type
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                {
+                  value: "CopyTrader" as UserRole,
+                  label: "Copy Trader",
+                  description: "Follow professional traders",
+                  Icon: RiUserFollowLine,
+                },
+                {
+                  value: "Pro Trader" as UserRole,
+                  label: "Professional Trader",
+                  description: "Publish signals for followers",
+                  Icon: RiLineChartLine,
+                },
+              ].map(({ value, label, description, Icon }) => {
+                const isSelected = role === value;
+
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRole(value)}
+                    disabled={isLoading}
+                    className={`
+                      min-h-24 rounded-xl p-4 text-left transition-all
+                      border flex gap-3 items-start
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      ${
+                        isSelected
+                          ? "border-[var(--color-secondary)] bg-[var(--color-secondary)]/10"
+                          : "border-transparent bg-[var(--color-surface-container-highest)] hover:border-[var(--color-secondary)]/30"
+                      }
+                    `}
+                    aria-pressed={isSelected}
+                  >
+                    <Icon
+                      className={`mt-0.5 text-xl ${
+                        isSelected
+                          ? "text-[var(--color-secondary)]"
+                          : "text-[var(--color-on-surface-variant)]"
+                      }`}
+                    />
+                    <span>
+                      <span className="block text-sm font-bold text-[var(--color-on-surface)]">
+                        {label}
+                      </span>
+                      <span className="block text-xs leading-5 text-[var(--color-on-surface-variant)]">
+                        {description}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
