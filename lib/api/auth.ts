@@ -1,3 +1,4 @@
+// lib/api/auth.ts - UPDATED
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://scopy-trade-backend.onrender.com/api";
@@ -28,6 +29,7 @@ export interface User {
   lastName?: string;
   role?: UserRole;
   traderID?: string;
+  hasOnboarded?: boolean;
 }
 
 interface AuthResponse {
@@ -45,12 +47,20 @@ export interface Admin {
   lastName?: string;
 }
 
+interface AdminResponse {
+  admin?: Admin;
+}
+
+interface ExchangeConnectionsResponse {
+  connections?: unknown[];
+}
+
 class AuthAPI {
   private async request<T>(
     endpoint: string,
     options?: RequestInit,
   ): Promise<T> {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -62,9 +72,12 @@ class AuthAPI {
     if (!response.ok) {
       let errorMessage = `Request failed: ${response.status}`;
       try {
-        const error = await response.json();
+        const error = (await response.json()) as {
+          message?: string;
+          error?: string;
+        };
         errorMessage = error.message || error.error || errorMessage;
-      } catch (e) {
+      } catch {
         errorMessage = response.statusText || errorMessage;
       }
       throw new Error(errorMessage);
@@ -72,33 +85,32 @@ class AuthAPI {
 
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-      return response.json();
+      return response.json() as Promise<T>;
     }
 
     return {} as T;
   }
 
-  async register(data: RegisterData): Promise<User> {
+  async register(data: RegisterData): Promise<string> {
     const response = await this.request<AuthResponse>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
 
-    const user: User = {
+    const responseUser = response.data?.user || response.user;
+    const user: User = responseUser ?? {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       role: data.role,
+      hasOnboarded: false,
     };
 
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("userEmail", data.email);
 
-    const responseUser = response.data?.user || response.user;
-    const storedUser = responseUser || user;
-    localStorage.setItem("user", JSON.stringify(storedUser));
-
-    return storedUser;
+    // Always redirect to login after registration
+    return "/login";
   }
 
   async login(credentials: LoginCredentials): Promise<User> {
@@ -108,33 +120,46 @@ class AuthAPI {
     });
 
     const user: User = response.data?.user ||
-      response.user || { email: credentials.email };
+      response.user || { email: credentials.email, hasOnboarded: false };
+
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("userEmail", credentials.email);
 
-    return response.user || user;
+    return user;
   }
 
   async getPostLoginRedirect(user: User): Promise<string> {
-    if (user.role === "Pro Trader") {
-      return "/professional-dashboard";
+    if (!user.role) {
+      return "/register";
     }
 
+    // Pro traders go straight to dashboard
+    if (user.role === "Pro Trader") {
+      return "/dashboard/protrader";
+    }
+
+    // For CopyTrader, check onboarding status
     if (user.role === "CopyTrader") {
+      // Check if user has onboarded (connected exchange)
       try {
         const response = await this.getUserExchangeConnections();
         const connections = Array.isArray(response?.connections)
           ? response.connections
           : [];
 
-        return connections.length > 0 ? "/dashboard" : "/onboarding";
-      } catch (error) {
-        console.error("Exchange connection check failed:", error);
-        return "/onboarding";
+        // Has exchange connected → already onboarded → dashboard
+        if (connections.length > 0) {
+          return "/dashboard/copytrader";
+        }
+      } catch {
+        // If connection check fails, assume not onboarded
       }
+
+      // Not onboarded yet → go to onboarding
+      return "/onboarding";
     }
 
-    return "/dashboard";
+    return "/register";
   }
 
   async logout(): Promise<void> {
@@ -142,8 +167,8 @@ class AuthAPI {
       await this.request("/auth/logout", {
         method: "POST",
       });
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      // Silently handle logout errors — still clear local state below
     } finally {
       localStorage.removeItem("user");
       localStorage.removeItem("userEmail");
@@ -151,7 +176,7 @@ class AuthAPI {
   }
 
   async adminLogin(credentials: LoginCredentials): Promise<Admin> {
-    const response = await this.request<any>("/admin/auth/login", {
+    const response = await this.request<AdminResponse>("/admin/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
@@ -168,8 +193,8 @@ class AuthAPI {
       await this.request("/admin/auth/logout", {
         method: "POST",
       });
-    } catch (error) {
-      console.error("Admin logout error:", error);
+    } catch {
+      // Silently handle
     } finally {
       localStorage.removeItem("admin");
       localStorage.removeItem("adminEmail");
@@ -187,7 +212,7 @@ class AuthAPI {
   getUser(): User | null {
     const userStr = localStorage.getItem("user");
     if (userStr) {
-      return JSON.parse(userStr);
+      return JSON.parse(userStr) as User;
     }
     return null;
   }
@@ -195,7 +220,7 @@ class AuthAPI {
   getAdmin(): Admin | null {
     const adminStr = localStorage.getItem("admin");
     if (adminStr) {
-      return JSON.parse(adminStr);
+      return JSON.parse(adminStr) as Admin;
     }
     return null;
   }
@@ -204,19 +229,17 @@ class AuthAPI {
     return localStorage.getItem("userEmail");
   }
 
-  async getUserExchanges(): Promise<any> {
-    return this.request("/exchanges", {
-      method: "GET",
-    });
+  async getUserExchanges(): Promise<unknown> {
+    return this.request("/exchanges");
   }
 
-  async getUserExchangeConnections(): Promise<any> {
-    return this.request("/exchanges/connections", {
-      method: "GET",
-    });
+  async getUserExchangeConnections(): Promise<ExchangeConnectionsResponse> {
+    return this.request<ExchangeConnectionsResponse>("/exchanges/connections");
   }
 
-  async connectExchange(connectionData: any): Promise<any> {
+  async connectExchange(
+    connectionData: Record<string, unknown>,
+  ): Promise<unknown> {
     return this.request("/exchanges/connect", {
       method: "POST",
       body: JSON.stringify(connectionData),

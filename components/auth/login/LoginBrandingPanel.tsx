@@ -1,84 +1,108 @@
+// components/auth/login/LoginBrandingPanel.tsx
 "use client";
 
 import Image from "next/image";
-import { RiVerifiedBadgeLine } from "react-icons/ri";
+import { RiShieldCheckLine, RiFlaskLine, RiGlobalLine } from "react-icons/ri";
 
-const stats = [
-  { value: "$4.2B+", label: "Total Vol." },
-  { value: "12ms", label: "Latency" },
+const features = [
+  { Icon: RiFlaskLine, text: "Advanced Analytics" },
+  { Icon: RiShieldCheckLine, text: "MPC Wallet" },
+  { Icon: RiGlobalLine, text: "Global Liquidity" },
 ];
 
 export default function LoginBrandingPanel() {
   return (
-    <div className="hidden md:flex flex-col justify-between p-12 relative overflow-hidden bg-[var(--color-surface-container)]">
-      {/* Background decorative image */}
-      <div className="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none">
+    <div className="hidden md:flex md:w-1/2 lg:w-3/5 relative flex-col justify-between p-8 lg:p-12 bg-gradient-to-br from-[var(--color-surface-container)] to-[var(--color-surface-container-low)] overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-secondary)]/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[var(--color-primary)]/20 rounded-full blur-[100px]" />
         <Image
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnqhpW3VjP16UVmJbK8K7NGZU7WE30ZuTee_lv64OrfX9o-x551OQ6FejcwLoUoI8dxfiNqtvLCHl95h-RZtp1S47Nji2rnrM1OyoS5FM4r_Z4l9JMqQftxyAkKo3HtGTXaLZPEAZtpVUIJYO6vSmelFZCBcZKdAuNc_o5I_f1abO4bBIhO1QQcqgIoRgcqUTclJqADZbj62tfiDVM5RazM6F-SIsmhu0Ww6QXSW4UC7UpOYbSulKi5RpV2VmYo1i9XAza7MFv4g"
-          alt="Abstract 3D digital visualization of a global ledger network"
+          alt="Abstract digital visualization"
           fill
-          className="object-cover"
+          className="object-cover opacity-20 mix-blend-overlay"
           unoptimized
         />
       </div>
 
-      {/* Top: wordmark */}
+      {/* Top: Logo */}
       <div className="relative z-10">
-        <h1
-          className="text-3xl font-black tracking-tighter text-[var(--color-secondary)]"
-          style={{ fontFamily: "var(--font-headline)" }}
-        >
-          SCopyTrade
-        </h1>
-        <p className="text-[var(--color-on-surface-variant)] mt-2 font-medium">
-          The Sovereign Ledger
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-secondary)] to-[var(--color-primary)] rounded-xl flex items-center justify-center shadow-lg">
+            <span className="text-white font-black text-xl">S</span>
+          </div>
+          <h1
+            className="text-2xl font-black tracking-tighter text-white"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            SCopyTrade
+          </h1>
+        </div>
+        <p className="text-[var(--color-on-surface-variant)] text-sm mt-2">
+          The Sovereign Trading Terminal
         </p>
       </div>
 
-      {/* Middle: badge + headline + subtext */}
-      <div className="relative z-10">
-        <div className="inline-flex items-center gap-2 bg-[var(--color-secondary)]/10 text-[var(--color-secondary)] px-3 py-1 rounded-full mb-6">
-          <RiVerifiedBadgeLine className="text-sm" />
-          <span className="text-xs font-bold tracking-wider uppercase">
-            Institutional Grade Security
+      {/* Middle: Hero section */}
+      <div className="relative z-10 py-8">
+        <div className="inline-flex items-center gap-2 bg-[var(--color-secondary)]/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-6 border border-[var(--color-secondary)]/30">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <span className="text-xs font-bold tracking-wider text-[var(--color-secondary)] uppercase">
+            Live Markets
           </span>
         </div>
 
         <h2
-          className="text-4xl font-bold text-white leading-tight mb-4"
+          className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4"
           style={{ fontFamily: "var(--font-headline)" }}
         >
-          Master the markets with Quant-led precision.
+          Trade with{" "}
+          <span className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-primary)] bg-clip-text text-transparent">
+            Institutional
+          </span>{" "}
+          Precision
         </h2>
 
-        <p className="text-[var(--color-on-surface-variant)] text-lg max-w-sm">
-          Connect your sovereign wallet or use institutional credentials to
-          access the terminal.
+        <p className="text-[var(--color-on-surface-variant)] text-base lg:text-lg max-w-md leading-relaxed">
+          Access deep liquidity, sub-millisecond execution, and enterprise-grade
+          security from a single interface.
         </p>
+
+        {/* Feature pills */}
+        <div className="flex flex-wrap gap-3 mt-8">
+          {features.map(({ Icon, text }) => (
+            <div
+              key={text}
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10"
+            >
+              <Icon className="text-[var(--color-secondary)] text-sm" />
+              <span className="text-sm text-white/80">{text}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Bottom: stats */}
-      <div className="relative z-10 flex gap-6">
-        {stats.map((stat, i) => (
-          <div
-            key={stat.label}
-            className={`flex flex-col ${
-              i > 0
-                ? "border-l border-[var(--color-outline-variant)]/20 pl-6"
-                : ""
-            }`}
-          >
-            <span
-              className="text-[var(--color-secondary)] font-bold text-xl"
-              style={{ fontFamily: "var(--font-headline)" }}
-            >
-              {stat.value}
-            </span>
-            <span className="text-[var(--color-on-surface-variant)] text-xs">
-              {stat.label}
-            </span>
+      {/* Bottom: Stats */}
+      <div className="relative z-10 flex gap-8 pt-8 border-t border-white/10">
+        <div>
+          <div className="text-2xl font-bold text-white">$4.2B+</div>
+          <div className="text-xs text-[var(--color-on-surface-variant)] uppercase tracking-wider">
+            Trading Volume
           </div>
-        ))}
+        </div>
+        <div>
+          <div className="text-2xl font-bold text-white">500K+</div>
+          <div className="text-xs text-[var(--color-on-surface-variant)] uppercase tracking-wider">
+            Active Traders
+          </div>
+        </div>
+        <div>
+          <div className="text-2xl font-bold text-white">12ms</div>
+          <div className="text-xs text-[var(--color-on-surface-variant)] uppercase tracking-wider">
+            Avg. Latency
+          </div>
+        </div>
       </div>
     </div>
   );

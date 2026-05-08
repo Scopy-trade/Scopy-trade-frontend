@@ -1,3 +1,4 @@
+// components/auth/register/PartnerLogos.tsx
 import Image from "next/image";
 
 const logos = [
@@ -17,9 +18,9 @@ const logos = [
 
 export default function PartnerLogos() {
   return (
-    <div className="mt-12 flex flex-wrap justify-center gap-6 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+    <div className="mt-6 flex flex-wrap justify-center gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
       {logos.map((logo) => (
-        <div key={logo.alt} className="relative h-6 w-20">
+        <div key={logo.alt} className="relative h-5 w-16">
           <Image
             src={logo.src}
             alt={logo.alt}
