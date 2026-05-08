@@ -2,10 +2,10 @@
 "use client";
 
 import { useState } from "react";
-import MetricCards from "@/components/pro-trader/MetricCards";
-import SignalsTable from "@/components/pro-trader/SignalsTable";
-import FloatingButton from "@/components/pro-trader/FloatingButton";
-import AddSignalModal from "@/components/pro-trader/AddSignalModal";
+import MetricCards from "@/components/pro-trader/signalsPage/MetricCards";
+import SignalsTable from "@/components/pro-trader/signalsPage/SignalsTable";
+import FloatingButton from "@/components/pro-trader/signalsPage/FloatingButton";
+import AddSignalModal from "@/components/pro-trader/signalsPage/AddSignalModal";
 import { MdAdd } from "react-icons/md";
 
 export default function Home() {

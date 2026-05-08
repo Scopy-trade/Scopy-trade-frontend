@@ -95,8 +95,8 @@ export default function DashboardSidebar({
         className={`
           fixed top-0 left-0 pt-12 h-screen bg-surface-container-low border-r border-white/5 
           shadow-2xl shadow-black/40 flex flex-col py-6 font-headline antialiased tracking-tight
-          transition-all duration-300 ease-in-out z-50
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          transition-all duration-300 ease-in-out z-50 
+          ${isOpen ? "translate-x-0" : "-translate-x-full md:overflow-visible overflow-hidden"}
           md:translate-x-0
           ${isCollapsed ? "md:w-20" : "md:w-64"}
           w-64

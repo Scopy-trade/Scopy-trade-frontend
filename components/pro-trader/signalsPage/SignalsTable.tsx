@@ -251,6 +251,7 @@ interface ActionDropdownProps {
   onClose: () => void;
 }
 
+// ActionDropdown
 function ActionDropdown({
   signal,
   onEdit,
@@ -278,7 +279,8 @@ function ActionDropdown({
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2 w-36 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-10"
+      className="absolute right-0 mt-2 w-36 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50"
+      style={{ position: "absolute", right: 0, top: "100%" }}
     >
       <button
         onClick={() => {
@@ -520,7 +522,7 @@ export default function SignalsTable() {
           {paginatedSignals.map((signal) => (
             <div
               key={signal.id}
-              className="p-4 hover:bg-gray-800/30 transition-colors cursor-pointer"
+              className="p-4 hover:bg-gray-800/30 transition-colors cursor-pointer relative"
               onClick={() => handleRowClick(signal)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -543,7 +545,7 @@ export default function SignalsTable() {
                     )}
                   </div>
                 </div>
-                <div onClick={(e) => e.stopPropagation()}>
+                <div onClick={(e) => e.stopPropagation()} className="relative">
                   <button
                     onClick={() =>
                       setActionDropdownSignal(
