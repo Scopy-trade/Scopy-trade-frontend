@@ -12,30 +12,34 @@ export default function DashboardLayout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Handle responsive behavior
   useEffect(() => {
-    const handleResize = () => {
-      const isDesktop = window.innerWidth >= 768;
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
 
-      if (isDesktop) {
-        // On desktop, sidebar is always visible but can be collapsed
+      if (mobile) {
+        // On mobile, sidebar is closed by default
+        setSidebarOpen(false);
+        setSidebarCollapsed(false);
+      } else {
+        // On desktop, sidebar is open by default
         setSidebarOpen(true);
         // Restore collapsed state from localStorage
         const savedCollapsed = localStorage.getItem("sidebarCollapsed");
         if (savedCollapsed !== null) {
           setSidebarCollapsed(savedCollapsed === "true");
+        } else {
+          setSidebarCollapsed(false);
         }
-      } else {
-        // On mobile, sidebar is closed by default and not collapsed
-        setSidebarOpen(false);
-        setSidebarCollapsed(false);
       }
     };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   const handleSidebarToggle = useCallback(() => {
@@ -52,7 +56,7 @@ export default function DashboardLayout({
 
   // Adjust main content margin based on sidebar state
   const getMainMargin = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
+    if (isMobile) {
       return "ml-0";
     }
     if (sidebarCollapsed) {
@@ -78,7 +82,7 @@ export default function DashboardLayout({
         className={`
           h-full overflow-y-auto transition-all duration-300 ease-in-out
           ${getMainMargin()}
-          pt-16
+          pt-16 md:pt-4
         `}
       >
         <div className="p-4 md:p-8">{children}</div>

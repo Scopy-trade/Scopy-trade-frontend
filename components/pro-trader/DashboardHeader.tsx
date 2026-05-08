@@ -1,28 +1,24 @@
 // components/pro-trader/DashboardHeader.tsx
 "use client";
 
-import { useState } from "react";
 import { MdAccountBalanceWallet, MdMenu } from "react-icons/md";
-import { GoSidebarCollapse } from "react-icons/go";
 
 interface DashboardNavProps {
   isOpen: boolean;
   isCollapsed: boolean;
   onToggle: () => void;
-  onCollapse?: () => void;
 }
 
 export default function DashboardHeader({
   isOpen,
   isCollapsed,
   onToggle,
-  onCollapse,
 }: DashboardNavProps) {
   return (
-    <header className="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
+    <header className="sticky md:hidden top-0 z-40 w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
       {/* Left Section - Mobile Menu Button */}
       <div className="flex items-center gap-3">
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Always visible on mobile */}
         <button
           onClick={onToggle}
           className="md:hidden p-2 rounded-lg bg-surface-container hover:bg-surface-container-highest transition-all text-slate-100"
@@ -31,8 +27,12 @@ export default function DashboardHeader({
           <MdMenu size={20} />
         </button>
 
-        {/* Desktop Collapse Button (hidden, now in sidebar) */}
+        {/* Desktop title */}
+        <h1 className="text-lg font-bold tracking-tighter text-slate-100 hidden md:block">
+          {isCollapsed ? "SCT" : "SCopyTrade"}
+        </h1>
 
+        {/* Mobile title */}
         <h1 className="text-lg font-bold tracking-tighter text-slate-100 md:hidden">
           SCopyTrade
         </h1>
