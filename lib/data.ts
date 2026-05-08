@@ -1,0 +1,62 @@
+export const metrics = [
+  {
+    title: "Total Signals",
+    value: "1,248",
+    subtitle: "+12% this month",
+  },
+  {
+    title: "Global Win Rate",
+    value: "74.2%",
+    progress: 74,
+  },
+  {
+    title: "Follower Profit Generated",
+    value: "$4.82M",
+    subtitle: "USDT",
+  },
+];
+
+export const signals = [
+  {
+    pair: "BTC/USDT",
+    type: "Long 20x",
+    date: "Oct 24, 2023",
+    time: "14:22 UTC",
+    price: "$34,812.50",
+    status: "SUCCESS",
+    pnl: "+$842,109",
+    pnlPercent: "+4.2% Net",
+    volume: "$12.4M",
+    followers: "1,402 Followers",
+    color: "text-emerald-400",
+    badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  },
+  {
+    pair: "ETH/USDT",
+    type: "Short 10x",
+    date: "Oct 22, 2023",
+    time: "09:15 UTC",
+    price: "$1,842.12",
+    status: "BAD",
+    pnl: "-$124,000",
+    pnlPercent: "-1.8% Net",
+    volume: "$8.1M",
+    followers: "982 Followers",
+    color: "text-rose-300",
+    badge: "bg-rose-500/10 text-rose-300 border-rose-500/20",
+  },
+  {
+    pair: "SOL/USDT",
+    type: "Long 5x",
+    date: "Oct 21, 2023",
+    time: "21:40 UTC",
+    price: "$32.05",
+    status: "EVEN",
+    pnl: "$0",
+    pnlPercent: "Break-even",
+    volume: "$4.2M",
+    followers: "450 Followers",
+    color: "text-slate-200",
+    badge: "bg-slate-700 text-slate-300 border-white/5",
+  },
+];
