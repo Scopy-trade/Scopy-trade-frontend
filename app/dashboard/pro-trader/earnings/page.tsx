@@ -1,9 +1,9 @@
 // app/dashboard/earnings/page.tsx
-import EarningsHeader from "@/components/pro-trader/earnings/EarningsHeader";
-import WithdrawalForm from "@/components/pro-trader/earnings/WithdrawalForm";
-import PayoutHistory from "@/components/pro-trader/earnings/PayoutHistory";
-import SecurityBanner from "@/components/pro-trader/earnings/SecurityBanner";
-import StatsBentoGrid from "@/components/pro-trader/earnings/StatsBentoGrid";
+import EarningsHeader from "@/components/pro-trader/earningsPage/EarningsHeader";
+import WithdrawalForm from "@/components/pro-trader/earningsPage/WithdrawalForm";
+import PayoutHistory from "@/components/pro-trader/earningsPage/PayoutHistory";
+import SecurityBanner from "@/components/pro-trader/earningsPage/SecurityBanner";
+import StatsBentoGrid from "@/components/pro-trader/earningsPage/StatsBentoGrid";
 
 export default function EarningsPage() {
   return (
