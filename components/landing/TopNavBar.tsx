@@ -69,7 +69,7 @@ export default function TopNavBar() {
             Register
           </Link>
           <Link
-            href="/register"
+            href="/login"
             className="px-6 py-2 bg-emerald-400 text-[var(--color-on-secondary-container)] font-semibold rounded-md active:scale-95 transition-transform hover:opacity-90"
           >
             Login
