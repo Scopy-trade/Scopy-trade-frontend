@@ -1,4 +1,4 @@
-// components/auth/register/RegisterForm.tsx - COMPLETE FIXED VERSION
+// components/auth/register/RegisterForm.tsx
 "use client";
 
 import { useState, FormEvent, ChangeEvent } from "react";
@@ -22,13 +22,6 @@ interface PasswordRequirement {
   validator: (password: string) => boolean;
 }
 
-interface StrengthInfo {
-  text: string;
-  color: string;
-  bg: string;
-  width: string;
-}
-
 interface RoleOption {
   value: UserRole;
   label: string;
@@ -40,7 +33,7 @@ const roleOptions: RoleOption[] = [
   {
     value: "CopyTrader",
     label: "Copy Trader",
-    description: "Follow traders",
+    description: "Follow & copy traders",
     Icon: RiUserFollowLine,
   },
   {
@@ -52,109 +45,66 @@ const roleOptions: RoleOption[] = [
 ];
 
 const requirements: PasswordRequirement[] = [
+  { label: "At least 8 characters", validator: (p) => p.length >= 8 },
+  { label: "Uppercase letter", validator: (p) => /[A-Z]/.test(p) },
+  { label: "Lowercase letter", validator: (p) => /[a-z]/.test(p) },
+  { label: "Number", validator: (p) => /\d/.test(p) },
   {
-    label: "At least 8 characters",
-    validator: (pwd: string) => pwd.length >= 8,
-  },
-  {
-    label: "Contains uppercase letter",
-    validator: (pwd: string) => /[A-Z]/.test(pwd),
-  },
-  {
-    label: "Contains lowercase letter",
-    validator: (pwd: string) => /[a-z]/.test(pwd),
-  },
-  { label: "Contains number", validator: (pwd: string) => /\d/.test(pwd) },
-  {
-    label: "Contains special character",
-    validator: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    label: "Special character",
+    validator: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p),
   },
 ];
 
-export default function RegisterForm() {
-  const [email, setEmail] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [role, setRole] = useState<UserRole>("CopyTrader");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
-  const [passwordStrength, setPasswordStrength] = useState<number>(0);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
-
-  const calculateStrength = (pwd: string): void => {
-    let strength = 0;
-    requirements.forEach((req) => {
-      if (req.validator(pwd)) strength++;
-    });
-    setPasswordStrength(strength);
-  };
-
-  const handlePasswordChange = (pwd: string): void => {
-    setPassword(pwd);
-    calculateStrength(pwd);
-  };
-
-  const getStrengthLabel = (): StrengthInfo | null => {
-    if (password.length === 0) return null;
-    if (passwordStrength <= 2) {
-      return {
-        text: "Weak",
-        color: "text-red-500",
-        bg: "bg-red-500",
-        width: "33%",
-      };
-    }
-    if (passwordStrength <= 4) {
-      return {
-        text: "Medium",
-        color: "text-yellow-500",
-        bg: "bg-yellow-500",
-        width: "66%",
-      };
-    }
+function getStrength(pwd: string) {
+  if (!pwd) return null;
+  const score = requirements.filter((r) => r.validator(pwd)).length;
+  if (score <= 2)
     return {
-      text: "Strong",
-      color: "text-green-500",
-      bg: "bg-green-500",
-      width: "100%",
+      text: "Weak",
+      color: "text-[#ffb4ab]",
+      bg: "bg-[#ffb4ab]",
+      width: "33%",
     };
+  if (score <= 4)
+    return {
+      text: "Medium",
+      color: "text-yellow-400",
+      bg: "bg-yellow-400",
+      width: "66%",
+    };
+  return {
+    text: "Strong",
+    color: "text-[#4edea3]",
+    bg: "bg-[#4edea3]",
+    width: "100%",
   };
+}
 
-  const strengthInfo = getStrengthLabel();
+export default function RegisterForm() {
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState<UserRole>("CopyTrader");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pwdFocused, setPwdFocused] = useState(false);
 
-  const validateForm = (): string | null => {
-    if (password !== confirmPassword) {
-      return "Passwords do not match";
-    }
-    if (passwordStrength < 3) {
-      return "Please use a stronger password";
-    }
-    if (!firstName || !lastName) {
-      return "Please enter both first name and last name";
-    }
-    if (!email) {
-      return "Please enter an email address";
-    }
-    return null;
-  };
+  const strengthInfo = getStrength(password);
+  const pwdScore = requirements.filter((r) => r.validator(password)).length;
+  const isSubmitDisabled =
+    isLoading || pwdScore < 3 || password !== confirmPassword;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
+    if (password !== confirmPassword) return setError("Passwords do not match");
+    if (pwdScore < 3) return setError("Please use a stronger password");
+    if (!firstName || !lastName) return setError("Please enter your full name");
     setIsLoading(true);
-
     try {
       await authAPI.register({
         firstName,
@@ -164,108 +114,108 @@ export default function RegisterForm() {
         confirmPassword,
         role,
       });
-      // Redirect to login page after successful registration
       window.location.href = "/login?registered=true";
     } catch (err: unknown) {
-      console.error("Registration error:", err);
-
-      let errorMessage = "Registration failed. Please try again.";
+      let msg = "Registration failed. Please try again.";
       if (
         err &&
         typeof err === "object" &&
         "message" in err &&
-        typeof err.message === "string"
+        typeof (err as { message: unknown }).message === "string"
       ) {
-        errorMessage = err.message;
-      } else if (err && typeof err === "string") {
-        errorMessage = err;
+        msg = (err as { message: string }).message;
       }
-
-      setError(errorMessage);
+      setError(msg);
       setIsLoading(false);
     }
   }
 
-  const isSubmitDisabled =
-    isLoading || passwordStrength < 3 || password !== confirmPassword;
+  const inputClass =
+    "w-full bg-[var(--color-surface-container-highest)] rounded-xl py-3 pl-10 pr-4 text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:outline-none border border-transparent focus:border-[var(--color-secondary)]/30 transition-all disabled:opacity-50";
 
   return (
-    <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 overflow-y-auto">
-      <div className="w-full max-w-md">
+    <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 xl:p-14 overflow-y-auto bg-[var(--color-surface-container-lowest)]">
+      <div className="w-full max-w-sm py-4">
+        {/* Mobile logo */}
+        <div className="lg:hidden flex items-center gap-2 mb-7">
+          <div className="w-8 h-8 bg-[var(--color-secondary)] rounded-lg flex items-center justify-center">
+            <span className="text-[var(--color-on-secondary)] font-black text-sm">
+              S
+            </span>
+          </div>
+          <span
+            className="text-xl font-black tracking-tighter text-[var(--color-secondary)]"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            SCopyTrade
+          </span>
+        </div>
+
         {/* Heading */}
-        <div className="mb-6 text-center lg:text-left">
-          <h2 className="text-2xl font-bold tracking-tight mb-1 text-[var(--color-on-surface)]">
+        <div className="mb-7">
+          <h2
+            className="text-3xl font-black tracking-tight text-[var(--color-on-surface)] mb-1.5"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
             Create Account
           </h2>
-          <p className="text-sm text-[var(--color-on-surface-variant)]">
+          <p className="text-[var(--color-on-surface-variant)] text-sm">
             Join SCopyTrade and start copy trading
           </p>
         </div>
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
-          <div className="mb-4 p-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-xs">
+          <div className="mb-5 p-3.5 bg-[var(--color-error-container)]/30 border border-[var(--color-error)]/20 rounded-xl text-[var(--color-error)] text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name fields - two columns */}
+          {/* Name fields */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label
-                htmlFor="firstName"
-                className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1"
-              >
-                First Name
-              </label>
-              <div className="relative">
-                <RiUserLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 text-sm pointer-events-none" />
-                <input
-                  id="firstName"
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setFirstName(e.target.value)
-                  }
-                  placeholder="John"
-                  disabled={isLoading}
-                  className="w-full bg-[var(--color-surface-container-highest)] rounded-lg py-2.5 pl-9 pr-3 text-sm focus:ring-1 focus:ring-[var(--color-secondary)]/20 focus:outline-none disabled:opacity-50"
-                />
+            {[
+              {
+                id: "firstName",
+                label: "First Name",
+                value: firstName,
+                set: setFirstName,
+                placeholder: "Alex",
+              },
+              {
+                id: "lastName",
+                label: "Last Name",
+                value: lastName,
+                set: setLastName,
+                placeholder: "Sovereign",
+              },
+            ].map((f) => (
+              <div key={f.id}>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-1.5">
+                  {f.label}
+                </label>
+                <div className="relative">
+                  <RiUserLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 text-sm pointer-events-none" />
+                  <input
+                    id={f.id}
+                    type="text"
+                    required
+                    value={f.value}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      f.set(e.target.value)
+                    }
+                    placeholder={f.placeholder}
+                    disabled={isLoading}
+                    className={inputClass}
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <label
-                htmlFor="lastName"
-                className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1"
-              >
-                Last Name
-              </label>
-              <div className="relative">
-                <RiUserLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 text-sm pointer-events-none" />
-                <input
-                  id="lastName"
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setLastName(e.target.value)
-                  }
-                  placeholder="Doe"
-                  disabled={isLoading}
-                  className="w-full bg-[var(--color-surface-container-highest)] rounded-lg py-2.5 pl-9 pr-3 text-sm focus:ring-1 focus:ring-[var(--color-secondary)]/20 focus:outline-none disabled:opacity-50"
-                />
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1"
-            >
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-1.5">
               Email Address
             </label>
             <div className="relative">
@@ -280,43 +230,42 @@ export default function RegisterForm() {
                 }
                 placeholder="name@example.com"
                 disabled={isLoading}
-                className="w-full bg-[var(--color-surface-container-highest)] rounded-lg py-2.5 pl-9 pr-3 text-sm focus:ring-1 focus:ring-[var(--color-secondary)]/20 focus:outline-none disabled:opacity-50"
+                className={inputClass}
               />
             </div>
           </div>
 
-          {/* Account role */}
+          {/* Role selector */}
           <div>
-            <label className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1">
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-1.5">
               Account Type
             </label>
             <div className="grid grid-cols-2 gap-2">
               {roleOptions.map(({ value, label, description, Icon }) => {
-                const isSelected = role === value;
+                const selected = role === value;
                 return (
                   <button
                     key={value}
                     type="button"
                     onClick={() => setRole(value)}
                     disabled={isLoading}
-                    className={`p-2 rounded-lg text-left transition-all border ${
-                      isSelected
+                    className={`p-3 rounded-xl text-left transition-all border ${
+                      selected
                         ? "border-[var(--color-secondary)] bg-[var(--color-secondary)]/10"
-                        : "border-transparent bg-[var(--color-surface-container-highest)] hover:border-[var(--color-secondary)]/30"
+                        : "border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-highest)] hover:border-[var(--color-secondary)]/40"
                     } disabled:opacity-50`}
-                    aria-pressed={isSelected}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <Icon
-                        className={`text-base ${isSelected ? "text-[var(--color-secondary)]" : "text-[var(--color-on-surface-variant)]"}`}
+                        className={`text-base flex-shrink-0 ${selected ? "text-[var(--color-secondary)]" : "text-[var(--color-on-surface-variant)]"}`}
                       />
                       <div>
-                        <div className="text-xs font-bold text-[var(--color-on-surface)]">
+                        <p className="text-xs font-bold text-[var(--color-on-surface)]">
                           {label}
-                        </div>
-                        <div className="text-[10px] text-[var(--color-on-surface-variant)]">
+                        </p>
+                        <p className="text-[10px] text-[var(--color-on-surface-variant)]">
                           {description}
-                        </div>
+                        </p>
                       </div>
                     </div>
                   </button>
@@ -327,10 +276,7 @@ export default function RegisterForm() {
 
           {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1"
-            >
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-1.5">
               Password
             </label>
             <div className="relative">
@@ -341,62 +287,59 @@ export default function RegisterForm() {
                 required
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handlePasswordChange(e.target.value)
+                  setPassword(e.target.value)
                 }
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onFocus={() => setPwdFocused(true)}
+                onBlur={() => setPwdFocused(false)}
                 placeholder="Create a strong password"
                 disabled={isLoading}
-                className="w-full bg-[var(--color-surface-container-highest)] rounded-lg py-2.5 pl-9 pr-9 text-sm focus:ring-1 focus:ring-[var(--color-secondary)]/20 focus:outline-none disabled:opacity-50"
+                className={`${inputClass} pr-10`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 hover:text-[var(--color-secondary)]"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 hover:text-[var(--color-secondary)] transition-colors"
               >
-                {showPassword ? (
-                  <RiEyeCloseLine className="text-sm" />
-                ) : (
-                  <RiEyeLine className="text-sm" />
-                )}
+                {showPassword ? <RiEyeCloseLine /> : <RiEyeLine />}
               </button>
             </div>
 
-            {password.length > 0 && strengthInfo && (
-              <div className="mt-1.5">
+            {/* Strength bar */}
+            {password && strengthInfo && (
+              <div className="mt-2">
                 <div className="h-1 bg-[var(--color-surface-container-highest)] rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${strengthInfo.bg}`}
+                    className={`h-full rounded-full transition-all duration-300 ${strengthInfo.bg}`}
                     style={{ width: strengthInfo.width }}
                   />
                 </div>
                 <p
-                  className={`text-[10px] mt-0.5 font-medium ${strengthInfo.color}`}
+                  className={`text-[10px] mt-1 font-semibold ${strengthInfo.color}`}
                 >
-                  {strengthInfo.text} Password
+                  {strengthInfo.text} password
                 </p>
               </div>
             )}
 
-            {(isFocused || password.length > 0) && (
-              <div className="mt-1.5 space-y-0.5">
-                {requirements.map((req, idx) => {
-                  const isValid = req.validator(password);
+            {/* Requirements */}
+            {(pwdFocused || password.length > 0) && (
+              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+                {requirements.map((req) => {
+                  const ok = req.validator(password);
                   return (
                     <div
-                      key={idx}
+                      key={req.label}
                       className="flex items-center gap-1.5 text-[10px]"
                     >
-                      {isValid ? (
-                        <RiCheckboxCircleLine className="text-green-500 text-[10px]" />
+                      {ok ? (
+                        <RiCheckboxCircleLine className="text-[#4edea3] flex-shrink-0" />
                       ) : (
-                        <RiCloseCircleLine className="text-red-500 text-[10px]" />
+                        <RiCloseCircleLine className="text-[#ffb4ab] flex-shrink-0" />
                       )}
                       <span
                         className={
-                          isValid
-                            ? "text-green-600"
+                          ok
+                            ? "text-[#4edea3]"
                             : "text-[var(--color-on-surface-variant)]"
                         }
                       >
@@ -409,19 +352,16 @@ export default function RegisterForm() {
             )}
           </div>
 
-          {/* Confirm Password */}
+          {/* Confirm password */}
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-xs font-medium text-[var(--color-on-surface-variant)] mb-1"
-            >
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-1.5">
               Confirm Password
             </label>
             <div className="relative">
               <RiLockLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 text-sm pointer-events-none" />
               <input
                 id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
+                type={showConfirm ? "text" : "password"}
                 required
                 value={confirmPassword}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -429,65 +369,61 @@ export default function RegisterForm() {
                 }
                 placeholder="Confirm your password"
                 disabled={isLoading}
-                className="w-full bg-[var(--color-surface-container-highest)] rounded-lg py-2.5 pl-9 pr-9 text-sm focus:ring-1 focus:ring-[var(--color-secondary)]/20 focus:outline-none disabled:opacity-50"
+                className={`${inputClass} pr-10 ${confirmPassword && password !== confirmPassword ? "border-[var(--color-error)]/40 focus:border-[var(--color-error)]/40" : confirmPassword && password === confirmPassword ? "border-[var(--color-secondary)]/30" : ""}`}
               />
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 hover:text-[var(--color-secondary)]"
-                aria-label={
-                  showConfirmPassword ? "Hide password" : "Show password"
-                }
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)]/50 hover:text-[var(--color-secondary)] transition-colors"
               >
-                {showConfirmPassword ? (
-                  <RiEyeCloseLine className="text-sm" />
-                ) : (
-                  <RiEyeLine className="text-sm" />
-                )}
+                {showConfirm ? <RiEyeCloseLine /> : <RiEyeLine />}
               </button>
             </div>
-            {confirmPassword.length > 0 && (
+            {confirmPassword && (
               <p
-                className={`text-[10px] mt-0.5 ${password === confirmPassword ? "text-green-500" : "text-red-500"}`}
+                className={`text-[10px] mt-1 font-semibold flex items-center gap-1 ${password === confirmPassword ? "text-[#4edea3]" : "text-[#ffb4ab]"}`}
               >
+                {password === confirmPassword ? (
+                  <RiCheckboxCircleLine />
+                ) : (
+                  <RiCloseCircleLine />
+                )}
                 {password === confirmPassword
-                  ? "✓ Passwords match"
-                  : "✗ Passwords do not match"}
+                  ? "Passwords match"
+                  : "Passwords do not match"}
               </p>
             )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-primary)] text-white font-semibold py-2.5 rounded-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="w-full button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>Creating account...</span>
               </div>
             ) : (
               <>
                 <span>Create Account</span>
-                <RiArrowRightLine className="text-base" />
+                <RiArrowRightLine className="text-lg" />
               </>
             )}
           </button>
 
-          {/* Sign in link */}
-          <div className="text-center">
-            <p className="text-xs text-[var(--color-on-surface-variant)]">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-[var(--color-secondary)] font-semibold hover:underline"
-              >
-                Sign In
-              </Link>
-            </p>
-          </div>
+          {/* Sign in */}
+          <p className="text-center text-sm text-[var(--color-on-surface-variant)]">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-[var(--color-secondary)] font-bold hover:underline"
+            >
+              Sign In
+            </Link>
+          </p>
         </form>
       </div>
     </div>
