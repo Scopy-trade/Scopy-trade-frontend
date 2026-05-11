@@ -1,4 +1,3 @@
-// app/dashboard/pro-trader/layout.tsx
 "use client";
 
 import DashboardHeader from "@/components/pro-trader/DashboardHeader";
@@ -13,33 +12,39 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Handle responsive behavior
   useEffect(() => {
+    setMounted(true);
+
+    if (typeof window === "undefined") return;
+
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
+
       setIsMobile(mobile);
 
       if (mobile) {
-        // On mobile, sidebar is closed by default
         setSidebarOpen(false);
         setSidebarCollapsed(false);
       } else {
-        // On desktop, sidebar is open by default
         setSidebarOpen(true);
-        // Restore collapsed state from localStorage
+
         const savedCollapsed = localStorage.getItem("sidebarCollapsed");
+
         if (savedCollapsed !== null) {
           setSidebarCollapsed(savedCollapsed === "true");
-        } else {
-          setSidebarCollapsed(false);
         }
       }
     };
 
     checkScreenSize();
+
     window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
   }, []);
 
   const handleSidebarToggle = useCallback(() => {
@@ -49,35 +54,42 @@ export default function DashboardLayout({
   const handleSidebarCollapse = useCallback(() => {
     setSidebarCollapsed((prev) => {
       const newState = !prev;
-      localStorage.setItem("sidebarCollapsed", String(newState));
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sidebarCollapsed", String(newState));
+      }
+
       return newState;
     });
   }, []);
 
-  // Adjust main content margin based on sidebar state
   const getMainMargin = () => {
-    if (isMobile) {
-      return "ml-0";
-    }
-    if (sidebarCollapsed) {
-      return "ml-20";
-    }
+    if (isMobile) return "ml-0";
+
+    if (sidebarCollapsed) return "ml-20";
+
     return "ml-64";
   };
+
+  // Prevent hydration mismatch
+  if (!mounted) return null;
 
   return (
     <div className="h-screen overflow-hidden">
       <DashboardSidebar
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
+        isMobile={isMobile}
         onToggle={handleSidebarToggle}
         onCollapse={handleSidebarCollapse}
       />
+
       <DashboardHeader
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
         onToggle={handleSidebarToggle}
       />
+
       <main
         className={`
           h-full overflow-y-auto transition-all duration-300 ease-in-out
