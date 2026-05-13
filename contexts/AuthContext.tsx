@@ -1,13 +1,8 @@
 "use client";
 
+import { authAPI } from "@/lib/api/client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { apiClient } from "@/lib/api/client";
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
+import type { User } from "@/lib/index";
 
 interface AuthContextType {
   user: User | null;
@@ -38,12 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apiClient.login({ email, password });
-      const userData = response.user || { email };
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
+      const user = await authAPI.login({ email, password }); // Already a User
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userEmail", email);
-      // Store password temporarily for exchange API calls (consider better security)
       sessionStorage.setItem("userPassword", password);
     } catch (err: any) {
       setError(err.message);
@@ -57,12 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apiClient.register(userData);
-      const user = response.user || { email: userData.email };
-      setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("userEmail", userData.email);
-      sessionStorage.setItem("userPassword", userData.password);
+      await authAPI.register(userData); // Returns a redirect string, not a user
+      // User is stored in localStorage by authAPI.register itself
+      const stored = localStorage.getItem("user");
+      if (stored) setUser(JSON.parse(stored));
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -74,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await apiClient.logout();
+      await authAPI.logout();
       setUser(null);
       localStorage.removeItem("user");
       localStorage.removeItem("userEmail");
