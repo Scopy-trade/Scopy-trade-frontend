@@ -1,10 +1,11 @@
-// lib/api/auth.ts
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from "..";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://scopy-trade-backend.onrender.com/api";
+
+// ─── Types ─────────────────────────────────────────────────────────────
 
 interface AdminResponse {
   status: "success" | "fail" | "error";
@@ -18,54 +19,51 @@ interface ExchangeConnectionsResponse {
   message?: string;
 }
 
-// ─── Axios Instances ──────────────────────────────────────────────────────────
+// ─── Axios ─────────────────────────────────────────────────────────────
+
 const SHARED_CONFIG = {
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 } as const;
 
-const api: AxiosInstance = axios.create({
+export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   ...SHARED_CONFIG,
 });
 
-const adminAxios: AxiosInstance = axios.create({
+export const adminAxios: AxiosInstance = axios.create({
   baseURL: `${API_BASE_URL}/admin`,
   ...SHARED_CONFIG,
 });
 
-// ─── Interceptor factory ──────────────────────────────────────────────────────
+// ─── Interceptor ───────────────────────────────────────────────────────
+
 function attachResponseInterceptor(
   instance: AxiosInstance,
   opts: {
-    refreshPath: string; // absolute path on `api`, e.g. "/auth/refresh"
+    refreshPath: string;
     clearStorage: () => void;
   },
 ) {
   instance.interceptors.response.use(
-    (response) => response,
+    (res) => res,
     async (error: AxiosError) => {
-      const originalRequest = error.config as typeof error.config & {
-        _retry?: boolean;
-      };
+      const original = error.config as any;
 
       const status = error.response?.status;
-      const url = originalRequest?.url ?? "";
+      const url = original?.url ?? "";
 
-      // Don't intercept auth endpoints themselves — would cause infinite loops
       const isAuthEndpoint =
         url.includes("/login") ||
         url.includes("/register") ||
         url.includes("/refresh");
 
-      if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
-        originalRequest._retry = true;
+      if (status === 401 && !original._retry && !isAuthEndpoint) {
+        original._retry = true;
 
         try {
-          // Always use the base `api` instance for refresh so the full path
-          // resolves correctly regardless of which instance errored
           await api.post(opts.refreshPath);
-          return instance(originalRequest);
+          return instance(original);
         } catch {
           opts.clearStorage();
           return Promise.reject(error);
@@ -93,28 +91,32 @@ attachResponseInterceptor(adminAxios, {
   },
 });
 
-// ─── Error normaliser ─────────────────────────────────────────────────────────
+// ─── Error helper ──────────────────────────────────────────────────────
 
 function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
       | { message?: string; error?: string }
       | undefined;
+
     return data?.message ?? data?.error ?? error.message ?? fallback;
   }
   return fallback;
 }
 
-// ─── Auth API ─────────────────────────────────────────────────────────────────
+// ─── API CLASS ────────────────────────────────────────────────────────
 
 class AuthAPI {
-  // ── User ──────────────────────────────────────────────────────────────────
+  // ── USER ────────────────────────────────────────────────────────────
 
-  async register(data: RegisterData): Promise<string> {
+  async register(data: RegisterData): Promise<User> {
     try {
-      await api.post<AuthResponse>("/auth/register", data);
+      const { data: body } = await api.post<AuthResponse>(
+        "/auth/register",
+        data,
+      );
 
-      const user: User = {
+      const user: User = body.data?.user ?? {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -123,9 +125,9 @@ class AuthAPI {
       };
 
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("userEmail", data.email);
+      localStorage.setItem("userEmail", user.email);
 
-      return "/login";
+      return user;
     } catch (error) {
       throw new Error(extractErrorMessage(error, "Registration failed"));
     }
@@ -158,8 +160,41 @@ class AuthAPI {
           throw new Error("Invalid email or password.");
         }
       }
+
       throw new Error(extractErrorMessage(error, "Login failed"));
     }
+  }
+
+  async getUser(): Promise<User> {
+    try {
+      const { data: body } = await api.get<{
+        status: string;
+        data: User;
+      }>("/auth/me");
+
+      if (body.status !== "success") {
+        throw new Error("Failed to fetch user");
+      }
+
+      return body.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new Error("Not authenticated");
+        }
+      }
+
+      throw new Error(extractErrorMessage(error, "Failed to fetch user"));
+    }
+  }
+
+  async logout(): Promise<void> {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userEmail");
+
+    try {
+      await api.post("/auth/logout");
+    } catch {}
   }
 
   async getPostLoginRedirect(user: User): Promise<string> {
@@ -169,15 +204,11 @@ class AuthAPI {
 
     if (user.role === "CopyTrader") {
       try {
-        const response = await this.getUserExchangeConnections();
-        const connections = Array.isArray(response.data?.connections)
-          ? response.data.connections
-          : [];
+        const res = await this.getUserExchangeConnections();
+        const connections = res.data?.connections ?? [];
 
         if (connections.length > 0) return "/dashboard/copytrader";
-      } catch {
-        // Connection check failed — assume not onboarded
-      }
+      } catch {}
 
       return "/onboarding";
     }
@@ -185,22 +216,10 @@ class AuthAPI {
     return "/register";
   }
 
-  async logout(): Promise<void> {
-    localStorage.removeItem("user");
-    localStorage.removeItem("userEmail");
-
-    try {
-      await api.post("/auth/logout");
-    } catch {
-      // Silently swallow — local state is already cleared
-    }
-  }
-
-  // ── Admin ─────────────────────────────────────────────────────────────────
+  // ── ADMIN ───────────────────────────────────────────────────────────
 
   async adminLogin(credentials: LoginCredentials): Promise<Admin> {
     try {
-      // adminAxios baseURL already includes /admin, so path is just /auth/login
       const { data: body } = await adminAxios.post<AdminResponse>(
         "/auth/login",
         credentials,
@@ -213,12 +232,34 @@ class AuthAPI {
 
       return admin;
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw new Error("Invalid email or password.");
+      }
+
+      throw new Error(extractErrorMessage(error, "Admin login failed"));
+    }
+  }
+
+  async getAdmin(): Promise<Admin> {
+    try {
+      const { data: body } = await adminAxios.get<{
+        status: string;
+        data: Admin;
+      }>("/auth/me");
+
+      if (body.status !== "success") {
+        throw new Error("Failed to fetch admin");
+      }
+
+      return body.data;
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          throw new Error("Invalid email or password.");
+          throw new Error("Not authenticated");
         }
       }
-      throw new Error(extractErrorMessage(error, "Admin login failed"));
+
+      throw new Error(extractErrorMessage(error, "Failed to fetch admin"));
     }
   }
 
@@ -228,34 +269,10 @@ class AuthAPI {
 
     try {
       await adminAxios.post("/auth/logout");
-    } catch {
-      // Silently swallow
-    }
+    } catch {}
   }
 
-  // ── Auth status ───────────────────────────────────────────────────────────
-
-  async isAuthenticated(): Promise<boolean> {
-    try {
-      const { data: body } = await api.get<{ status: string }>("/auth/me");
-      return body.status === "success";
-    } catch {
-      return false;
-    }
-  }
-
-  async isAdminAuthenticated(): Promise<boolean> {
-    try {
-      const { data: body } = await adminAxios.get<{ status: string }>(
-        "/auth/me",
-      );
-      return body.status === "success";
-    } catch {
-      return false;
-    }
-  }
-
-  // ── Exchanges ─────────────────────────────────────────────────────────────
+  // ── EXCHANGES ───────────────────────────────────────────────────────
 
   async getUserExchanges(): Promise<unknown> {
     const { data } = await api.get("/exchanges");
@@ -263,16 +280,12 @@ class AuthAPI {
   }
 
   async getUserExchangeConnections(): Promise<ExchangeConnectionsResponse> {
-    const { data } = await api.get<ExchangeConnectionsResponse>(
-      "/exchanges/connections",
-    );
+    const { data } = await api.get("/exchanges/connections");
     return data;
   }
 
-  async connectExchange(
-    connectionData: Record<string, unknown>,
-  ): Promise<unknown> {
-    const { data } = await api.post("/exchanges/connect", connectionData);
+  async connectExchange(payload: Record<string, unknown>): Promise<unknown> {
+    const { data } = await api.post("/exchanges/connect", payload);
     return data;
   }
 }
@@ -362,6 +375,3 @@ function buildApiHelper(instance: AxiosInstance) {
 export const userApi = buildApiHelper(api);
 
 export const adminApi = buildApiHelper(adminAxios);
-
-// Export raw instances for callers that need full AxiosResponse access
-export { api, adminAxios };
