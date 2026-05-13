@@ -13,7 +13,8 @@ import {
   RiGoogleFill,
   RiGithubFill,
 } from "react-icons/ri";
-import { authAPI, User } from "@/lib/api/auth";
+import { authAPI } from "@/lib/api/client";
+import { User } from "@/lib";
 
 export default function LoginForm() {
   const [email, setEmail] = useState(() => {
@@ -197,7 +198,7 @@ export default function LoginForm() {
               className="w-4 h-4 rounded border-[var(--color-outline)] text-[var(--color-secondary)] focus:ring-[var(--color-secondary)]/20 accent-[var(--color-secondary)]"
             />
             <span className="text-sm text-[var(--color-on-surface-variant)]">
-              Remember me for 30 days
+              Remember me for 7 days
             </span>
           </label>
 

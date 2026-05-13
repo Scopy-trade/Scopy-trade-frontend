@@ -15,7 +15,8 @@ import {
   RiLineChartLine,
   RiUserFollowLine,
 } from "react-icons/ri";
-import { authAPI, UserRole } from "@/lib/api/auth";
+import { authAPI } from "@/lib/api/client";
+import { UserRole } from "@/lib";
 
 interface PasswordRequirement {
   label: string;

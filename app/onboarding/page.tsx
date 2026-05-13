@@ -16,7 +16,7 @@ import {
   RiEyeCloseLine,
   RiLoader4Line,
 } from "react-icons/ri";
-import { authAPI } from "@/lib/api/auth";
+import { authAPI } from "@/lib/api/client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
