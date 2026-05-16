@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
+import { authAPI } from "@/lib/api/client";
 
 const navItems = [
   { label: "Overview", href: "/admin/dashboard", icon: "dashboard" },
@@ -32,10 +33,19 @@ interface SidebarProps {
 
 export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (href: string) => {
     if (href === "/admin/dashboard") return pathname === href;
     return pathname.startsWith(href);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authAPI.adminLogout();
+    } finally {
+      router.push("/admin/login");
+    }
   };
 
   return (
@@ -134,13 +144,14 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             </span>
             Profile
           </Link>
-          <Link
-            href="/admin/login"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#8f9098] hover:text-[#ffb4ab] hover:bg-[#93000a]/10 transition-all duration-200"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#8f9098] hover:text-[#ffb4ab] hover:bg-[#93000a]/10 transition-all duration-200"
           >
             <span className="material-symbols-outlined text-xl">logout</span>
             Logout
-          </Link>
+          </button>
         </div>
       </aside>
     </>
