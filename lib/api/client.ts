@@ -1,5 +1,14 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
-import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from "..";
+import {
+  Admin,
+  AuthResponse,
+  ConnectionSummary,
+  ExchangeConnectionsResponse,
+  LoginCredentials,
+  RegisterData,
+  SupportedExchangesResponse,
+  User,
+} from "..";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -10,12 +19,6 @@ const API_BASE_URL =
 interface AdminResponse {
   status: "success" | "fail" | "error";
   data?: { admin: Admin };
-  message?: string;
-}
-
-interface ExchangeConnectionsResponse {
-  status: "success" | "fail" | "error";
-  data?: { connections: unknown[] };
   message?: string;
 }
 
@@ -205,7 +208,7 @@ class AuthAPI {
     if (user.role === "CopyTrader") {
       try {
         const res = await this.getUserExchangeConnections();
-        const connections = res.data?.connections ?? [];
+        const connections = res.connections ?? [];
 
         if (connections.length > 0) return "/dashboard/copytrader";
       } catch {}
@@ -274,7 +277,7 @@ class AuthAPI {
 
   // ── EXCHANGES ───────────────────────────────────────────────────────
 
-  async getUserExchanges(): Promise<unknown> {
+  async getUserExchanges(): Promise<SupportedExchangesResponse> {
     const { data } = await api.get("/exchanges");
     return data;
   }
@@ -284,8 +287,45 @@ class AuthAPI {
     return data;
   }
 
-  async connectExchange(payload: Record<string, unknown>): Promise<unknown> {
+  async connectExchange(payload: Record<string, unknown>): Promise<{
+    success: boolean;
+    message: string;
+    connection: ConnectionSummary;
+  }> {
     const { data } = await api.post("/exchanges/connect", payload);
+    return data;
+  }
+
+  async testConnection(connectionId: string): Promise<{
+    success: boolean;
+    message: string;
+    accountInfo?: Record<string, unknown>;
+  }> {
+    const { data } = await api.post(
+      `/exchanges/connections/${connectionId}/test`,
+    );
+    return data;
+  }
+
+  async removeConnection(connectionId: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    const { data } = await api.delete(`/exchanges/connections/${connectionId}`);
+    return data;
+  }
+
+  async updateConnectionCredentials(
+    connectionId: string,
+    payload: { apiKey: string; apiSecret: string; passphrase?: string },
+  ): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    const { data } = await api.patch(
+      `/exchanges/connections/${connectionId}`,
+      payload,
+    );
     return data;
   }
 }

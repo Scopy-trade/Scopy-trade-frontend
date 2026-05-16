@@ -29,11 +29,11 @@ const steps = [
 
 export default function BrandingPanel() {
   return (
-    <div className="w-full relative flex-col justify-between p-10 xl:p-14 bg-[var(--color-surface-container-low)] overflow-hidden">
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 xl:p-14 bg-surface-container-low] overflow-hidden">
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] bg-[var(--color-secondary-container)]/40 rounded-full blur-[140px]" />
-        <div className="absolute -bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-[var(--color-primary-container)]/40 rounded-full blur-[140px]" />
+        <div className="absolute -top-1/4 -left-1/4 w-150 h-150 bg-secondary-container/40 rounded-full blur-[140px]" />
+        <div className="absolute -bottom-1/4 -right-1/4 w-150 h-150 bg-primary-container/40 rounded-full blur-[140px]" />
       </div>
 
       {/* Background decorative image */}
