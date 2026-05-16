@@ -1,14 +1,20 @@
-// components/ExchangeSettings.tsx
+// components/onboarding/ExchangeSettings.tsx (enhanced)
 "use client";
 
 import { useState, useEffect } from "react";
-import { MdCable, MdVerifiedUser, MdRefresh } from "react-icons/md";
+import {
+  MdCable,
+  MdVerifiedUser,
+  MdRefresh,
+  MdCheckCircle,
+  MdError,
+} from "react-icons/md";
 import { userApi, authAPI } from "@/lib/api/client";
 import { ConnectedExchange } from "./ConnectedExchange";
 import { AvailableIntegration } from "./AvailableIntegration";
 import { ConnectionSummary, ExchangeListItem } from "@/lib";
+import { ExchangeConnectionModal } from "./ExchangeConnectionModal";
 
-// Response types from your backend
 interface GetSupportedExchangesResponse {
   success: boolean;
   exchanges: ExchangeListItem[];
@@ -21,25 +27,12 @@ interface GetUserConnectionsResponse {
   message?: string;
 }
 
-interface TestConnectionResponse {
-  success: boolean;
-  message: string;
-  accountInfo?: Record<string, unknown>;
-}
-
-interface DeleteConnectionResponse {
-  success: boolean;
-  message: string;
-}
-
 interface ExchangeSettingsProps {
   onConnectionChange?: () => void;
-  onConnectClick?: (exchange: ExchangeListItem) => void;
 }
 
 export function ExchangeSettings({
   onConnectionChange,
-  onConnectClick,
 }: ExchangeSettingsProps) {
   const [availableExchanges, setAvailableExchanges] = useState<
     ExchangeListItem[]
@@ -55,21 +48,22 @@ export function ExchangeSettings({
   const [testResults, setTestResults] = useState<
     Record<string, { success: boolean; message: string }>
   >({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedExchange, setSelectedExchange] =
+    useState<ExchangeListItem | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Fetch both available and connected exchanges
   const fetchData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Fetch supported exchanges with connection status
       const exchangesResponse =
         (await authAPI.getUserExchanges()) as GetSupportedExchangesResponse;
       if (exchangesResponse.success && exchangesResponse.exchanges) {
         setAvailableExchanges(exchangesResponse.exchanges);
       }
 
-      // Fetch user's active connections
       const connectionsResponse =
         (await authAPI.getUserExchangeConnections()) as GetUserConnectionsResponse;
       if (connectionsResponse.success && connectionsResponse.connections) {
@@ -88,14 +82,26 @@ export function ExchangeSettings({
   }, []);
 
   const handleConnect = (exchange: ExchangeListItem) => {
-    // If onConnectClick prop is provided, use it
-    if (onConnectClick) {
-      onConnectClick(exchange);
-    } else {
-      // Otherwise dispatch an event that parent can listen to
-      const event = new CustomEvent("connect-exchange", { detail: exchange });
-      window.dispatchEvent(event);
-    }
+    setSelectedExchange(exchange);
+    setIsModalOpen(true);
+  };
+
+  const handleConnectSuccess = (connection: ConnectionSummary) => {
+    fetchData();
+    onConnectionChange?.();
+
+    // Show success message
+    setSuccessMessage(`Successfully connected ${connection.label}`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+
+    // Trigger a custom event for toast notification
+    const event = new CustomEvent("show-toast", {
+      detail: {
+        message: `Successfully connected ${connection.label}`,
+        type: "success",
+      },
+    });
+    window.dispatchEvent(event);
   };
 
   const handleTestConnection = async (connectionId: string) => {
@@ -104,7 +110,11 @@ export function ExchangeSettings({
     try {
       const response = (await userApi.post(
         `/exchanges/connections/${connectionId}/test`,
-      )) as TestConnectionResponse;
+      )) as {
+        success: boolean;
+        message: string;
+        accountInfo?: Record<string, unknown>;
+      };
 
       setTestResults((prev) => ({
         ...prev,
@@ -114,10 +124,8 @@ export function ExchangeSettings({
         },
       }));
 
-      // Refresh the connections to update accountInfo if it changed
       await fetchData();
 
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setTestResults((prev) => {
           const newResults = { ...prev };
@@ -154,26 +162,48 @@ export function ExchangeSettings({
     }
 
     try {
+      const connection = connectedExchanges.find((c) => c._id === connectionId);
       const response = (await userApi.delete(
         `/exchanges/connections/${connectionId}`,
-      )) as DeleteConnectionResponse;
+      )) as {
+        success: boolean;
+        message: string;
+      };
 
       if (response.success) {
         await fetchData();
         onConnectionChange?.();
+
+        // Show success message
+        const event = new CustomEvent("show-toast", {
+          detail: {
+            message: connection
+              ? `${connection.label} disconnected successfully`
+              : "Exchange disconnected",
+            type: "success",
+          },
+        });
+        window.dispatchEvent(event);
       }
     } catch (err) {
       console.error("[ExchangeSettings] Error removing connection:", err);
-      alert(err instanceof Error ? err.message : "Failed to remove connection");
+      const event = new CustomEvent("show-toast", {
+        detail: {
+          message:
+            err instanceof Error ? err.message : "Failed to remove connection",
+          type: "error",
+        },
+      });
+      window.dispatchEvent(event);
     }
   };
 
   if (loading) {
     return (
       <div className="w-full">
-        <div className="bg-surface-container-low rounded-xl p-8 shadow-inner border-y-4 border-emerald-400">
+        <div className="bg-surface-container-low rounded-xl p-8 shadow-inner">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-2xl h-8 w-8 border-b-2 border-emerald-400"></div>
+            <div className="animate-spin rounded-2xl h-8 w-8 border-b-2 border-secondary"></div>
             <span className="ml-3 text-on-surface-variant">
               Loading exchanges...
             </span>
@@ -183,14 +213,41 @@ export function ExchangeSettings({
     );
   }
 
+  const hasConnections = connectedExchanges.length > 0;
+
   return (
     <div className="w-full">
-      {/* Left Column: Connected & Available Exchanges */}
-      <div className="bg-surface-container-low rounded-xl p-8 shadow-inner border-y-4 border-emerald-400">
+      {/* Success Message Banner */}
+      {successMessage && (
+        <div className="mb-4 p-3 bg-success/10 border border-success/20 rounded-lg animate-in slide-in-from-top-2 fade-in duration-200">
+          <div className="flex items-center gap-2 text-success">
+            <MdCheckCircle className="w-5 h-5" />
+            <p className="text-sm font-medium">{successMessage}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-lg">
+          <div className="flex items-center gap-2 text-error">
+            <MdError className="w-5 h-5" />
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="bg-surface-container-low rounded-xl p-8 shadow-inner">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold font-headline flex items-center gap-2">
             <MdCable className="w-6 h-6 text-secondary" />
             Active Connections
+            {hasConnections && (
+              <span className="ml-2 text-sm font-normal text-on-surface-variant">
+                ({connectedExchanges.length})
+              </span>
+            )}
           </h2>
           <button
             onClick={fetchData}
@@ -201,18 +258,17 @@ export function ExchangeSettings({
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 text-red-400 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
         <div className="space-y-4">
-          {connectedExchanges.length === 0 ? (
-            <div className="text-center py-8 text-on-surface-variant">
-              <p>No exchanges connected yet.</p>
-              <p className="text-sm mt-2">
-                Connect your first exchange below to start trading.
+          {!hasConnections ? (
+            <div className="text-center py-12 bg-surface-container-highest/30 rounded-lg">
+              <div className="w-16 h-16 mx-auto mb-4 bg-surface-container-highest rounded-full flex items-center justify-center">
+                <MdCable className="w-8 h-8 text-on-surface-variant" />
+              </div>
+              <p className="text-on-surface-variant mb-2">
+                No exchanges connected yet
+              </p>
+              <p className="text-sm text-on-surface-variant/70">
+                Connect your first exchange below to start trading
               </p>
             </div>
           ) : (
@@ -238,40 +294,49 @@ export function ExchangeSettings({
             ))
           )}
 
-          <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant pt-4 pb-2">
-            Available Integrations
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {availableExchanges
-              .filter((exchange) => !exchange.connected)
-              .map((exchange) => (
-                <AvailableIntegration
-                  key={exchange.id}
-                  name={exchange.name}
-                  id={exchange.id}
-                  logo={exchange.id}
-                  requiresPassphrase={exchange.requiresPassphrase}
-                  fields={exchange.fields}
-                  onConnect={() => handleConnect(exchange)}
-                />
-              ))}
+          {/* Available Integrations Section */}
+          <div className="pt-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant pb-4">
+              Available Integrations
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {availableExchanges
+                .filter((exchange) => !exchange.connected)
+                .map((exchange) => (
+                  <AvailableIntegration
+                    key={exchange.id}
+                    name={exchange.name}
+                    id={exchange.id}
+                    logo={exchange.id}
+                    requiresPassphrase={exchange.requiresPassphrase}
+                    fields={exchange.fields}
+                    onConnect={() => handleConnect(exchange)}
+                  />
+                ))}
 
-            {availableExchanges.filter((e) => !e.connected).length === 0 && (
-              <div className="col-span-2 text-center py-4 text-on-surface-variant text-sm">
-                All available exchanges are connected
-              </div>
-            )}
+              {availableExchanges.filter((e) => !e.connected).length === 0 && (
+                <div className="col-span-2 text-center py-8 bg-surface-container-highest/30 rounded-lg">
+                  <p className="text-on-surface-variant text-sm">
+                    All available exchanges are connected
+                  </p>
+                  <p className="text-xs text-on-surface-variant/70 mt-1">
+                    You can connect multiple accounts of the same exchange using
+                    different API keys
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Security Tips Banner */}
-      <div className="bg-primary-container/40 mt-5 rounded-xl p-8 flex gap-6 items-start">
-        <div className="bg-primary/20 p-3 rounded-lg text-primary">
-          <MdVerifiedUser className="w-8 h-8" />
+      <div className="bg-primary-container/40 mt-6 rounded-xl p-6 flex gap-4 items-start">
+        <div className="bg-primary/20 p-2 rounded-lg text-primary shrink-0">
+          <MdVerifiedUser className="w-6 h-6" />
         </div>
         <div>
-          <h4 className="font-bold text-primary mb-2">Security Standard</h4>
+          <h4 className="font-bold text-primary mb-1">Security Standard</h4>
           <p className="text-sm text-on-primary-container leading-relaxed">
             Never share your API Secret. Always enable 2FA on your exchange
             account. Our system uses AES-256-GCM encryption to secure your
@@ -280,6 +345,17 @@ export function ExchangeSettings({
           </p>
         </div>
       </div>
+
+      {/* Connection Modal */}
+      <ExchangeConnectionModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedExchange(null);
+        }}
+        exchange={selectedExchange}
+        onSuccess={handleConnectSuccess}
+      />
     </div>
   );
 }
