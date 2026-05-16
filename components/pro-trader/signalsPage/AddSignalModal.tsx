@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
+import { userApi } from "@/lib/api/client";
 
 interface AddSignalModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export default function AddSignalModal({
   });
 
   const [tradeType, setTradeType] = useState<"BUY" | "SELL">("BUY");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -42,29 +45,33 @@ export default function AddSignalModal({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
 
-    // Prepare data according to backend model
     const signalData = {
       pair: formData.pair,
-      entry: formData.entry,
-      tp: formData.tp,
-      sl: formData.sl,
-      tradeType: tradeType,
-      leverage: formData.leverage,
+      entry: Number(formData.entry),
+      tp: Number(formData.tp),
+      sl: Number(formData.sl),
+      tradeType,
+      leverage: formData.leverage ? Number(formData.leverage) : undefined,
       notes: formData.notes,
-      // trader: will be added from authenticated user
-      // signalResult: defaults to null
-      // status: defaults to "active"
     };
 
-    console.log("Signal data to be sent:", signalData);
-    // TODO: Connect to backend API when ready
-
-    // Reset form and close modal
-    handleReset();
-    onClose();
+    try {
+      await userApi.post("/pro-trader/dashboard/signals", signalData);
+      handleReset();
+      onClose();
+    } catch (error: any) {
+      setErrorMessage(
+        error?.message ||
+          "Unable to publish signal. Please try again or contact support.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -251,6 +258,12 @@ export default function AddSignalModal({
             />
           </div>
 
+          {errorMessage && (
+            <div className="rounded-lg border border-red-500/10 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {errorMessage}
+            </div>
+          )}
+
           {/* Info Box */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <p className="text-xs text-blue-400">
@@ -271,9 +284,10 @@ export default function AddSignalModal({
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Publish Signal
+              {isSubmitting ? "Publishing…" : "Publish Signal"}
             </button>
           </div>
         </form>

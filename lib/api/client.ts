@@ -200,14 +200,16 @@ class AuthAPI {
   async getPostLoginRedirect(user: User): Promise<string> {
     if (!user.role) return "/register";
 
-    if (user.role === "Pro Trader") return "/dashboard/protrader";
+    const normalizedRole = user.role.trim();
 
-    if (user.role === "CopyTrader") {
+    if (normalizedRole === "Pro Trader") return "/dashboard/pro-trader";
+
+    if (normalizedRole === "CopyTrader" || normalizedRole === "Copy Trader") {
       try {
         const res = await this.getUserExchangeConnections();
         const connections = res.data?.connections ?? [];
 
-        if (connections.length > 0) return "/dashboard/copytrader";
+        if (connections.length > 0) return "/dashboard/copy-trader";
       } catch {}
 
       return "/onboarding";

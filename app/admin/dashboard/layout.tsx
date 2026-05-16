@@ -2,7 +2,9 @@
 
 import Header from "@/components/admin/dashboard/Header";
 import Sidebar from "@/components/admin/dashboard/Sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { authAPI } from "@/lib/api/client";
 
 export default function DashboardLayout({
   children,
@@ -10,6 +12,24 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isValidating, setIsValidating] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const validate = async () => {
+      try {
+        await authAPI.getAdmin();
+      } catch {
+        router.replace("/admin/login");
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    validate();
+  }, [router]);
+
+  if (isValidating) return null;
 
   return (
     <div className="min-h-screen bg-[#0b1326]">

@@ -1,4 +1,3 @@
-// app/(auth)/login/page.tsx
 import { Suspense } from "react";
 import LoginBrandingPanel from "@/components/auth/login/LoginBrandingPanel";
 import LoginForm from "@/components/auth/login/LoginForm";
