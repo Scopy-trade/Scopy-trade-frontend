@@ -10,9 +10,7 @@ import {
   User,
 } from "..";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://scopy-trade-backend.onrender.com/api";
+const API_BASE_URL = "/api";
 
 // ─── Types ─────────────────────────────────────────────────────────────
 

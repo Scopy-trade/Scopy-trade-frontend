@@ -5,7 +5,9 @@ async function verifyToken(token: string) {
   try {
     await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
     return true;
-  } catch {
+  } catch (err) {
+    console.error("Token verification failed:", err); // see the real reason
+
     return false;
   }
 }
@@ -14,6 +16,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const userToken = request.cookies.get("user_token")?.value;
+
   const adminToken = request.cookies.get("admin_token")?.value;
 
   const isUserDashboard = pathname.startsWith("/dashboard");
@@ -30,10 +33,6 @@ export async function middleware(request: NextRequest) {
 
     if (isUserDashboard && !isUserAuthenticated) {
       return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    if (isUserAuthPage && isUserAuthenticated) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();

@@ -173,7 +173,7 @@ export function ExchangeSettings({
       <div className="w-full">
         <div className="bg-surface-container-low rounded-xl p-8 shadow-inner border-y-4 border-emerald-400">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400"></div>
+            <div className="animate-spin rounded-2xl h-8 w-8 border-b-2 border-emerald-400"></div>
             <span className="ml-3 text-on-surface-variant">
               Loading exchanges...
             </span>
