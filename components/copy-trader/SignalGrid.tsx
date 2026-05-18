@@ -1,5 +1,7 @@
 "use client";
 
+import { MdTrendingUp, MdTrendingDown } from "react-icons/md";
+
 const signals = [
   {
     id: "SL-9942",
@@ -7,13 +9,14 @@ const signals = [
     tier: "ELITE TIER",
     followers: "8.4k",
     successRatio: "92.4%",
-    pair: "BTC / USDT",
+    pair: "BTC/USDT",
     position: "LONG",
     leverage: "20x",
-    entryPrice: "$64,281.50",
-    target: "$68,400.00",
-    stopLoss: "$62,100.00",
-    size: "featured",
+    entryPrice: "64,281.50",
+    target: "68,400.00",
+    stopLoss: "62,100.00",
+    time: "2m ago",
+    status: "ACTIVE",
   },
   {
     id: "SL-9901",
@@ -21,41 +24,44 @@ const signals = [
     tier: "Indices Specialist",
     followers: "3.1k",
     successRatio: "87.5%",
-    pair: "NDX / USD",
+    pair: "NDX/USD",
     position: "SHORT",
     leverage: "10x",
-    entryPrice: "$19,200.00",
-    target: "$18,500.00",
-    stopLoss: "$19,600.00",
-    size: "medium",
+    entryPrice: "19,200.00",
+    target: "18,500.00",
+    stopLoss: "19,600.00",
+    time: "15m ago",
+    status: "ACTIVE",
   },
   {
     id: "SL-9887",
     trader: "Julian Thorne",
-    tier: "Crypto Volatility Alpha",
+    tier: "Crypto Volatility",
     followers: "2.7k",
     successRatio: "81.2%",
-    pair: "ETH / USDT",
+    pair: "ETH/USDT",
     position: "LONG",
     leverage: "15x",
-    entryPrice: "$3,450.00",
-    target: "$3,900.00",
-    stopLoss: "$3,200.00",
-    size: "medium",
+    entryPrice: "3,450.00",
+    target: "3,900.00",
+    stopLoss: "3,200.00",
+    time: "1h ago",
+    status: "ACTIVE",
   },
   {
     id: "SL-9871",
     trader: "Luna Apex",
     tier: "FOREX MASTER",
     followers: "5.2k",
-    successRatio: "89%",
-    pair: "GBP / JPY",
+    successRatio: "89.0%",
+    pair: "GBP/JPY",
     position: "LONG",
     leverage: "5x",
-    entryPrice: "$189.50",
-    target: "$193.00",
-    stopLoss: "$187.00",
-    size: "medium",
+    entryPrice: "189.50",
+    target: "193.00",
+    stopLoss: "187.00",
+    time: "3h ago",
+    status: "ACTIVE",
   },
   {
     id: "SL-9855",
@@ -63,13 +69,14 @@ const signals = [
     tier: "PRO TIER",
     followers: "1.9k",
     successRatio: "79.8%",
-    pair: "SOL / USDT",
+    pair: "SOL/USDT",
     position: "LONG",
     leverage: "8x",
-    entryPrice: "$142.10",
-    target: "$158.00",
-    stopLoss: "$135.00",
-    size: "compact",
+    entryPrice: "142.10",
+    target: "158.00",
+    stopLoss: "135.00",
+    time: "5h ago",
+    status: "WAITING",
   },
   {
     id: "SL-9841",
@@ -77,13 +84,14 @@ const signals = [
     tier: "RISING STAR",
     followers: "890",
     successRatio: "82.1%",
-    pair: "GOLD / USD",
+    pair: "GOLD/USD",
     position: "SHORT",
     leverage: "3x",
-    entryPrice: "$2,310.00",
-    target: "$2,250.00",
-    stopLoss: "$2,340.00",
-    size: "compact",
+    entryPrice: "2,310.00",
+    target: "2,250.00",
+    stopLoss: "2,340.00",
+    time: "12h ago",
+    status: "WAITING",
   },
 ];
 
@@ -92,222 +100,90 @@ interface SignalGridProps {
 }
 
 export default function SignalGrid({ onExecute }: SignalGridProps) {
-  const featured = signals.filter((s) => s.size === "featured");
-  const medium = signals.filter((s) => s.size === "medium");
-  const compact = signals.filter((s) => s.size === "compact");
-
   return (
-    <div className="space-y-4">
-      {/* Featured card */}
-      {featured.map((signal) => (
-        <div
-          key={signal.id}
-          className="rounded-xl p-6 flex flex-col md:flex-row justify-between gap-6"
-          style={{ backgroundColor: "#131b2e" }}
-        >
-          <div className="flex items-start gap-4">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold"
-              style={{ backgroundColor: "#222a3d", color: "#4edea3" }}
-            >
-              {signal.trader[0]}
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded"
-                  style={{ backgroundColor: "#4edea3", color: "#003824" }}
-                >
-                  {signal.tier}
-                </span>
-                <span style={{ color: "#c5c6ce", fontSize: "13px" }}>
-                  {signal.followers} Followers
-                </span>
-              </div>
-              <h3
-                className="text-xl font-bold"
-                style={{ fontFamily: "Manrope, sans-serif" }}
-              >
-                {signal.trader}
-              </h3>
-              <div className="flex items-center gap-4 mt-3">
-                <div>
-                  <p style={{ color: "#c5c6ce", fontSize: "11px" }}>
-                    ASSET PAIR
-                  </p>
-                  <p
-                    className="text-2xl font-bold"
-                    style={{ fontFamily: "Manrope, sans-serif" }}
-                  >
-                    {signal.pair}
-                  </p>
-                </div>
-                <span
-                  className="px-3 py-1 rounded text-sm font-bold"
-                  style={{ backgroundColor: "#4edea3", color: "#003824" }}
-                >
-                  {signal.position}
-                </span>
-                <div>
-                  <p style={{ color: "#c5c6ce", fontSize: "11px" }}>
-                    LEVERAGE
-                  </p>
-                  <p className="font-bold">{signal.leverage}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col items-end justify-between gap-4">
-            <div className="text-right">
-              <p style={{ color: "#c5c6ce", fontSize: "11px" }}>
-                SUCCESS RATIO
-              </p>
-              <p
-                className="text-4xl font-bold"
-                style={{ color: "#4edea3", fontFamily: "Manrope, sans-serif" }}
-              >
-                {signal.successRatio}
-              </p>
-            </div>
-            <button
-              onClick={() => onExecute(signal)}
-              className="px-6 py-3 rounded-lg font-bold text-sm transition-all hover:opacity-90 active:scale-95"
-              style={{ backgroundColor: "#4edea3", color: "#003824" }}
-            >
-              Execute Trade
-            </button>
-          </div>
-        </div>
-      ))}
+    <div className="w-full overflow-x-auto">
+      <table className="w-full text-left text-sm whitespace-nowrap">
+        <thead className="bg-surface-container-highest/50 text-slate-400 text-xs uppercase tracking-wider sticky top-0 z-10">
+          <tr>
+            <th className="px-4 py-3 font-medium border-b border-white/5">Time</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5">Pair</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5">Trader</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5">Type</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5 text-right">Entry</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5 text-right">Target</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5 text-right">Stop Loss</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5 text-right">Win Rate</th>
+            <th className="px-4 py-3 font-medium border-b border-white/5 text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/5 text-slate-200">
+          {signals.map((signal) => {
+            const isLong = signal.position === "LONG";
+            const posColor = isLong ? "text-secondary" : "text-tertiary";
+            const bgPosColor = isLong ? "bg-secondary/10" : "bg-tertiary/10";
+            const borderPosColor = isLong ? "border-secondary/20" : "border-tertiary/20";
+            const Icon = isLong ? MdTrendingUp : MdTrendingDown;
 
-      {/* Medium cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {medium.map((signal) => (
-          <div
-            key={signal.id}
-            className="rounded-xl p-5 flex flex-col gap-4"
-            style={{ backgroundColor: "#131b2e" }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center font-bold"
-                style={{ backgroundColor: "#222a3d", color: "#4edea3" }}
+            return (
+              <tr
+                key={signal.id}
+                className="hover:bg-surface-container/80 transition-colors group"
               >
-                {signal.trader[0]}
-              </div>
-              <div>
-                <p className="font-bold text-sm">{signal.trader}</p>
-                <p style={{ color: "#c5c6ce", fontSize: "11px" }}>
-                  {signal.tier}
-                </p>
-              </div>
-              <div className="ml-auto text-right">
-                <p style={{ color: "#c5c6ce", fontSize: "11px" }}>WIN RATE</p>
-                <p
-                  className="font-bold"
-                  style={{ color: "#4edea3" }}
-                >
+                <td className="px-4 py-3 text-xs text-slate-500">
+                  {signal.time}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2 font-bold font-headline">
+                    <span>{signal.pair}</span>
+                    <span className="text-xs text-slate-500 px-1 bg-surface-container rounded">
+                      {signal.leverage}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded bg-surface-container-highest flex items-center justify-center text-xs font-bold text-primary">
+                      {signal.trader[0]}
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm leading-tight">{signal.trader}</p>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+                        {signal.tier}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded border w-min ${bgPosColor} ${posColor} ${borderPosColor}`}>
+                    <Icon size={14} />
+                    {signal.position}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-sm">
+                  ${signal.entryPrice}
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-sm text-secondary">
+                  ${signal.target}
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-sm text-tertiary">
+                  ${signal.stopLoss}
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-sm">
                   {signal.successRatio}
-                </p>
-              </div>
-            </div>
-            <div
-              className="flex items-center justify-between p-3 rounded-lg"
-              style={{ backgroundColor: "#222a3d" }}
-            >
-              <div>
-                <p style={{ color: "#c5c6ce", fontSize: "10px" }}>
-                  {signal.pair.split("/")[0].trim()}
-                </p>
-                <p className="font-bold text-sm">{signal.pair}</p>
-              </div>
-              <span
-                className="px-2 py-0.5 rounded text-xs font-bold"
-                style={{
-                  backgroundColor:
-                    signal.position === "LONG" ? "#4edea3" : "#ffb2b9",
-                  color: signal.position === "LONG" ? "#003824" : "#67001f",
-                }}
-              >
-                {signal.position}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => onExecute(signal)}
-                className="flex-1 py-2 rounded-lg font-bold text-sm transition-all hover:opacity-90"
-                style={{ backgroundColor: "#4edea3", color: "#003824" }}
-              >
-                Execute
-              </button>
-              <button
-                className="flex-1 py-2 rounded-lg font-bold text-sm transition-all hover:opacity-80"
-                style={{
-                  backgroundColor: "#222a3d",
-                  color: "#dae2fd",
-                }}
-              >
-                View Details
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Compact rows */}
-      <div className="space-y-3">
-        {compact.map((signal) => (
-          <div
-            key={signal.id}
-            className="rounded-xl px-6 py-4 flex items-center justify-between gap-4"
-            style={{ backgroundColor: "#131b2e" }}
-          >
-            <div className="flex items-center gap-3 min-w-[160px]">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                style={{ backgroundColor: "#222a3d", color: "#4edea3" }}
-              >
-                {signal.trader[0]}
-              </div>
-              <div>
-                <p className="font-bold text-sm">{signal.trader}</p>
-                <p style={{ color: "#c5c6ce", fontSize: "11px" }}>
-                  {signal.tier}
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <p style={{ color: "#c5c6ce", fontSize: "10px" }}>ASSET</p>
-              <p className="font-bold text-sm">{signal.pair}</p>
-            </div>
-            <div className="hidden md:block">
-              <p style={{ color: "#c5c6ce", fontSize: "10px" }}>SUCCESS</p>
-              <p className="font-bold text-sm" style={{ color: "#4edea3" }}>
-                {signal.successRatio}
-              </p>
-            </div>
-            <div>
-              <span
-                className="px-2 py-0.5 rounded text-xs font-bold"
-                style={{
-                  backgroundColor:
-                    signal.position === "LONG" ? "#4edea3" : "#ffb2b9",
-                  color: signal.position === "LONG" ? "#003824" : "#67001f",
-                }}
-              >
-                {signal.position}
-              </span>
-            </div>
-            <button
-              onClick={() => onExecute(signal)}
-              className="px-4 py-2 rounded-lg font-bold text-sm transition-all hover:opacity-90"
-              style={{ backgroundColor: "#4edea3", color: "#003824" }}
-            >
-              Execute
-            </button>
-          </div>
-        ))}
-      </div>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <button
+                    onClick={() => onExecute(signal)}
+                    className="px-4 py-1.5 rounded bg-surface-container-high hover:bg-primary/20 text-primary border border-white/5 hover:border-primary/30 transition-all font-bold text-xs uppercase tracking-wider"
+                  >
+                    Execute
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
