@@ -4,7 +4,9 @@ import {
   MdAccountBalance,
   MdFilterList,
   MdDownload,
+  MdArrowForward,
 } from "react-icons/md";
+import Link from "next/link";
 
 interface Transaction {
   id: string;
@@ -69,23 +71,31 @@ export default function PayoutHistory() {
   };
 
   return (
-    <div className="col-span-12 xl:col-span-8">
+    <div className="w-full">
       <div className="bg-surface-container-low rounded-xl overflow-hidden border border-white/5">
-        <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+        <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h3 className="text-lg font-bold text-on-surface">Payout History</h3>
-          <div className="flex space-x-2">
-            <button className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-surface-container-highest text-on-surface rounded-md flex items-center gap-1">
+          <div className="flex space-x-2 w-full sm:w-auto">
+            <button className="flex-1 sm:flex-initial px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-surface-container-highest text-on-surface rounded-md flex items-center justify-center gap-1">
               <MdFilterList className="text-xs" />
               Filter
             </button>
-            <button className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-surface-container-highest text-on-surface rounded-md flex items-center gap-1">
+            <button className="flex-1 sm:flex-initial px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-surface-container-highest text-on-surface rounded-md flex items-center justify-center gap-1">
               <MdDownload className="text-xs" />
               Export CSV
             </button>
+            <Link
+              href="/dashboard/withdrawals"
+              className="flex-1 sm:flex-initial px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-secondary/20 text-secondary rounded-md flex items-center justify-center gap-1"
+            >
+              View All
+              <MdArrowForward className="text-xs" />
+            </Link>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table View - Hidden on mobile */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-surface-container-low text-on-surface-variant text-[10px] font-black uppercase tracking-[0.2em]">
               <tr>
@@ -97,7 +107,7 @@ export default function PayoutHistory() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {transactions.map((tx, index) => (
+              {transactions.slice(0, 3).map((tx, index) => (
                 <tr
                   key={tx.id}
                   className={`${
@@ -143,6 +153,62 @@ export default function PayoutHistory() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View - Visible only on mobile */}
+        <div className="md:hidden divide-y divide-white/5">
+          {transactions.slice(0, 3).map((tx) => (
+            <div key={tx.id} className="p-4 space-y-3">
+              <div className="flex justify-between items-start">
+                <span className="font-mono text-xs text-on-surface">
+                  {tx.id}
+                </span>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyles(tx.status)}`}
+                >
+                  {tx.status}
+                </span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <div>
+                  <div className="text-sm font-medium text-on-surface">
+                    {tx.date}
+                  </div>
+                  <div className="text-[10px] text-on-surface-variant">
+                    {tx.time}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-on-surface">
+                    $
+                    {tx.amount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </div>
+                  <div className="flex items-center text-xs text-on-surface-variant mt-1">
+                    {tx.method === "USDC" ? (
+                      <MdCurrencyBitcoin className="text-xs mr-1" />
+                    ) : (
+                      <MdAccountBalance className="text-xs mr-1" />
+                    )}
+                    {tx.method === "USDC" ? "USDC (ETH)" : "Bank Wire"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* View All Link for Mobile */}
+        <div className="md:hidden p-4 border-t border-white/5 text-center">
+          <Link
+            href="/dashboard/withdrawals"
+            className="text-secondary text-sm font-medium hover:underline inline-flex items-center gap-1"
+          >
+            View All Transactions
+            <MdArrowForward className="text-sm" />
+          </Link>
         </div>
       </div>
     </div>
