@@ -135,7 +135,7 @@ export default function RegisterForm() {
     "w-full bg-[var(--color-surface-container-highest)] rounded-xl py-3 pl-10 pr-4 text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:outline-none border border-transparent focus:border-[var(--color-secondary)]/30 transition-all disabled:opacity-50";
 
   return (
-    <div className="w-full flex items-center justify-center p-6 md:p-10 xl:p-14 overflow-y-auto bg-[var(--color-surface-container-lowest)]">
+    <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 xl:p-14 overflow-y-auto bg-[var(--color-surface-container-lowest)]">
       <div className="w-full max-w-sm py-4">
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-2 mb-7">

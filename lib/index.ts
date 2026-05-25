@@ -59,3 +59,35 @@ export interface Admin {
   firstName?: string;
   lastName?: string;
 }
+
+export interface ExchangeListItem {
+  id: string;
+  name: string;
+  requiresPassphrase: boolean;
+  fields: string[];
+  connected: boolean;
+}
+
+export interface ConnectionSummary {
+  _id: string;
+  id?: string; // Some responses might use _id
+  exchange: string;
+  label: string;
+  accountInfo: Record<string, unknown>;
+  connectedAt: string;
+  lastTestStatus?: string;
+  lastTestedAt?: string;
+  isActive: boolean;
+}
+
+export interface SupportedExchangesResponse {
+  success: boolean;
+  exchanges: ExchangeListItem[];
+  message?: string;
+}
+
+export interface ExchangeConnectionsResponse {
+  success: boolean;
+  connections: ConnectionSummary[];
+  message?: string;
+}
