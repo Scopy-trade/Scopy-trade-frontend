@@ -75,7 +75,7 @@ const trades = [
   },
 ];
 
-const pages = [1, 2, 3, 52];
+const pages = [1, 2, 3];
 
 export default function TradeHistoryTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,9 +85,9 @@ export default function TradeHistoryTable() {
       className="rounded-xl overflow-hidden"
       style={{ backgroundColor: "#131b2e" }}
     >
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      {/* Table - Mobile Responsive wrapper */}
+      <div className="overflow-x-auto scroll-smooth-touch w-full">
+        <table className="w-full min-w-[800px] whitespace-nowrap">
           <thead>
             <tr style={{ borderBottom: "1px solid #222a3d" }}>
               {["DATE/TIME", "ASSET PAIR", "TYPE", "EXCHANGE", "ENTRY / EXIT", "PNL", "STATUS"].map((col) => (
@@ -155,8 +155,8 @@ export default function TradeHistoryTable() {
 
                 {/* Entry / Exit */}
                 <td className="px-6 py-5">
-                  <p className="font-bold text-sm">{trade.entry}</p>
-                  <p className="text-xs" style={{ color: "#c5c6ce" }}>
+                  <p className="font-bold text-sm font-mono">{trade.entry}</p>
+                  <p className="text-xs font-mono" style={{ color: "#c5c6ce" }}>
                     {trade.exit}
                   </p>
                 </td>
@@ -164,7 +164,7 @@ export default function TradeHistoryTable() {
                 {/* PnL */}
                 <td className="px-6 py-5">
                   <p
-                    className="font-bold text-sm"
+                    className="font-bold text-sm font-mono tracking-tight"
                     style={{
                       color: trade.pnl.startsWith("+") ? "#4edea3" : "#ffb2b9",
                     }}
@@ -172,9 +172,9 @@ export default function TradeHistoryTable() {
                     {trade.pnl}
                   </p>
                   <p
-                    className="text-xs"
+                    className="text-[11px] font-mono"
                     style={{
-                      color: trade.pnl.startsWith("+") ? "#4edea3" : "#ffb2b9",
+                      color: trade.pnl.startsWith("+") ? "rgba(78, 222, 163, 0.7)" : "rgba(255, 178, 185, 0.7)",
                     }}
                   >
                     {trade.pnlPercent}
@@ -204,26 +204,26 @@ export default function TradeHistoryTable() {
         </table>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - Responsive wrap */}
       <div
-        className="px-6 py-4 flex items-center justify-between"
+        className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4"
         style={{ borderTop: "1px solid #222a3d" }}
       >
-        <p className="text-sm" style={{ color: "#c5c6ce" }}>
+        <p className="text-sm text-center sm:text-left" style={{ color: "#c5c6ce" }}>
           Showing 1 to 25 of 1,284 trades
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto justify-center sm:justify-end">
           <button
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80 shrink-0"
             style={{ backgroundColor: "#222a3d", color: "#c5c6ce" }}
           >
             ‹
           </button>
-          {[1, 2, 3].map((page) => (
+          {pages.map((page) => (
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-all"
+              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-all shrink-0"
               style={{
                 backgroundColor: currentPage === page ? "#4edea3" : "#222a3d",
                 color: currentPage === page ? "#003824" : "#dae2fd",
@@ -232,15 +232,15 @@ export default function TradeHistoryTable() {
               {page}
             </button>
           ))}
-          <span style={{ color: "#c5c6ce" }}>...</span>
+          <span style={{ color: "#c5c6ce" }} className="px-1 shrink-0">...</span>
           <button
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-all hover:opacity-80"
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-all hover:opacity-80 shrink-0"
             style={{ backgroundColor: "#222a3d", color: "#dae2fd" }}
           >
             52
           </button>
           <button
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80 shrink-0"
             style={{ backgroundColor: "#222a3d", color: "#c5c6ce" }}
           >
             ›

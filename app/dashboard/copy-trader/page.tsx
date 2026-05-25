@@ -1,15 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SignalFilters from "@/components/copy-trader/SignalFilters";
 import SignalGrid from "@/components/copy-trader/SignalGrid";
 import ExecuteTradeModal from "@/components/copy-trader/ExecuteTradeModal";
+import { userApi } from "@/lib/api/client";
+import { Signal } from "@/lib";
 
 export default function CopyTraderPage() {
-  const [selectedSignal, setSelectedSignal] = useState<any>(null);
+  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleExecute(signal: any) {
+  useEffect(() => {
+    async function fetchSignals() {
+      try {
+        setLoading(true);
+        setError(null);
+        // Using the existing userApi helper to call GET /api/signals
+        const response = await userApi.get<{ signals: Signal[] } | Signal[]>("/signals");
+        
+        // Handle both possible response shapes: { signals: [...] } or just [...]
+        const data = Array.isArray(response) ? response : response.signals;
+        setSignals(data || []);
+      } catch (err) {
+        console.error("Failed to fetch signals:", err);
+        setError("Failed to connect to the signal feed. Displaying cached data instead.");
+        setSignals([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSignals();
+  }, []);
+
+  function handleExecute(signal: Signal) {
     setSelectedSignal(signal);
     setIsModalOpen(true);
   }
@@ -42,7 +70,12 @@ export default function CopyTraderPage() {
 
         {/* Signal Grid / Terminal Data */}
         <div className="bg-surface-container-low rounded-lg border border-white/5 overflow-hidden flex-1">
-          <SignalGrid onExecute={handleExecute} />
+          <SignalGrid 
+            signals={signals}
+            loading={loading}
+            error={error}
+            onExecute={handleExecute} 
+          />
         </div>
       </main>
 

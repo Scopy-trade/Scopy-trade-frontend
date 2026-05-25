@@ -121,3 +121,43 @@ h3,
     var(--color-secondary)
   );
 }
+
+/* ── Trading card glow ── */
+.card-glow {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 20px rgba(78, 222, 163, 0.08), 0 4px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(78, 222, 163, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ── Skeleton loading pulse ── */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+.skeleton-pulse {
+  animation: skeletonPulse 1.8s ease-in-out infinite;
+  background: linear-gradient(90deg, #222a3d 0%, #2d3449 50%, #222a3d 100%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+}
+
+/* ── Smooth mobile scroll ── */
+.scroll-smooth-touch {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #2d3449 transparent;
+}
+.scroll-smooth-touch::-webkit-scrollbar {
+  height: 4px;
+}
+.scroll-smooth-touch::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-smooth-touch::-webkit-scrollbar-thumb {
+  background: #2d3449;
+  border-radius: 2px;
+}
+

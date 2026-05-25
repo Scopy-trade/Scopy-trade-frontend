@@ -1,67 +1,98 @@
 "use client";
 
 import { useState } from "react";
-import { MdFilterList } from "react-icons/md";
+import { MdFilterList, MdSearch } from "react-icons/md";
 
 const assetTabs = ["ALL", "CRYPTO", "FOREX", "INDICES"];
+const periodTabs = ["7D", "30D", "90D"];
+const metricTabs = ["PNL", "ROI", "MDD", "AUM", "Copy Traders", "Sharpe Ratio"];
 
 export default function SignalFilters() {
-  const [activeTab, setActiveTab] = useState("ALL");
-  const [riskLevel, setRiskLevel] = useState("Moderate");
-  const [traderTier, setTraderTier] = useState("Elite");
+  const [activeAsset, setActiveAsset] = useState("ALL");
+  const [activePeriod, setActivePeriod] = useState("7D");
+  const [activeMetric, setActiveMetric] = useState("PNL");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 w-full">
-      {/* Asset tabs */}
-      <div className="flex items-center bg-surface-container-highest/50 rounded p-1 border border-white/5">
-        {assetTabs.map((tab) => (
+    <div className="flex flex-col gap-3 w-full">
+      {/* Top row: Period + Metric tabs */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Period selector */}
+        <div className="flex items-center bg-surface-container-highest/50 rounded p-0.5 border border-white/5">
+          {periodTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActivePeriod(tab)}
+              className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
+                activePeriod === tab
+                  ? "bg-surface-container-high text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Metric tabs */}
+        <div className="flex items-center gap-0.5 flex-wrap">
+          {metricTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveMetric(tab)}
+              className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
+                activeMetric === tab
+                  ? "bg-secondary/15 text-secondary border border-secondary/20"
+                  : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Right side: Search + Filter */}
+        <div className="ml-auto flex items-center gap-2">
+          {searchOpen && (
+            <input
+              type="text"
+              placeholder="Search traders..."
+              className="bg-surface-container-highest/50 border border-white/5 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-primary/30 w-40 transition-all placeholder:text-slate-600"
+              autoFocus
+              onBlur={() => setSearchOpen(false)}
+            />
+          )}
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
-              activeTab === tab
-                ? "bg-secondary text-on-secondary shadow-sm"
-                : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
-            }`}
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="p-2 rounded bg-surface-container hover:bg-surface-container-high border border-white/5 text-slate-400 hover:text-slate-200 transition-all"
           >
-            {tab}
+            <MdSearch size={16} />
           </button>
-        ))}
+          <button className="p-2 rounded bg-surface-container hover:bg-surface-container-high border border-white/5 text-slate-400 hover:text-slate-200 transition-all">
+            <MdFilterList size={16} />
+          </button>
+        </div>
       </div>
 
-      {/* Risk Level */}
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface-container-highest/50 border border-white/5 text-xs font-bold">
-        <span className="text-slate-500 uppercase tracking-widest text-[10px]">RISK:</span>
-        <select
-          value={riskLevel}
-          onChange={(e) => setRiskLevel(e.target.value)}
-          className="bg-transparent border-none outline-none text-slate-200 cursor-pointer appearance-none"
-        >
-          <option value="Low" className="bg-surface-container">Low</option>
-          <option value="Moderate" className="bg-surface-container">Moderate</option>
-          <option value="High" className="bg-surface-container">High</option>
-        </select>
+      {/* Bottom row: Asset tabs */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Asset tabs */}
+        <div className="flex items-center bg-surface-container-highest/50 rounded p-0.5 border border-white/5">
+          {assetTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveAsset(tab)}
+              className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
+                activeAsset === tab
+                  ? "bg-secondary text-on-secondary shadow-sm"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
-
-      {/* Trader Tier */}
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface-container-highest/50 border border-white/5 text-xs font-bold">
-        <span className="text-slate-500 uppercase tracking-widest text-[10px]">TIER:</span>
-        <select
-          value={traderTier}
-          onChange={(e) => setTraderTier(e.target.value)}
-          className="bg-transparent border-none outline-none text-slate-200 cursor-pointer appearance-none"
-        >
-          <option value="Elite" className="bg-surface-container">Elite</option>
-          <option value="Pro" className="bg-surface-container">Pro</option>
-          <option value="Rising Star" className="bg-surface-container">Rising Star</option>
-        </select>
-      </div>
-
-      {/* Advanced Sorting */}
-      <button className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high border border-white/5 text-[10px] uppercase tracking-widest font-bold text-slate-300 transition-all">
-        <MdFilterList size={14} />
-        More Filters
-      </button>
     </div>
   );
 }
