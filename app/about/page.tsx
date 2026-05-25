@@ -2,7 +2,6 @@ import TopNavBar from "@/components/landing/TopNavBar";
 import Footer from "@/components/landing/Footer";
 import Link from "next/link";
 
-// Team members data
 const team = [
   {
     name: "Arjan Mehta",
@@ -117,6 +116,38 @@ const accentMap: Record<string, { ring: string; bg: string; text: string }> = {
   },
 };
 
+// Simulated live feed entries for the hero visual panel
+const liveFeed = [
+  {
+    pair: "BTC/USDT",
+    action: "LONG 20x",
+    pnl: "+$842K",
+    color: "text-emerald-400",
+    dot: "bg-emerald-400",
+  },
+  {
+    pair: "ETH/USDT",
+    action: "SHORT 10x",
+    pnl: "-$124K",
+    color: "text-rose-400",
+    dot: "bg-rose-400",
+  },
+  {
+    pair: "SOL/USDT",
+    action: "LONG 5x",
+    pnl: "+$291K",
+    color: "text-emerald-400",
+    dot: "bg-emerald-400",
+  },
+  {
+    pair: "BNB/USDT",
+    action: "LONG 15x",
+    pnl: "+$67K",
+    color: "text-emerald-400",
+    dot: "bg-emerald-400",
+  },
+];
+
 export const metadata = {
   title: "About Us | SCopyTrade",
   description:
@@ -130,7 +161,8 @@ export default function AboutPage() {
 
       <main className="pt-28">
         {/* ─── HERO ─────────────────────────────────────────────── */}
-        <section className="relative py-24 px-6 lg:px-16 overflow-hidden">
+        <section className="relative py-24 px-6 lg:px-16 overflow-hidden min-h-[600px]">
+          {/* Background decorations */}
           <div className="absolute inset-0 pointer-events-none">
             <div
               className="absolute inset-0 opacity-[0.025]"
@@ -155,32 +187,186 @@ export default function AboutPage() {
               <span className="text-zinc-400">About Us</span>
             </div>
 
-            <div className="max-w-3xl">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-5">
-                Our Story
-              </p>
-              <h1
-                className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.0] mb-8"
-                style={{
-                  fontFamily: "var(--font-headline)",
-                  letterSpacing: "-0.04em",
-                }}
-              >
-                Built for Traders
-                <br />
-                <span
-                  className="text-transparent"
-                  style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)" }}
+            <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+              {/* Left: text */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-5">
+                  Our Story
+                </p>
+                <h1
+                  className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.0] mb-8"
+                  style={{
+                    fontFamily: "var(--font-headline)",
+                    letterSpacing: "-0.04em",
+                  }}
                 >
-                  By Traders.
-                </span>
-              </h1>
-              <p className="text-zinc-400 text-lg leading-relaxed max-w-xl font-medium">
-                SCopyTrade was born out of frustration. We watched talented
-                traders lose funds to exchange collapses and custodial failures.
-                We decided to build something different — a trading terminal
-                where sovereignty is non-negotiable.
-              </p>
+                  Built for Traders
+                  <br />
+                  <span
+                    className="text-transparent"
+                    style={{ WebkitTextStroke: "1px rgba(255,255,255,0.15)" }}
+                  >
+                    By Traders.
+                  </span>
+                </h1>
+                <p className="text-zinc-400 text-lg leading-relaxed max-w-lg font-medium mb-10">
+                  SCopyTrade was born out of frustration. We watched talented
+                  traders lose funds to exchange collapses and custodial
+                  failures. We decided to build something different — a trading
+                  terminal where sovereignty is non-negotiable.
+                </p>
+
+                {/* Quick stats row */}
+                <div className="flex gap-8">
+                  {[
+                    { v: "2021", l: "Founded" },
+                    { v: "34", l: "Team Members" },
+                    { v: "12", l: "Countries" },
+                  ].map(({ v, l }) => (
+                    <div key={l}>
+                      <p
+                        className="text-2xl font-black text-white mb-0.5"
+                        style={{ fontFamily: "var(--font-headline)" }}
+                      >
+                        {v}
+                      </p>
+                      <p className="text-xs text-zinc-600 uppercase tracking-widest font-bold">
+                        {l}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: live terminal visual */}
+              <div className="relative">
+                {/* Outer glow */}
+                <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-white/[0.07] to-transparent pointer-events-none" />
+
+                <div className="relative bg-[#0D1117] rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl shadow-black/60">
+                  {/* Terminal titlebar */}
+                  <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05] bg-white/[0.02]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                      <div className="w-3 h-3 rounded-full bg-amber-500/50" />
+                      <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
+                    </div>
+                    <span className="text-xs text-zinc-600 font-mono tracking-wider">
+                      SCOPY — LIVE FEED
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                      <span className="text-[11px] text-emerald-500 font-bold font-mono">
+                        LIVE
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-5">
+                    {/* Company summary card */}
+                    <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-teal-600/20 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 22 22"
+                            fill="none"
+                          >
+                            <path
+                              d="M11 2L19 6.5V15.5L11 20L3 15.5V6.5L11 2Z"
+                              stroke="#34d399"
+                              strokeWidth="1.5"
+                              strokeLinejoin="round"
+                            />
+                            <circle cx="11" cy="11" r="2.5" fill="#34d399" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3
+                            className="text-white font-bold text-sm mb-1"
+                            style={{ fontFamily: "var(--font-headline)" }}
+                          >
+                            SCopyTrade Terminal
+                          </h3>
+                          <p className="text-zinc-600 text-xs leading-relaxed">
+                            Non-custodial copy trading infrastructure. Founded
+                            2021 · London, UK
+                          </p>
+                          <div className="flex gap-2 mt-3">
+                            {["Fintech", "DeFi", "Web3"].map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/15 rounded text-[10px] font-bold text-emerald-500 uppercase tracking-wider"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live signal feed */}
+                    <div>
+                      <p className="text-[11px] text-zinc-700 font-bold uppercase tracking-widest mb-3">
+                        Recent Signal Activity
+                      </p>
+                      <div className="space-y-2">
+                        {liveFeed.map(
+                          ({ pair, action, pnl, color, dot }, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between py-2.5 px-4 bg-white/[0.02] border border-white/[0.04] rounded-lg"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full ${dot} flex-shrink-0`}
+                                />
+                                <span className="text-xs text-zinc-300 font-mono font-bold">
+                                  {pair}
+                                </span>
+                                <span className="text-[11px] text-zinc-700 font-medium">
+                                  {action}
+                                </span>
+                              </div>
+                              <span
+                                className={`text-xs font-black font-mono ${color}`}
+                              >
+                                {pnl}
+                              </span>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Bottom metric strip */}
+                    <div className="grid grid-cols-3 gap-3 pt-1">
+                      {[
+                        { v: "$2.4B+", l: "Volume" },
+                        { v: "74.2%", l: "Win Rate" },
+                        { v: "99.8%", l: "Uptime" },
+                      ].map(({ v, l }) => (
+                        <div
+                          key={l}
+                          className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-3 text-center"
+                        >
+                          <p
+                            className="text-sm font-black text-white font-mono mb-0.5"
+                            style={{ fontFamily: "var(--font-headline)" }}
+                          >
+                            {v}
+                          </p>
+                          <p className="text-[10px] text-zinc-700 uppercase tracking-wider font-bold">
+                            {l}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -316,25 +502,18 @@ export default function AboutPage() {
             </div>
 
             <div className="relative">
-              {/* Vertical line */}
               <div className="absolute left-[72px] top-0 bottom-0 w-px bg-gradient-to-b from-emerald-500/30 via-white/[0.04] to-transparent" />
-
               <div className="space-y-8">
                 {milestones.map(({ year, event }, i) => (
                   <div key={i} className="flex gap-8 items-start group">
-                    {/* Year */}
                     <div className="flex-shrink-0 w-[72px] text-right">
                       <span className="text-xs font-black text-zinc-700 font-mono group-hover:text-emerald-500 transition-colors">
                         {year}
                       </span>
                     </div>
-
-                    {/* Dot */}
                     <div className="flex-shrink-0 relative z-10 mt-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#080C10] border-2 border-zinc-700 group-hover:border-emerald-500 transition-colors" />
                     </div>
-
-                    {/* Event */}
                     <div className="flex-1 pb-2">
                       <p className="text-sm text-zinc-500 font-medium group-hover:text-zinc-300 transition-colors leading-relaxed">
                         {event}
@@ -374,7 +553,6 @@ export default function AboutPage() {
                     key={name}
                     className="group bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300"
                   >
-                    {/* Avatar */}
                     <div
                       className={`w-14 h-14 rounded-2xl ${colors.bg} ring-1 ${colors.ring} flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300`}
                     >
@@ -385,7 +563,6 @@ export default function AboutPage() {
                         {initials}
                       </span>
                     </div>
-
                     <h3
                       className="text-base font-bold text-white mb-1"
                       style={{ fontFamily: "var(--font-headline)" }}
