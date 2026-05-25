@@ -313,8 +313,8 @@ function SignalCard({
       </div>
 
       {/* ─ Pair + Position + Win Rate ─ */}
-      <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="px-5 py-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <span className="font-bold text-sm text-slate-100 font-headline">
             {signal.pair}
           </span>
@@ -335,7 +335,7 @@ function SignalCard({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-16 h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+          <div className="w-14 h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
             <div
               className="h-full rounded-full bg-secondary"
               style={{ width: `${Math.min(signal.winRate ?? 0, 100)}%` }}
