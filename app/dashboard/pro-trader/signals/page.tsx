@@ -1,19 +1,58 @@
-// app/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MdAdd } from "react-icons/md";
 import MetricCards from "@/components/pro-trader/signalsPage/MetricCards";
 import SignalsTable from "@/components/pro-trader/signalsPage/SignalsTable";
 import FloatingButton from "@/components/pro-trader/signalsPage/FloatingButton";
 import AddSignalModal from "@/components/pro-trader/signalsPage/AddSignalModal";
-import { MdAdd } from "react-icons/md";
+import { authAPI, Signal } from "@/lib/api/client";
 
-export default function Home() {
+export default function SignalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [refetchKey, setRefetchKey] = useState(0);
+
+  useEffect(() => {
+    const fetchSignals = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await authAPI.getAllSignals(currentPage);
+
+        if (!response.success) {
+          throw new Error(response.message || "Failed to fetch signals");
+        }
+
+        setSignals(response.signals);
+        setTotalPages(response.pages);
+      } catch (err) {
+        console.error("Failed to fetch signals:", err);
+        setError(err instanceof Error ? err.message : "Failed to load signals");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchSignals();
+  }, [currentPage, refetchKey]);
+
+  const handleSignalCreated = () => {
+    setIsModalOpen(false);
+    setRefetchKey((previous) => previous + 1);
+  };
+
+  const handleSignalDeleted = () => {
+    setRefetchKey((previous) => previous + 1);
+  };
 
   return (
     <>
-      {/* Dashboard Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
           <h2 className="text-4xl font-extrabold tracking-tight text-on-surface mb-2">
@@ -33,19 +72,24 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Metrics Grid */}
-      <MetricCards />
+      <MetricCards signals={signals} />
 
-      {/* Signals Table */}
-      <SignalsTable />
+      <SignalsTable
+        signals={signals}
+        loading={loading}
+        error={error}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        onSignalDeleted={handleSignalDeleted}
+      />
 
-      {/* Floating Action Button */}
       <FloatingButton onClick={() => setIsModalOpen(true)} />
 
-      {/* Add Signal Modal */}
       <AddSignalModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSignalCreated={handleSignalCreated}
       />
     </>
   );
