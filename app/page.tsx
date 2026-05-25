@@ -13,16 +13,14 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="bg-[var(--color-background)] text-[var(--color-on-background)] antialiased selection:bg-[var(--color-secondary)] selection:text-[var(--color-on-secondary)]">
+    <div className="bg-[#080C10] text-white antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
       <TopNavBar />
-
-      <main className="pt-24">
+      <main>
         <HeroSection />
         <FeaturesSection />
         <ExchangesSection />
         <CtaSection />
       </main>
-
       <Footer />
     </div>
   );
