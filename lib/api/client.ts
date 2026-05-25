@@ -1,4 +1,8 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from "axios";
 import {
   Admin,
   AuthResponse,
@@ -18,6 +22,64 @@ interface AdminResponse {
   status: "success" | "fail" | "error";
   data?: { admin: Admin };
   message?: string;
+}
+
+// User management types
+export interface UserManagementUser extends User {
+  id: string;
+  _id: string;
+  uid?: string;
+  name?: string;
+  initials?: string;
+  status?: "Active" | "Offline" | "Banned";
+  trades?: string;
+  lastActive?: string;
+  location?: string;
+  roi?: string;
+  roiPositive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface UsersResponse {
+  status: string;
+  data: {
+    users: UserManagementUser[];
+    total: number;
+    page: number;
+    limit: number;
+  };
+  message?: string;
+}
+
+interface UserActionResponse {
+  status: string;
+  message: string;
+  data?: {
+    user?: UserManagementUser;
+  };
+}
+
+interface GetUserResponse {
+  status: string;
+  data: {
+    user: UserManagementUser;
+  };
+}
+
+interface DashboardStatsResponse {
+  status: string;
+  data: {
+    totalUsers: number;
+    activeNow: number;
+    pendingKYC: number;
+    bannedAccounts: number;
+  };
+}
+
+// Extended config type for retry logic
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
 }
 
 // ─── Axios ─────────────────────────────────────────────────────────────
@@ -49,7 +111,7 @@ function attachResponseInterceptor(
   instance.interceptors.response.use(
     (res) => res,
     async (error: AxiosError) => {
-      const original = error.config as any;
+      const original = error.config as ExtendedAxiosRequestConfig | undefined;
 
       const status = error.response?.status;
       const url = original?.url ?? "";
@@ -59,7 +121,7 @@ function attachResponseInterceptor(
         url.includes("/register") ||
         url.includes("/refresh");
 
-      if (status === 401 && !original._retry && !isAuthEndpoint) {
+      if (status === 401 && !original?._retry && !isAuthEndpoint && original) {
         original._retry = true;
 
         try {
@@ -94,11 +156,14 @@ attachResponseInterceptor(adminAxios, {
 
 // ─── Error helper ──────────────────────────────────────────────────────
 
+interface ErrorResponseData {
+  message?: string;
+  error?: string;
+}
+
 function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as
-      | { message?: string; error?: string }
-      | undefined;
+    const data = error.response?.data as ErrorResponseData | undefined;
 
     return data?.message ?? data?.error ?? error.message ?? fallback;
   }
@@ -168,10 +233,12 @@ class AuthAPI {
 
   async getUser(): Promise<User> {
     try {
-      const { data: body } = await api.get<{
+      interface UserMeResponse {
         status: string;
         data: User;
-      }>("/auth/me");
+      }
+
+      const { data: body } = await api.get<UserMeResponse>("/auth/me");
 
       if (body.status !== "success") {
         throw new Error("Failed to fetch user");
@@ -195,7 +262,9 @@ class AuthAPI {
 
     try {
       await api.post("/auth/logout");
-    } catch {}
+    } catch {
+      // Ignore logout errors
+    }
   }
 
   async getPostLoginRedirect(user: User): Promise<string> {
@@ -211,7 +280,9 @@ class AuthAPI {
         const connections = res.connections ?? [];
 
         if (connections.length > 0) return "/dashboard/copy-trader";
-      } catch {}
+      } catch {
+        // Ignore error and proceed to onboarding
+      }
 
       return "/onboarding";
     }
@@ -245,10 +316,12 @@ class AuthAPI {
 
   async getAdmin(): Promise<Admin> {
     try {
-      const { data: body } = await adminAxios.get<{
+      interface AdminMeResponse {
         status: string;
         data: Admin;
-      }>("/auth/me");
+      }
+
+      const { data: body } = await adminAxios.get<AdminMeResponse>("/auth/me");
 
       if (body.status !== "success") {
         throw new Error("Failed to fetch admin");
@@ -272,18 +345,151 @@ class AuthAPI {
 
     try {
       await adminAxios.post("/auth/logout");
-    } catch {}
+    } catch {
+      // Ignore logout errors
+    }
+  }
+
+  // ── USER MANAGEMENT (ADMIN) ─────────────────────────────────────────
+
+  async getAllUsers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    status?: string;
+  }): Promise<UsersResponse> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.search) queryParams.append("search", params.search);
+      if (params?.role) queryParams.append("role", params.role);
+      if (params?.status) queryParams.append("status", params.status);
+
+      const url = `/dashboard/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+      const { data } = await adminAxios.get<UsersResponse>(url);
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to fetch users"));
+    }
+  }
+
+  async getUserById(userId: string): Promise<UserManagementUser> {
+    try {
+      const { data } = await adminAxios.get<GetUserResponse>(
+        `/dashboard/users/${userId}`,
+      );
+
+      if (data.status !== "success") {
+        throw new Error("Failed to fetch user");
+      }
+
+      return data.data.user;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to fetch user"));
+    }
+  }
+
+  async updateUserStatus(
+    userId: string,
+    status: "Active" | "Offline" | "Banned",
+  ): Promise<UserActionResponse> {
+    try {
+      const { data } = await adminAxios.patch<UserActionResponse>(
+        `/dashboard/users/${userId}/status`,
+        { status },
+      );
+      return data;
+    } catch (error) {
+      throw new Error(
+        extractErrorMessage(error, "Failed to update user status"),
+      );
+    }
+  }
+
+  async banUser(userId: string, reason?: string): Promise<UserActionResponse> {
+    try {
+      const { data } = await adminAxios.post<UserActionResponse>(
+        `/dashboard/users/${userId}/ban`,
+        { reason },
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to ban user"));
+    }
+  }
+
+  async unbanUser(userId: string): Promise<UserActionResponse> {
+    try {
+      const { data } = await adminAxios.post<UserActionResponse>(
+        `/dashboard/users/${userId}/unban`,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to unban user"));
+    }
+  }
+
+  async updateUserRole(
+    userId: string,
+    role: "Pro Trader" | "Copy Trader",
+  ): Promise<UserActionResponse> {
+    try {
+      const { data } = await adminAxios.patch<UserActionResponse>(
+        `/dashboard/users/${userId}/role`,
+        { role },
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to update user role"));
+    }
+  }
+
+  async deleteUser(userId: string): Promise<UserActionResponse> {
+    try {
+      const { data } = await adminAxios.delete<UserActionResponse>(
+        `/dashboard/users/${userId}`,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to delete user"));
+    }
+  }
+
+  async getDashboardStats(): Promise<{
+    totalUsers: number;
+    activeNow: number;
+    pendingKYC: number;
+    bannedAccounts: number;
+  }> {
+    try {
+      const { data } =
+        await adminAxios.get<DashboardStatsResponse>("/dashboard/stats");
+
+      return data.data;
+    } catch (error) {
+      console.error("Failed to fetch dashboard stats:", error);
+      return {
+        totalUsers: 0,
+        activeNow: 0,
+        pendingKYC: 0,
+        bannedAccounts: 0,
+      };
+    }
   }
 
   // ── EXCHANGES ───────────────────────────────────────────────────────
 
   async getUserExchanges(): Promise<SupportedExchangesResponse> {
-    const { data } = await api.get("/exchanges");
+    const { data } = await api.get<SupportedExchangesResponse>("/exchanges");
     return data;
   }
 
   async getUserExchangeConnections(): Promise<ExchangeConnectionsResponse> {
-    const { data } = await api.get("/exchanges/connections");
+    const { data } = await api.get<ExchangeConnectionsResponse>(
+      "/exchanges/connections",
+    );
     return data;
   }
 
@@ -292,7 +498,15 @@ class AuthAPI {
     message: string;
     connection: ConnectionSummary;
   }> {
-    const { data } = await api.post("/exchanges/connect", payload);
+    interface ConnectExchangeResponse {
+      success: boolean;
+      message: string;
+      connection: ConnectionSummary;
+    }
+    const { data } = await api.post<ConnectExchangeResponse>(
+      "/exchanges/connect",
+      payload,
+    );
     return data;
   }
 
@@ -301,7 +515,12 @@ class AuthAPI {
     message: string;
     accountInfo?: Record<string, unknown>;
   }> {
-    const { data } = await api.post(
+    interface TestConnectionResponse {
+      success: boolean;
+      message: string;
+      accountInfo?: Record<string, unknown>;
+    }
+    const { data } = await api.post<TestConnectionResponse>(
       `/exchanges/connections/${connectionId}/test`,
     );
     return data;
@@ -311,7 +530,13 @@ class AuthAPI {
     success: boolean;
     message: string;
   }> {
-    const { data } = await api.delete(`/exchanges/connections/${connectionId}`);
+    interface RemoveConnectionResponse {
+      success: boolean;
+      message: string;
+    }
+    const { data } = await api.delete<RemoveConnectionResponse>(
+      `/exchanges/connections/${connectionId}`,
+    );
     return data;
   }
 
@@ -322,7 +547,11 @@ class AuthAPI {
     success: boolean;
     message: string;
   }> {
-    const { data } = await api.patch(
+    interface UpdateConnectionResponse {
+      success: boolean;
+      message: string;
+    }
+    const { data } = await api.patch<UpdateConnectionResponse>(
       `/exchanges/connections/${connectionId}`,
       payload,
     );
@@ -366,8 +595,7 @@ async function makeRequest<T>(
       }
       return envelope.data as T;
     })
-    .catch((error) => {
-      // Re-throw already-normalised errors (e.g. from the block above)
+    .catch((error: unknown) => {
       if (error instanceof Error && !axios.isAxiosError(error)) throw error;
       throw new Error(
         extractErrorMessage(error, `Request to ${endpoint} failed`),
