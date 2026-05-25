@@ -1,4 +1,6 @@
+// Forced IDE type-resolution reload comment
 import type { NextConfig } from "next";
+
 
 const nextConfig: NextConfig = {
   images: {

@@ -16,6 +16,27 @@ export interface SignalInterface {
   leverage?: string;
 }
 
+export interface Signal {
+  _id: string;
+  pair: string;
+  tradeType: "BUY" | "SELL";
+  entryPrice: number;
+  tp: number;
+  sl: number;
+  status: "ACTIVE" | "EXPIRED";
+  leverage?: string;
+  trader?: string;
+  tier?: string;
+  winRate?: number;
+  roi30d?: number;
+  maxDrawdown?: number;
+  copiers?: number;
+  pnl7d?: number;
+  aum?: number;
+  sharpeRatio?: number;
+  createdAt?: string;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
