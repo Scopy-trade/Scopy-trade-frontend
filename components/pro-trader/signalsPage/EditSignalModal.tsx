@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { authAPI } from "@/lib/api/client";
+import { useState, useEffect } from "react";
+import { Signal, authAPI } from "@/lib/api/client";
 import { MdClose } from "react-icons/md";
 
-interface AddSignalModalProps {
+interface EditSignalModalProps {
   isOpen: boolean;
+  signal: Signal | null;
   onClose: () => void;
-  onSignalCreated: () => void;
+  onSignalUpdated: () => void;
 }
 
-export default function AddSignalModal({
+export default function EditSignalModal({
   isOpen,
+  signal,
   onClose,
-  onSignalCreated,
-}: AddSignalModalProps) {
+  onSignalUpdated,
+}: EditSignalModalProps) {
   const [formData, setFormData] = useState({
     pair: "",
     entry: "",
@@ -26,13 +28,28 @@ export default function AddSignalModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (signal) {
+      setFormData({
+        pair: signal.pair,
+        entry: signal.entry.toString(),
+        tp: signal.tp.toString(),
+        sl: signal.sl.toString(),
+        direction: signal.direction,
+        notes: signal.notes || "",
+      });
+    }
+  }, [signal]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!signal) return;
+
     setLoading(true);
     setError(null);
 
     try {
-      const response = await authAPI.createSignal({
+      const response = await authAPI.updateSignal(signal._id, {
         pair: formData.pair,
         entry: parseFloat(formData.entry),
         tp: parseFloat(formData.tp),
@@ -42,21 +59,13 @@ export default function AddSignalModal({
       });
 
       if (response.success) {
-        setFormData({
-          pair: "",
-          entry: "",
-          tp: "",
-          sl: "",
-          direction: "BUY",
-          notes: "",
-        });
-        onSignalCreated();
+        onSignalUpdated();
         onClose();
       } else {
-        setError(response.message || "Failed to create signal");
+        setError(response.message || "Failed to update signal");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create signal");
+      setError(err instanceof Error ? err.message : "Failed to update signal");
     } finally {
       setLoading(false);
     }
@@ -69,9 +78,7 @@ export default function AddSignalModal({
       <div className="bg-surface-container rounded-2xl w-full max-w-md border border-white/10 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-on-surface">
-            Create New Signal
-          </h2>
+          <h2 className="text-xl font-bold text-on-surface">Edit Signal</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -206,7 +213,7 @@ export default function AddSignalModal({
               disabled={loading}
               className="flex-1 px-4 py-2 rounded-lg bg-secondary text-on-secondary font-semibold hover:bg-secondary-container transition-colors disabled:opacity-50"
             >
-              {loading ? "Creating..." : "Create Signal"}
+              {loading ? "Updating..." : "Update Signal"}
             </button>
           </div>
         </form>

@@ -1,51 +1,94 @@
-// components/MetricCards.tsx
-import { MdGroups, MdTrendingUp } from "react-icons/md";
+"use client";
 
-export default function MetricCards() {
+import { Signal } from "@/lib/api/client";
+import {
+  MdTrendingUp,
+  MdCheckCircle,
+  MdError,
+  MdRemoveCircle,
+} from "react-icons/md";
+
+interface MetricCardsProps {
+  signals: Signal[];
+}
+
+export default function MetricCards({ signals }: MetricCardsProps) {
+  const totalSignals = signals.length;
+  const successfulSignals = signals.filter(
+    (s) => s.result === "SUCCESS",
+  ).length;
+  const failedSignals = signals.filter((s) => s.result === "BAD").length;
+  const breakEvenSignals = signals.filter((s) => s.result === "EVEN").length;
+
+  const winRate =
+    totalSignals > 0 ? (successfulSignals / totalSignals) * 100 : 0;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <div className="bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between">
-        <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest">
-          Total Signals
-        </span>
-        <div className="mt-4">
-          <div className="text-3xl font-bold tracking-tight">1,248</div>
-          <div className="flex items-center gap-1 text-secondary text-xs mt-1">
-            <MdTrendingUp className="text-sm" />
-            <span>+12% this month</span>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      {/* Total Signals */}
+      <div className="bg-surface-container rounded-2xl p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+            <MdTrendingUp className="text-2xl text-secondary" />
           </div>
-        </div>
-      </div>
-
-      <div className="bg-surface-container p-6 rounded-2xl border border-secondary/10 flex flex-col justify-between">
-        <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest">
-          Global Win Rate
-        </span>
-        <div className="mt-4">
-          <div className="text-3xl font-bold tracking-tight text-secondary">
-            74.2%
-          </div>
-          <div className="w-full bg-surface-container-lowest h-1 mt-2 rounded-full overflow-hidden">
-            <div className="h-full bg-secondary w-[74%]"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-linear-to-br from-primary-container/30 to-surface-container p-6 rounded-2xl flex flex-col justify-between">
-        <div className="flex justify-between items-start">
-          <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest">
-            Follower Profit Generated
+          <span className="text-3xl font-black text-on-surface">
+            {totalSignals}
           </span>
-          <MdGroups className="text-primary text-xl" />
         </div>
-        <div className="mt-4 flex items-baseline gap-2">
-          <div className="text-4xl font-black tracking-tighter text-primary">
-            $4.82M
+        <h3 className="text-sm font-medium text-on-surface-variant">
+          Total Signals
+        </h3>
+        <p className="text-xs text-on-surface-variant/60 mt-1">
+          All time published
+        </p>
+      </div>
+
+      {/* Win Rate */}
+      <div className="bg-surface-container rounded-2xl p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+            <MdCheckCircle className="text-2xl text-emerald-400" />
           </div>
-          <div className="text-on-surface-variant text-sm font-medium">
-            USDT
-          </div>
+          <span className="text-3xl font-black text-on-surface">
+            {winRate.toFixed(1)}%
+          </span>
         </div>
+        <h3 className="text-sm font-medium text-on-surface-variant">
+          Win Rate
+        </h3>
+        <p className="text-xs text-on-surface-variant/60 mt-1">
+          Successful signals
+        </p>
+      </div>
+
+      {/* Successful */}
+      <div className="bg-surface-container rounded-2xl p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+            <MdCheckCircle className="text-2xl text-emerald-400" />
+          </div>
+          <span className="text-3xl font-black text-on-surface">
+            {successfulSignals}
+          </span>
+        </div>
+        <h3 className="text-sm font-medium text-on-surface-variant">
+          Successful
+        </h3>
+        <p className="text-xs text-on-surface-variant/60 mt-1">+ PnL signals</p>
+      </div>
+
+      {/* Failed */}
+      <div className="bg-surface-container rounded-2xl p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center">
+            <MdError className="text-2xl text-rose-400" />
+          </div>
+          <span className="text-3xl font-black text-on-surface">
+            {failedSignals}
+          </span>
+        </div>
+        <h3 className="text-sm font-medium text-on-surface-variant">Failed</h3>
+        <p className="text-xs text-on-surface-variant/60 mt-1">- PnL signals</p>
       </div>
     </div>
   );

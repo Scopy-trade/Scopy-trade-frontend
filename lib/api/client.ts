@@ -77,6 +77,71 @@ interface DashboardStatsResponse {
   };
 }
 
+// Signal types based on backend
+export interface Signal {
+  _id: string;
+  pair: string;
+  tp: number;
+  sl: number;
+  entry: number;
+  direction: "BUY" | "SELL";
+  notes?: string;
+  trader: string;
+  status: "active" | "expired";
+  result?: "SUCCESS" | "BAD" | "EVEN";
+  pnl?: string;
+  pnlPercent?: string;
+  volume?: string;
+  followers?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CreateSignalData {
+  pair: string;
+  tp: number;
+  sl: number;
+  entry: number;
+  direction: "BUY" | "SELL";
+  notes?: string;
+}
+
+interface UpdateSignalData {
+  pair?: string;
+  tp?: number;
+  sl?: number;
+  entry?: number;
+  direction?: "BUY" | "SELL";
+  notes?: string;
+}
+
+interface GetAllSignalsResponse {
+  success: boolean;
+  message: string;
+  signals: Signal[];
+  page: number;
+  limit: number;
+  pageSize: number;
+  pages: number;
+}
+
+interface CreateSignalResponse {
+  success: boolean;
+  message: string;
+  signal: Signal;
+}
+
+interface UpdateSignalResponse {
+  success: boolean;
+  message: string;
+  signal: Signal;
+}
+
+interface DeleteSignalResponse {
+  success: boolean;
+  message: string;
+}
+
 // Extended config type for retry logic
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -290,6 +355,59 @@ class AuthAPI {
     return "/register";
   }
 
+  // ── PRO TRADER SIGNALS ───────────────────────────────────────────────
+
+  async getAllSignals(page: number = 1): Promise<GetAllSignalsResponse> {
+    try {
+      const { data } = await api.get<GetAllSignalsResponse>(
+        `/signals?page=${page}`,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to fetch signals"));
+    }
+  }
+
+  async createSignal(
+    signalData: CreateSignalData,
+  ): Promise<CreateSignalResponse> {
+    try {
+      const { data } = await api.post<CreateSignalResponse>(
+        "/signals",
+        signalData,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to create signal"));
+    }
+  }
+
+  async updateSignal(
+    signalId: string,
+    signalData: UpdateSignalData,
+  ): Promise<UpdateSignalResponse> {
+    try {
+      const { data } = await api.patch<UpdateSignalResponse>(
+        `/signals/${signalId}`,
+        signalData,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to update signal"));
+    }
+  }
+
+  async deleteSignal(signalId: string): Promise<DeleteSignalResponse> {
+    try {
+      const { data } = await api.delete<DeleteSignalResponse>(
+        `/signals/${signalId}`,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to delete signal"));
+    }
+  }
+
   // ── ADMIN ───────────────────────────────────────────────────────────
 
   async adminLogin(credentials: LoginCredentials): Promise<Admin> {
@@ -476,6 +594,56 @@ class AuthAPI {
         pendingKYC: 0,
         bannedAccounts: 0,
       };
+    }
+  }
+
+  // ── ADMIN SIGNALS ───────────────────────────────────────────────────
+
+  async adminGetAllSignals(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }): Promise<GetAllSignalsResponse> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.search) queryParams.append("search", params.search);
+      if (params?.status) queryParams.append("status", params.status);
+
+      const url = `/dashboard/signals${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+      const { data } = await adminAxios.get<GetAllSignalsResponse>(url);
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to fetch signals"));
+    }
+  }
+
+  async adminGetSignalById(signalId: string): Promise<Signal> {
+    try {
+      interface GetSignalResponse {
+        success: boolean;
+        message: string;
+        signal: Signal;
+      }
+      const { data } = await adminAxios.get<GetSignalResponse>(
+        `/dashboard/signals/${signalId}`,
+      );
+      return data.signal;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to fetch signal"));
+    }
+  }
+
+  async adminDeleteSignal(signalId: string): Promise<DeleteSignalResponse> {
+    try {
+      const { data } = await adminAxios.delete<DeleteSignalResponse>(
+        `/dashboard/signals/${signalId}`,
+      );
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Failed to delete signal"));
     }
   }
 
