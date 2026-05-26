@@ -217,7 +217,7 @@ class AuthAPI {
 
     if (normalizedRole === "CopyTrader" || normalizedRole === "Copy Trader") {
       try {
-        const res = await exchangeService.getConnections();
+        const res = await exchangeService.getUserExchangeConnections();
         const connections = res.connections ?? [];
 
         if (connections.length > 0) {

@@ -6,6 +6,7 @@ import { MdClose, MdInfo, MdSecurity, MdWarning } from "react-icons/md";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { authAPI } from "@/lib/api/client";
 import { ExchangeListItem, ConnectionSummary } from "@/lib";
+import { exchangeService } from "@/lib/api/exchanges";
 
 interface ExchangeConnectionModalProps {
   isOpen: boolean;
@@ -216,10 +217,10 @@ export function ExchangeConnectionModal({
         payload.passphrase = formData.passphrase.trim();
       }
 
-      const response = await authAPI.connectExchange(payload);
+      const response = await exchangeService.connectExchange(payload);
 
-      if (response.success && response.connection) {
-        onSuccess(response.connection);
+      if (response.success && response.connections) {
+        onSuccess(response.connections[0]);
         onClose();
       } else {
         setGeneralError(response.message || "Failed to connect exchange");

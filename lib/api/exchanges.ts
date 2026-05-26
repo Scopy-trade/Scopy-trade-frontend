@@ -10,8 +10,13 @@ export const exchangeService = {
     return userApi.get<ExchangeConnectionsResponse>("/exchanges/connections");
   },
 
-  connectExchange(payload: Record<string, unknown>) {
-    return userApi.post("/exchanges/connect", payload);
+  connectExchange(
+    payload: Record<string, unknown>,
+  ): Promise<ExchangeConnectionsResponse> {
+    return userApi.post<ExchangeConnectionsResponse>(
+      "/exchanges/connect",
+      payload,
+    );
   },
 
   testConnection(connectionId: string) {
