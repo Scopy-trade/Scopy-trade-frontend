@@ -1,24 +1,19 @@
 "use client";
 
-import { Signal } from "@/lib/api/client";
-import {
-  MdTrendingUp,
-  MdCheckCircle,
-  MdError,
-  MdRemoveCircle,
-} from "react-icons/md";
+import { SignalInterface } from "@/lib";
+import { MdTrendingUp, MdCheckCircle, MdError } from "react-icons/md";
 
 interface MetricCardsProps {
-  signals: Signal[];
+  signals: SignalInterface[];
 }
 
 export default function MetricCards({ signals }: MetricCardsProps) {
   const totalSignals = signals.length;
-  const successfulSignals = signals.filter(
-    (s) => s.result === "SUCCESS",
+  const successfulSignals = signals.filter((s) => s.result === "profit").length;
+  const failedSignals = signals.filter((s) => s.result === "loss").length;
+  const breakEvenSignals = signals.filter(
+    (s) => s.result === "breakeven",
   ).length;
-  const failedSignals = signals.filter((s) => s.result === "BAD").length;
-  const breakEvenSignals = signals.filter((s) => s.result === "EVEN").length;
 
   const winRate =
     totalSignals > 0 ? (successfulSignals / totalSignals) * 100 : 0;

@@ -6,7 +6,7 @@ import { MdClose } from "react-icons/md";
 interface Signal {
   id: number;
   pair: string;
-  tradeType: "BUY" | "SELL";
+  direction: "buy" | "sell";
   logo: string;
   logoBg: string;
   date: string;
@@ -14,8 +14,8 @@ interface Signal {
   entryPrice: number;
   tp: number;
   sl: number;
-  result: "SUCCESS" | "BAD" | "EVEN";
-  status: "ACTIVE" | "EXPIRED";
+  result: "profit" | "loss" | "breakeven";
+  status: "active" | "expired";
   followers: number;
   volume: string;
   leverage?: string;
@@ -36,9 +36,9 @@ export default function SignalDetailsModal({
 
   const getResultColor = (result: string) => {
     switch (result) {
-      case "SUCCESS":
+      case "profit":
         return "text-green-500";
-      case "BAD":
+      case "loss":
         return "text-red-500";
       default:
         return "text-gray-400";
@@ -75,12 +75,12 @@ export default function SignalDetailsModal({
               <div className="flex gap-2 mt-1">
                 <span
                   className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                    signal.tradeType === "BUY"
+                    signal.direction === "buy"
                       ? "bg-green-500/10 text-green-500"
                       : "bg-red-500/10 text-red-500"
                   }`}
                 >
-                  {signal.tradeType}
+                  {signal.direction}
                 </span>
                 {signal.leverage && (
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
@@ -139,7 +139,7 @@ export default function SignalDetailsModal({
               <span className="text-gray-400 text-sm">Status</span>
               <span
                 className={`text-sm font-semibold ${
-                  signal.status === "ACTIVE" ? "text-blue-500" : "text-gray-400"
+                  signal.status === "active" ? "text-blue-500" : "text-gray-400"
                 }`}
               >
                 {signal.status}
