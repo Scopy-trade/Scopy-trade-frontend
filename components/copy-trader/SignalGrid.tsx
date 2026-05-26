@@ -15,7 +15,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 64281.5,
     tp: 68400.0,
     sl: 62100.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 92.4,
     roi30d: 116.02,
     maxDrawdown: 20.2,
@@ -34,7 +34,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 19200.0,
     tp: 18500.0,
     sl: 19600.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 87.5,
     roi30d: 84.31,
     maxDrawdown: 15.8,
@@ -53,7 +53,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 3450.0,
     tp: 3900.0,
     sl: 3200.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 81.2,
     roi30d: 67.44,
     maxDrawdown: 24.1,
@@ -72,7 +72,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 189.5,
     tp: 193.0,
     sl: 187.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 89.0,
     roi30d: 52.18,
     maxDrawdown: 12.5,
@@ -91,7 +91,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 142.1,
     tp: 158.0,
     sl: 135.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 79.8,
     roi30d: 41.92,
     maxDrawdown: 28.4,
@@ -110,7 +110,7 @@ const FALLBACK_SIGNALS: Signal[] = [
     entryPrice: 2310.0,
     tp: 2250.0,
     sl: 2340.0,
-    status: "ACTIVE",
+    status: "active",
     winRate: 82.1,
     roi30d: 33.6,
     maxDrawdown: 18.9,
@@ -125,7 +125,8 @@ const FALLBACK_SIGNALS: Signal[] = [
 
 function formatNumber(n: number | undefined, prefix = ""): string {
   if (n === undefined || n === null) return "—";
-  if (Math.abs(n) >= 1_000_000) return `${prefix}${(n / 1_000_000).toFixed(2)}M`;
+  if (Math.abs(n) >= 1_000_000)
+    return `${prefix}${(n / 1_000_000).toFixed(2)}M`;
   if (Math.abs(n) >= 1_000) return `${prefix}${(n / 1_000).toFixed(2)}k`;
   return `${prefix}${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
@@ -260,11 +261,29 @@ function SignalCard({
           </div>
           {/* Mini chart placeholder — CSS gradient wave */}
           <div className="w-20 h-10 relative overflow-hidden rounded">
-            <svg viewBox="0 0 80 40" className="w-full h-full" preserveAspectRatio="none">
+            <svg
+              viewBox="0 0 80 40"
+              className="w-full h-full"
+              preserveAspectRatio="none"
+            >
               <defs>
-                <linearGradient id={`grad-${signal._id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={pnlPositive ? "#4edea3" : "#ffb2b9"} stopOpacity="0.3" />
-                  <stop offset="100%" stopColor={pnlPositive ? "#4edea3" : "#ffb2b9"} stopOpacity="0" />
+                <linearGradient
+                  id={`grad-${signal._id}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="0%"
+                    stopColor={pnlPositive ? "#4edea3" : "#ffb2b9"}
+                    stopOpacity="0.3"
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor={pnlPositive ? "#4edea3" : "#ffb2b9"}
+                    stopOpacity="0"
+                  />
                 </linearGradient>
               </defs>
               <path
@@ -293,19 +312,25 @@ function SignalCard({
       {/* ─ Stats Row ─ */}
       <div className="px-5 py-3 grid grid-cols-3 gap-3 border-t border-white/5">
         <div>
-          <p className="text-[9px] text-slate-500 uppercase tracking-wider">AUM (USDT)</p>
+          <p className="text-[9px] text-slate-500 uppercase tracking-wider">
+            AUM (USDT)
+          </p>
           <p className="text-xs font-bold font-mono text-slate-200 mt-0.5">
             {formatNumber(signal.aum)}
           </p>
         </div>
         <div>
-          <p className="text-[9px] text-slate-500 uppercase tracking-wider">7D MDD</p>
+          <p className="text-[9px] text-slate-500 uppercase tracking-wider">
+            7D MDD
+          </p>
           <p className="text-xs font-bold font-mono text-tertiary mt-0.5">
             {signal.maxDrawdown?.toFixed(1) ?? "—"}%
           </p>
         </div>
         <div>
-          <p className="text-[9px] text-slate-500 uppercase tracking-wider">Sharpe Ratio</p>
+          <p className="text-[9px] text-slate-500 uppercase tracking-wider">
+            Sharpe Ratio
+          </p>
           <p className="text-xs font-bold font-mono text-slate-200 mt-0.5">
             {signal.sharpeRatio?.toFixed(2) ?? "—"}
           </p>
@@ -378,7 +403,12 @@ export default function SignalGrid({
   loading = false,
   error = null,
 }: SignalGridProps) {
-  const displaySignals = signals && signals.length > 0 ? signals : (!loading && !error ? FALLBACK_SIGNALS : []);
+  const displaySignals =
+    signals && signals.length > 0
+      ? signals
+      : !loading && !error
+        ? FALLBACK_SIGNALS
+        : [];
 
   return (
     <div className="p-3 md:p-5">
