@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BrandingPanel from "@/components/auth/register/BrandingPanel";
 import { ExchangeSettings } from "@/components/onboarding/ExchangeSettings";
-import { authAPI } from "@/lib/api/client";
+import { exchangeService } from "@/lib/api/exchanges";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     const fetchConnectionCount = async () => {
       try {
-        const response = await authAPI.getUserExchangeConnections();
+        const response = await exchangeService.getUserExchangeConnections();
         if (response.success && response.connections) {
           setConnectionCount(response.connections.length);
         }
@@ -31,7 +31,7 @@ export default function OnboardingPage() {
   const handleConnectionChange = async () => {
     // Refresh connection count when connections are added/removed
     try {
-      const response = await authAPI.getUserExchangeConnections();
+      const response = await exchangeService.getUserExchangeConnections();
       if (response.success && response.connections) {
         setConnectionCount(response.connections.length);
       }

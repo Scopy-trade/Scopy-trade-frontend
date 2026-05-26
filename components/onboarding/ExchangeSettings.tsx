@@ -14,6 +14,7 @@ import { ConnectedExchange } from "./ConnectedExchange";
 import { AvailableIntegration } from "./AvailableIntegration";
 import { ConnectionSummary, ExchangeListItem } from "@/lib";
 import { ExchangeConnectionModal } from "./ExchangeConnectionModal";
+import { exchangeService } from "@/lib/api/exchanges";
 
 interface GetSupportedExchangesResponse {
   success: boolean;
@@ -59,13 +60,13 @@ export function ExchangeSettings({
 
     try {
       const exchangesResponse =
-        (await authAPI.getUserExchanges()) as GetSupportedExchangesResponse;
+        (await exchangeService.getUserExchanges()) as GetSupportedExchangesResponse;
       if (exchangesResponse.success && exchangesResponse.exchanges) {
         setAvailableExchanges(exchangesResponse.exchanges);
       }
 
       const connectionsResponse =
-        (await authAPI.getUserExchangeConnections()) as GetUserConnectionsResponse;
+        (await exchangeService.getUserExchangeConnections()) as GetUserConnectionsResponse;
       if (connectionsResponse.success && connectionsResponse.connections) {
         setConnectedExchanges(connectionsResponse.connections);
       }

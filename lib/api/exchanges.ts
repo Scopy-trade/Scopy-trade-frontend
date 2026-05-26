@@ -2,15 +2,15 @@ import { ExchangeConnectionsResponse, SupportedExchangesResponse } from "..";
 import { userApi } from "./client";
 
 export const exchangeService = {
-  getSupported() {
+  getUserExchanges() {
     return userApi.get<SupportedExchangesResponse>("/exchanges");
   },
 
-  getConnections() {
+  getUserExchangeConnections() {
     return userApi.get<ExchangeConnectionsResponse>("/exchanges/connections");
   },
 
-  connect(payload: Record<string, unknown>) {
+  connectExchange(payload: Record<string, unknown>) {
     return userApi.post("/exchanges/connect", payload);
   },
 
@@ -22,7 +22,7 @@ export const exchangeService = {
     return userApi.delete(`/exchanges/connections/${connectionId}`);
   },
 
-  updateCredentials(
+  updateConnectionCredentials(
     connectionId: string,
     payload: {
       apiKey: string;
