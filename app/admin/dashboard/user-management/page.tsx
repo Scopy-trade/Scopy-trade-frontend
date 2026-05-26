@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { authAPI, UserManagementUser } from "@/lib/api/client";
+import { adminUserService } from "@/lib/api/admin";
 
 type UserStatus = "Active" | "Offline" | "Banned";
 type UserRole = "Pro Trader" | "Copy Trader";
 
 interface User {
   id: string;
-  _id: string;
-  uid: string;
+  ID: string;
   name: string;
   initials: string;
   role: UserRole;
@@ -118,46 +117,41 @@ export default function UserManagementPage() {
     setError(null);
     try {
       const roleParam = filter === "All Users" ? undefined : filter;
-      const response = await authAPI.getAllUsers({
+      const response = await adminUserService.getAllUsers({
         page: currentPage,
         limit: itemsPerPage,
         search: search || undefined,
         role: roleParam,
       });
 
-      if (response.status === "success" && response.data) {
-        const formattedUsers: User[] = response.data.users.map(
-          (user, index) => ({
-            id: user._id || user.id,
-            _id: user._id || user.id,
-            uid: user.uid || user._id?.slice(-7) || `UID${index + 1}`,
-            name:
-              user.name ||
-              `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-              user.email,
-            initials: user.initials || getInitials(user.name || user.email),
-            role: (user.role === "CopyTrader"
-              ? "Copy Trader"
-              : user.role || "Copy Trader") as UserRole,
-            status: user.status || "Offline",
-            trades: user.trades || "0 Trades",
-            lastActive:
-              user.lastActive ||
-              new Date(user.updatedAt || Date.now()).toLocaleDateString(),
-            location: user.location || "Unknown",
-            roi: user.roi || "0%",
-            roiPositive: user.roiPositive ?? true,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            hasOnboarded: user.hasOnboarded,
-          }),
-        );
+      const formattedUsers: User[] = response.users.map((user, index) => ({
+        id: user._id || user.id,
+        ID: user.traderID || user._id?.slice(-7) || `UID${index + 1}`,
+        name:
+          user.name ||
+          `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+          user.email,
+        initials: user.initials || getInitials(user.name || user.email),
+        role: (user.role === "CopyTrader"
+          ? "Copy Trader"
+          : user.role || "Copy Trader") as UserRole,
+        status: user.status || "Offline",
+        trades: user.trades || "0 Trades",
+        lastActive:
+          user.lastActive ||
+          new Date(user.updatedAt || Date.now()).toLocaleDateString(),
+        location: user.location || "Unknown",
+        roi: user.roi || "0%",
+        roiPositive: user.roiPositive ?? true,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        hasOnboarded: user.hasOnboarded,
+      }));
 
-        setUsers(formattedUsers);
-        setTotalUsersCount(response.data.total);
-        setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-      }
+      setUsers(formattedUsers);
+      setTotalUsersCount(response.pages);
+      setTotalPages(Math.ceil(response.pages / itemsPerPage));
     } catch (err) {
       console.error("Failed to fetch users:", err);
       setError(err instanceof Error ? err.message : "Failed to load users");
@@ -167,29 +161,13 @@ export default function UserManagementPage() {
     }
   };
 
-  // Fetch dashboard stats
-  const fetchStats = async () => {
-    try {
-      const statsData = await authAPI.getDashboardStats();
-      setStats({
-        totalUsers: statsData.totalUsers.toLocaleString(),
-        activeNow: statsData.activeNow.toLocaleString(),
-        pendingKYC: statsData.pendingKYC.toLocaleString(),
-        bannedAccounts: statsData.bannedAccounts.toLocaleString(),
-      });
-    } catch (err) {
-      console.error("Failed to fetch stats:", err);
-    }
-  };
-
   // Handle user actions
   const handleBanUser = async (userId: string) => {
     if (!confirm("Are you sure you want to ban this user?")) return;
     setActionLoading(userId);
     try {
-      await authAPI.banUser(userId);
+      await adminUserService.banUser(userId);
       await fetchUsers();
-      await fetchStats();
     } catch (err) {
       console.error("Failed to ban user:", err);
       alert(err instanceof Error ? err.message : "Failed to ban user");
@@ -202,26 +180,11 @@ export default function UserManagementPage() {
     if (!confirm("Are you sure you want to unban this user?")) return;
     setActionLoading(userId);
     try {
-      await authAPI.unbanUser(userId);
+      await adminUserService.unbanUser(userId);
       await fetchUsers();
-      await fetchStats();
     } catch (err) {
       console.error("Failed to unban user:", err);
       alert(err instanceof Error ? err.message : "Failed to unban user");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleUpdateRole = async (userId: string, newRole: UserRole) => {
-    if (!confirm(`Change user role to ${newRole}?`)) return;
-    setActionLoading(userId);
-    try {
-      await authAPI.updateUserRole(userId, newRole);
-      await fetchUsers();
-    } catch (err) {
-      console.error("Failed to update role:", err);
-      alert(err instanceof Error ? err.message : "Failed to update role");
     } finally {
       setActionLoading(null);
     }
@@ -242,10 +205,6 @@ export default function UserManagementPage() {
   useEffect(() => {
     fetchUsers();
   }, [currentPage]);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
 
   const paginate = (page: number) => {
     setCurrentPage(page);
@@ -422,7 +381,7 @@ export default function UserManagementPage() {
                             {user.name}
                           </p>
                           <p className="text-[10px] text-[#8f9098] font-mono">
-                            UID: {user.uid}
+                            ID: {user.ID}
                           </p>
                         </div>
                       </div>
@@ -432,9 +391,6 @@ export default function UserManagementPage() {
                     <td className="px-4 sm:px-6 py-4">
                       <select
                         value={user.role}
-                        onChange={(e) =>
-                          handleUpdateRole(user.id, e.target.value as UserRole)
-                        }
                         disabled={actionLoading === user.id}
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer ${roleStyle[user.role]} ${
                           actionLoading === user.id

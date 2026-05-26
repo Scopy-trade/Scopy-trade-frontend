@@ -3,16 +3,8 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from "axios";
-import {
-  Admin,
-  AuthResponse,
-  ConnectionSummary,
-  ExchangeConnectionsResponse,
-  LoginCredentials,
-  RegisterData,
-  SupportedExchangesResponse,
-  User,
-} from "..";
+import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from "..";
+import { exchangeService } from "./exchanges";
 
 const API_BASE_URL = "/api";
 
@@ -22,124 +14,6 @@ interface AdminResponse {
   status: "success" | "fail" | "error";
   data?: { admin: Admin };
   message?: string;
-}
-
-// User management types
-export interface UserManagementUser extends User {
-  id: string;
-  _id: string;
-  uid?: string;
-  name?: string;
-  initials?: string;
-  status?: "Active" | "Offline" | "Banned";
-  trades?: string;
-  lastActive?: string;
-  location?: string;
-  roi?: string;
-  roiPositive?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface UsersResponse {
-  status: string;
-  data: {
-    users: UserManagementUser[];
-    total: number;
-    page: number;
-    limit: number;
-  };
-  message?: string;
-}
-
-interface UserActionResponse {
-  status: string;
-  message: string;
-  data?: {
-    user?: UserManagementUser;
-  };
-}
-
-interface GetUserResponse {
-  status: string;
-  data: {
-    user: UserManagementUser;
-  };
-}
-
-interface DashboardStatsResponse {
-  status: string;
-  data: {
-    totalUsers: number;
-    activeNow: number;
-    pendingKYC: number;
-    bannedAccounts: number;
-  };
-}
-
-// Signal types based on backend
-export interface Signal {
-  _id: string;
-  pair: string;
-  tp: number;
-  sl: number;
-  entry: number;
-  direction: "BUY" | "SELL";
-  notes?: string;
-  trader: string;
-  status: "active" | "expired";
-  result?: "SUCCESS" | "BAD" | "EVEN";
-  pnl?: string;
-  pnlPercent?: string;
-  volume?: string;
-  followers?: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface CreateSignalData {
-  pair: string;
-  tp: number;
-  sl: number;
-  entry: number;
-  direction: "BUY" | "SELL";
-  notes?: string;
-}
-
-interface UpdateSignalData {
-  pair?: string;
-  tp?: number;
-  sl?: number;
-  entry?: number;
-  direction?: "BUY" | "SELL";
-  notes?: string;
-}
-
-interface GetAllSignalsResponse {
-  success: boolean;
-  message: string;
-  signals: Signal[];
-  page: number;
-  limit: number;
-  pageSize: number;
-  pages: number;
-}
-
-interface CreateSignalResponse {
-  success: boolean;
-  message: string;
-  signal: Signal;
-}
-
-interface UpdateSignalResponse {
-  success: boolean;
-  message: string;
-  signal: Signal;
-}
-
-interface DeleteSignalResponse {
-  success: boolean;
-  message: string;
 }
 
 // Extended config type for retry logic
@@ -337,14 +211,18 @@ class AuthAPI {
 
     const normalizedRole = user.role.trim();
 
-    if (normalizedRole === "Pro Trader") return "/dashboard/pro-trader";
+    if (normalizedRole === "Pro Trader") {
+      return "/dashboard/pro-trader";
+    }
 
     if (normalizedRole === "CopyTrader" || normalizedRole === "Copy Trader") {
       try {
-        const res = await this.getUserExchangeConnections();
+        const res = await exchangeService.getConnections();
         const connections = res.connections ?? [];
 
-        if (connections.length > 0) return "/dashboard/copy-trader";
+        if (connections.length > 0) {
+          return "/dashboard/copy-trader";
+        }
       } catch {
         // Ignore error and proceed to onboarding
       }
@@ -353,59 +231,6 @@ class AuthAPI {
     }
 
     return "/register";
-  }
-
-  // ── PRO TRADER SIGNALS ───────────────────────────────────────────────
-
-  async getAllSignals(page: number = 1): Promise<GetAllSignalsResponse> {
-    try {
-      const { data } = await api.get<GetAllSignalsResponse>(
-        `/signals?page=${page}`,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to fetch signals"));
-    }
-  }
-
-  async createSignal(
-    signalData: CreateSignalData,
-  ): Promise<CreateSignalResponse> {
-    try {
-      const { data } = await api.post<CreateSignalResponse>(
-        "/signals",
-        signalData,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to create signal"));
-    }
-  }
-
-  async updateSignal(
-    signalId: string,
-    signalData: UpdateSignalData,
-  ): Promise<UpdateSignalResponse> {
-    try {
-      const { data } = await api.patch<UpdateSignalResponse>(
-        `/signals/${signalId}`,
-        signalData,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to update signal"));
-    }
-  }
-
-  async deleteSignal(signalId: string): Promise<DeleteSignalResponse> {
-    try {
-      const { data } = await api.delete<DeleteSignalResponse>(
-        `/signals/${signalId}`,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to delete signal"));
-    }
   }
 
   // ── ADMIN ───────────────────────────────────────────────────────────
@@ -467,275 +292,11 @@ class AuthAPI {
       // Ignore logout errors
     }
   }
-
-  // ── USER MANAGEMENT (ADMIN) ─────────────────────────────────────────
-
-  async getAllUsers(params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    role?: string;
-    status?: string;
-  }): Promise<UsersResponse> {
-    try {
-      const queryParams = new URLSearchParams();
-      if (params?.page) queryParams.append("page", params.page.toString());
-      if (params?.limit) queryParams.append("limit", params.limit.toString());
-      if (params?.search) queryParams.append("search", params.search);
-      if (params?.role) queryParams.append("role", params.role);
-      if (params?.status) queryParams.append("status", params.status);
-
-      const url = `/dashboard/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-      const { data } = await adminAxios.get<UsersResponse>(url);
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to fetch users"));
-    }
-  }
-
-  async getUserById(userId: string): Promise<UserManagementUser> {
-    try {
-      const { data } = await adminAxios.get<GetUserResponse>(
-        `/dashboard/users/${userId}`,
-      );
-
-      if (data.status !== "success") {
-        throw new Error("Failed to fetch user");
-      }
-
-      return data.data.user;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to fetch user"));
-    }
-  }
-
-  async updateUserStatus(
-    userId: string,
-    status: "Active" | "Offline" | "Banned",
-  ): Promise<UserActionResponse> {
-    try {
-      const { data } = await adminAxios.patch<UserActionResponse>(
-        `/dashboard/users/${userId}/status`,
-        { status },
-      );
-      return data;
-    } catch (error) {
-      throw new Error(
-        extractErrorMessage(error, "Failed to update user status"),
-      );
-    }
-  }
-
-  async banUser(userId: string, reason?: string): Promise<UserActionResponse> {
-    try {
-      const { data } = await adminAxios.post<UserActionResponse>(
-        `/dashboard/users/${userId}/ban`,
-        { reason },
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to ban user"));
-    }
-  }
-
-  async unbanUser(userId: string): Promise<UserActionResponse> {
-    try {
-      const { data } = await adminAxios.post<UserActionResponse>(
-        `/dashboard/users/${userId}/unban`,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to unban user"));
-    }
-  }
-
-  async updateUserRole(
-    userId: string,
-    role: "Pro Trader" | "Copy Trader",
-  ): Promise<UserActionResponse> {
-    try {
-      const { data } = await adminAxios.patch<UserActionResponse>(
-        `/dashboard/users/${userId}/role`,
-        { role },
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to update user role"));
-    }
-  }
-
-  async deleteUser(userId: string): Promise<UserActionResponse> {
-    try {
-      const { data } = await adminAxios.delete<UserActionResponse>(
-        `/dashboard/users/${userId}`,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to delete user"));
-    }
-  }
-
-  async getDashboardStats(): Promise<{
-    totalUsers: number;
-    activeNow: number;
-    pendingKYC: number;
-    bannedAccounts: number;
-  }> {
-    try {
-      const { data } =
-        await adminAxios.get<DashboardStatsResponse>("/dashboard/stats");
-
-      return data.data;
-    } catch (error) {
-      console.error("Failed to fetch dashboard stats:", error);
-      return {
-        totalUsers: 0,
-        activeNow: 0,
-        pendingKYC: 0,
-        bannedAccounts: 0,
-      };
-    }
-  }
-
-  // ── ADMIN SIGNALS ───────────────────────────────────────────────────
-
-  async adminGetAllSignals(params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    status?: string;
-  }): Promise<GetAllSignalsResponse> {
-    try {
-      const queryParams = new URLSearchParams();
-      if (params?.page) queryParams.append("page", params.page.toString());
-      if (params?.limit) queryParams.append("limit", params.limit.toString());
-      if (params?.search) queryParams.append("search", params.search);
-      if (params?.status) queryParams.append("status", params.status);
-
-      const url = `/dashboard/signals${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-      const { data } = await adminAxios.get<GetAllSignalsResponse>(url);
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to fetch signals"));
-    }
-  }
-
-  async adminGetSignalById(signalId: string): Promise<Signal> {
-    try {
-      interface GetSignalResponse {
-        success: boolean;
-        message: string;
-        signal: Signal;
-      }
-      const { data } = await adminAxios.get<GetSignalResponse>(
-        `/dashboard/signals/${signalId}`,
-      );
-      return data.signal;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to fetch signal"));
-    }
-  }
-
-  async adminDeleteSignal(signalId: string): Promise<DeleteSignalResponse> {
-    try {
-      const { data } = await adminAxios.delete<DeleteSignalResponse>(
-        `/dashboard/signals/${signalId}`,
-      );
-      return data;
-    } catch (error) {
-      throw new Error(extractErrorMessage(error, "Failed to delete signal"));
-    }
-  }
-
-  // ── EXCHANGES ───────────────────────────────────────────────────────
-
-  async getUserExchanges(): Promise<SupportedExchangesResponse> {
-    const { data } = await api.get<SupportedExchangesResponse>("/exchanges");
-    return data;
-  }
-
-  async getUserExchangeConnections(): Promise<ExchangeConnectionsResponse> {
-    const { data } = await api.get<ExchangeConnectionsResponse>(
-      "/exchanges/connections",
-    );
-    return data;
-  }
-
-  async connectExchange(payload: Record<string, unknown>): Promise<{
-    success: boolean;
-    message: string;
-    connection: ConnectionSummary;
-  }> {
-    interface ConnectExchangeResponse {
-      success: boolean;
-      message: string;
-      connection: ConnectionSummary;
-    }
-    const { data } = await api.post<ConnectExchangeResponse>(
-      "/exchanges/connect",
-      payload,
-    );
-    return data;
-  }
-
-  async testConnection(connectionId: string): Promise<{
-    success: boolean;
-    message: string;
-    accountInfo?: Record<string, unknown>;
-  }> {
-    interface TestConnectionResponse {
-      success: boolean;
-      message: string;
-      accountInfo?: Record<string, unknown>;
-    }
-    const { data } = await api.post<TestConnectionResponse>(
-      `/exchanges/connections/${connectionId}/test`,
-    );
-    return data;
-  }
-
-  async removeConnection(connectionId: string): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    interface RemoveConnectionResponse {
-      success: boolean;
-      message: string;
-    }
-    const { data } = await api.delete<RemoveConnectionResponse>(
-      `/exchanges/connections/${connectionId}`,
-    );
-    return data;
-  }
-
-  async updateConnectionCredentials(
-    connectionId: string,
-    payload: { apiKey: string; apiSecret: string; passphrase?: string },
-  ): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    interface UpdateConnectionResponse {
-      success: boolean;
-      message: string;
-    }
-    const { data } = await api.patch<UpdateConnectionResponse>(
-      `/exchanges/connections/${connectionId}`,
-      payload,
-    );
-    return data;
-  }
 }
 
 export const authAPI = new AuthAPI();
 
 type ApiMethod = "get" | "post" | "put" | "patch" | "delete";
-
-interface ApiEnvelope<T> {
-  status: "success" | "fail" | "error";
-  data?: T;
-  message?: string;
-}
 
 interface RequestOptions {
   params?: Record<string, unknown>;
@@ -750,18 +311,18 @@ async function makeRequest<T>(
   options: RequestOptions = {},
 ): Promise<T> {
   return instance
-    .request<ApiEnvelope<T>>({
+    .request<T & { success: boolean; message?: string }>({
       method,
       url: endpoint,
       data: body,
       params: options.params,
       headers: options.headers,
     })
-    .then(({ data: envelope }) => {
-      if (envelope.status !== "success") {
-        throw new Error(envelope.message ?? `Request to ${endpoint} failed`);
+    .then(({ data }) => {
+      if (data.success !== true) {
+        throw new Error(data.message ?? `Request to ${endpoint} failed`);
       }
-      return envelope.data as T;
+      return data as T; // ✅ return the whole flat response
     })
     .catch((error: unknown) => {
       if (error instanceof Error && !axios.isAxiosError(error)) throw error;

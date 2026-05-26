@@ -6,11 +6,12 @@ import MetricCards from "@/components/pro-trader/signalsPage/MetricCards";
 import SignalsTable from "@/components/pro-trader/signalsPage/SignalsTable";
 import FloatingButton from "@/components/pro-trader/signalsPage/FloatingButton";
 import AddSignalModal from "@/components/pro-trader/signalsPage/AddSignalModal";
-import { authAPI, Signal } from "@/lib/api/client";
+import { SignalInterface } from "@/lib";
+import { proTradersignalService } from "@/lib/api/user";
 
 export default function SignalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [signals, setSignals] = useState<Signal[]>([]);
+  const [signals, setSignals] = useState<SignalInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +24,8 @@ export default function SignalsPage() {
       setError(null);
 
       try {
-        const response = await authAPI.getAllSignals(currentPage);
+        const response =
+          await proTradersignalService.getAllSignals(currentPage);
 
         if (!response.success) {
           throw new Error(response.message || "Failed to fetch signals");

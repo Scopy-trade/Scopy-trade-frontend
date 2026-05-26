@@ -1,19 +1,22 @@
 export interface SignalInterface {
-  id: number;
+  _id: string;
   pair: string;
-  tradeType: "BUY" | "SELL";
-  logo: string;
-  logoBg: string;
-  date: string;
-  time: string;
-  entryPrice: number;
+  tradeType: "buy" | "sell";
+  logo?: string;
+  logoBg?: string;
+  date?: string;
+  time?: string;
+  entry: number;
   tp: number;
   sl: number;
-  result: "SUCCESS" | "BAD" | "EVEN";
-  status: "ACTIVE" | "EXPIRED";
-  followers: number;
-  volume: string;
+  result: "profit" | "loss" | "breakeven";
+  status: "active" | "expired";
+  trader?: string;
+  followers?: number;
+  volume?: string;
   leverage?: string;
+  createdAt: string;
+  direction?: "buy" | "sell";
 }
 
 export interface Signal {
@@ -23,12 +26,15 @@ export interface Signal {
   entryPrice: number;
   tp: number;
   sl: number;
-  status: "ACTIVE" | "EXPIRED";
+  status: "active" | "expired";
   leverage?: string;
   trader?: string;
+  result?: "SUCCESS" | "BAD" | "EVEN";
   tier?: string;
+  notes?: string;
   winRate?: number;
   roi30d?: number;
+  pnlPercent?: string;
   maxDrawdown?: number;
   copiers?: number;
   pnl7d?: number;
@@ -111,4 +117,102 @@ export interface ExchangeConnectionsResponse {
   success: boolean;
   connections: ConnectionSummary[];
   message?: string;
+}
+
+// User management types
+export interface UserManagementUser extends User {
+  id: string;
+  _id: string;
+  uid?: string;
+  name?: string;
+  initials?: string;
+  status?: "Active" | "Offline" | "Banned";
+  trades?: string;
+  lastActive?: string;
+  location?: string;
+  roi?: string;
+  roiPositive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UsersResponse {
+  success: boolean;
+  message?: string;
+  users: UserManagementUser[];
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface UserActionResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    user?: UserManagementUser;
+  };
+}
+
+export interface GetUserResponse {
+  success: boolean;
+  data: {
+    user: UserManagementUser;
+  };
+}
+
+export interface DashboardStatsResponse {
+  success: boolean;
+  data: {
+    totalUsers: number;
+    activeNow: number;
+    pendingKYC: number;
+    bannedAccounts: number;
+  };
+}
+
+// Signal types based on backend
+
+export interface GetAllSignalsResponse {
+  success: boolean;
+  message: string;
+  signals: SignalInterface[];
+  page: number;
+  limit: number;
+  pageSize: number;
+  pages: number;
+}
+
+export interface DeleteSignalResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface CreateSignalData {
+  pair: string;
+  tp: number;
+  sl: number;
+  entry: number;
+  direction: "BUY" | "SELL";
+  notes?: string;
+}
+
+export interface UpdateSignalData {
+  pair?: string;
+  tp?: number;
+  sl?: number;
+  entry?: number;
+  direction?: "BUY" | "SELL";
+  notes?: string;
+}
+
+export interface CreateSignalResponse {
+  success: boolean;
+  message: string;
+  signal: SignalInterface;
+}
+
+export interface UpdateSignalResponse {
+  success: boolean;
+  message: string;
+  signal: SignalInterface;
 }

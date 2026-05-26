@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Signal, authAPI } from "@/lib/api/client";
 import { MdDelete, MdEdit } from "react-icons/md";
 import EditSignalModal from "./EditSignalModal";
+import { SignalInterface } from "@/lib";
+import { proTradersignalService } from "@/lib/api/user";
 
 interface SignalsTableProps {
-  signals: Signal[];
+  signals: SignalInterface[];
   loading: boolean;
   error: string | null;
   currentPage: number;
@@ -25,14 +26,16 @@ export default function SignalsTable({
   onSignalDeleted,
 }: SignalsTableProps) {
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [editingSignal, setEditingSignal] = useState<Signal | null>(null);
+  const [editingSignal, setEditingSignal] = useState<SignalInterface | null>(
+    null,
+  );
 
   const handleDelete = async (signalId: string) => {
     if (!confirm("Are you sure you want to delete this signal?")) return;
 
     setDeleteLoading(signalId);
     try {
-      const response = await authAPI.deleteSignal(signalId);
+      const response = await proTradersignalService.deleteSignal(signalId);
       if (response.success) {
         onSignalDeleted();
       } else {
@@ -158,7 +161,7 @@ export default function SignalsTable({
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-2 py-1 rounded-md text-xs font-bold ${
-                        signal.direction === "BUY"
+                        signal.direction === "buy"
                           ? "text-emerald-400 bg-emerald-500/10"
                           : "text-rose-400 bg-rose-500/10"
                       }`}
