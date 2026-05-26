@@ -16,7 +16,8 @@ export interface SignalInterface {
   volume?: string;
   leverage?: string;
   createdAt: string;
-  direction?: "buy" | "sell";
+  direction: "buy" | "sell";
+  notes?: string;
 }
 
 export interface Signal {
@@ -192,7 +193,7 @@ export interface CreateSignalData {
   tp: number;
   sl: number;
   entry: number;
-  direction: "BUY" | "SELL";
+  direction: "buy" | "sell";
   notes?: string;
 }
 
@@ -201,7 +202,7 @@ export interface UpdateSignalData {
   tp?: number;
   sl?: number;
   entry?: number;
-  direction?: "BUY" | "SELL";
+  direction?: "buy" | "sell";
   notes?: string;
 }
 

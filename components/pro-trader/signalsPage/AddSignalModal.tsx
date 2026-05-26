@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { authAPI } from "@/lib/api/client";
 import { MdClose } from "react-icons/md";
+import { proTradersignalService } from "@/lib/api/pro-trader";
 
 interface AddSignalModalProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ export default function AddSignalModal({
     entry: "",
     tp: "",
     sl: "",
-    direction: "BUY" as "BUY" | "SELL",
+    direction: "buy" as "buy" | "sell",
     notes: "",
   });
   const [loading, setLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function AddSignalModal({
     setError(null);
 
     try {
-      const response = await authAPI.createSignal({
+      const response = await proTradersignalService.createSignal({
         pair: formData.pair,
         entry: parseFloat(formData.entry),
         tp: parseFloat(formData.tp),
@@ -47,7 +47,7 @@ export default function AddSignalModal({
           entry: "",
           tp: "",
           sl: "",
-          direction: "BUY",
+          direction: "buy",
           notes: "",
         });
         onSignalCreated();
@@ -114,13 +114,13 @@ export default function AddSignalModal({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    direction: e.target.value as "BUY" | "SELL",
+                    direction: e.target.value as "buy" | "sell",
                   })
                 }
                 className="w-full px-4 py-2 rounded-lg bg-surface-container-highest border border-white/10 text-on-surface focus:outline-none focus:border-secondary transition-colors"
               >
-                <option value="BUY">BUY (Long)</option>
-                <option value="SELL">SELL (Short)</option>
+                <option value="buy">BUY (Long)</option>
+                <option value="sell">SELL (Short)</option>
               </select>
             </div>
 

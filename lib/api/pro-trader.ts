@@ -17,14 +17,14 @@ export const proTradersignalService = {
     });
   },
 
-  create(signalData: CreateSignalData) {
+  createSignal(signalData: CreateSignalData) {
     return userApi.post<CreateSignalResponse>(
       "/pro-trader/dashboard/signals",
       signalData,
     );
   },
 
-  update(signalId: string, signalData: UpdateSignalData) {
+  updateSignal(signalId: string, signalData: UpdateSignalData) {
     return userApi.patch<UpdateSignalResponse>(
       `/pro-trader/dashboard/signals/${signalId}`,
       signalData,

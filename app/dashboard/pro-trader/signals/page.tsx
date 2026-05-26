@@ -7,7 +7,7 @@ import SignalsTable from "@/components/pro-trader/signalsPage/SignalsTable";
 import FloatingButton from "@/components/pro-trader/signalsPage/FloatingButton";
 import AddSignalModal from "@/components/pro-trader/signalsPage/AddSignalModal";
 import { SignalInterface } from "@/lib";
-import { proTradersignalService } from "@/lib/api/user";
+import { proTradersignalService } from "@/lib/api/pro-trader";
 
 export default function SignalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

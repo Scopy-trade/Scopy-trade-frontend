@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import EditSignalModal from "./EditSignalModal";
 import { SignalInterface } from "@/lib";
-import { proTradersignalService } from "@/lib/api/user";
+import { proTradersignalService } from "@/lib/api/pro-trader";
 
 interface SignalsTableProps {
   signals: SignalInterface[];
