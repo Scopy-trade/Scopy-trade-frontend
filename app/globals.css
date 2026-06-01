@@ -124,24 +124,44 @@ h3,
 
 /* ── Trading card glow ── */
 .card-glow {
-  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.2s ease;
 }
 .card-glow:hover {
-  box-shadow: 0 0 20px rgba(78, 222, 163, 0.08), 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 0 20px rgba(78, 222, 163, 0.08),
+    0 4px 24px rgba(0, 0, 0, 0.3);
   border-color: rgba(78, 222, 163, 0.15);
   transform: translateY(-2px);
 }
 
 /* ── Skeleton loading pulse ── */
 @keyframes skeletonPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.15; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.15;
+  }
 }
 .skeleton-pulse {
   animation: skeletonPulse 1.8s ease-in-out infinite;
   background: linear-gradient(90deg, #222a3d 0%, #2d3449 50%, #222a3d 100%);
   background-size: 200% 100%;
   border-radius: 4px;
+}
+
+/* ── Marquee scroll animation ── */
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ── Smooth mobile scroll ── */
@@ -161,3 +181,7 @@ h3,
   border-radius: 2px;
 }
 
+/* ── Tonal transition ── */
+.tonal-transition {
+  background: linear-gradient(to bottom, #0b1326, #060e20);
+}

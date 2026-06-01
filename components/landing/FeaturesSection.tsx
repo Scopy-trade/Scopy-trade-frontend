@@ -17,7 +17,7 @@ const features = [
   },
   {
     Icon: RiSignalTowerLine,
-    accent: "sky",
+    accent: "primary",
     tag: "Intelligence",
     title: "Verified Expert Signals",
     description:
@@ -26,7 +26,7 @@ const features = [
   },
   {
     Icon: RiFlashlightLine,
-    accent: "violet",
+    accent: "secondary",
     tag: "Execution",
     title: "Instant One-Click Trading",
     description:
@@ -35,7 +35,7 @@ const features = [
   },
   {
     Icon: RiBarChartBoxLine,
-    accent: "amber",
+    accent: "tertiary",
     tag: "Analytics",
     title: "Deep Portfolio Insights",
     description:
@@ -53,35 +53,34 @@ const accentMap: Record<
     text: "text-emerald-400",
     border: "border-emerald-500/20",
     tagBg: "bg-emerald-500/10",
-    tagText: "text-emerald-500",
+    tagText: "text-emerald-400",
   },
-  sky: {
-    bg: "bg-sky-500/10",
-    text: "text-sky-400",
-    border: "border-sky-500/20",
-    tagBg: "bg-sky-500/10",
-    tagText: "text-sky-500",
+  primary: {
+    bg: "bg-[#b6c4ff]/10",
+    text: "text-[#b6c4ff]",
+    border: "border-[#b6c4ff]/20",
+    tagBg: "bg-[#b6c4ff]/10",
+    tagText: "text-[#b6c4ff]",
   },
-  violet: {
-    bg: "bg-violet-500/10",
-    text: "text-violet-400",
-    border: "border-violet-500/20",
-    tagBg: "bg-violet-500/10",
-    tagText: "text-violet-500",
+  secondary: {
+    bg: "bg-[#4edea3]/10",
+    text: "text-[#4edea3]",
+    border: "border-[#4edea3]/20",
+    tagBg: "bg-[#4edea3]/10",
+    tagText: "text-[#4edea3]",
   },
-  amber: {
-    bg: "bg-amber-500/10",
-    text: "text-amber-400",
-    border: "border-amber-500/20",
-    tagBg: "bg-amber-500/10",
-    tagText: "text-amber-500",
+  tertiary: {
+    bg: "bg-[#ffb2b9]/10",
+    text: "text-[#ffb2b9]",
+    border: "border-[#ffb2b9]/20",
+    tagBg: "bg-[#ffb2b9]/10",
+    tagText: "text-[#ffb2b9]",
   },
 };
 
 export default function FeaturesSection() {
   return (
-    <section className="py-32 relative px-6 lg:px-16 bg-[#080C10]">
-      {/* Subtle divider top */}
+    <section className="py-32 relative px-6 lg:px-16 bg-[#0b1326]">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
       <div className="max-w-7xl mx-auto">
@@ -101,7 +100,7 @@ export default function FeaturesSection() {
               Precision Tools for Modern Finance
             </h2>
           </div>
-          <p className="text-zinc-500 max-w-sm leading-relaxed text-sm font-medium md:text-right">
+          <p className="text-[#c5c6ce] max-w-sm leading-relaxed text-sm font-medium md:text-right">
             Everything you need to mirror professional performance without
             compromising your security posture.
           </p>
@@ -142,14 +141,11 @@ export default function FeaturesSection() {
                   >
                     {title}
                   </h3>
-                  <p className="text-zinc-600 text-sm leading-relaxed mb-6">
+                  <p className="text-[#8f9098] text-sm leading-relaxed mb-6">
                     {description}
                   </p>
 
-                  {/* Bottom metric */}
-                  <div
-                    className={`flex items-center gap-2 pt-4 border-t border-white/[0.04]`}
-                  >
+                  <div className="flex items-center gap-2 pt-4 border-t border-white/[0.04]">
                     <span
                       className={`text-xs font-bold ${colors.text} font-mono`}
                     >
@@ -164,7 +160,7 @@ export default function FeaturesSection() {
 
         {/* Marquee strip */}
         <div className="mt-20 border-y border-white/[0.04] py-5 overflow-hidden relative">
-          <div className="flex gap-16 items-center text-xs font-bold uppercase tracking-[0.15em] text-zinc-700 whitespace-nowrap animate-[scroll_20s_linear_infinite]">
+          <div className="flex gap-16 items-center text-xs font-bold uppercase tracking-[0.15em] text-[#44474d] whitespace-nowrap animate-[scroll_20s_linear_infinite]">
             {[
               "Non-Custodial",
               "Sub-100ms Execution",

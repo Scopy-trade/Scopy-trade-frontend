@@ -1,6 +1,19 @@
 import Link from "next/link";
 
-const footerSections = [
+const footerLinks = [
+  { label: "Risk Disclosure", href: "#" },
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+];
+
+const socialLinks = [
+  { label: "Twitter / X", href: "#" },
+  { label: "Telegram", href: "#" },
+  { label: "GitHub", href: "#" },
+  { label: "Discord", href: "#" },
+];
+
+const navColumns = [
   {
     title: "Product",
     links: [
@@ -16,7 +29,7 @@ const footerSections = [
       { label: "About Us", href: "/about" },
       { label: "Blog", href: "#" },
       { label: "Careers", href: "#" },
-      { label: "Press Kit", href: "#" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
@@ -30,18 +43,11 @@ const footerSections = [
   },
 ];
 
-const socials = [
-  { label: "Twitter", href: "#", icon: "𝕏" },
-  { label: "Telegram", href: "#", icon: "✈" },
-  { label: "GitHub", href: "#", icon: "⌥" },
-  { label: "Discord", href: "#", icon: "◈" },
-];
-
 export default function Footer() {
   return (
-    <footer className="bg-[#060A0E] border-t border-white/[0.04]">
+    <footer className="bg-slate-950 w-full border-t border-slate-800/30">
       <div className="max-w-7xl mx-auto px-6 lg:px-16 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-16 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-16 mb-12">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2.5 mb-5">
@@ -66,28 +72,26 @@ export default function Footer() {
                 SCopy<span className="text-emerald-400">Trade</span>
               </span>
             </div>
-            <p className="text-zinc-600 text-xs leading-relaxed mb-6 font-medium max-w-[180px]">
+            <p className="text-slate-400 text-xs leading-relaxed mb-6 font-medium max-w-[180px]">
               Institutional-grade copy trading. Your keys, your rules.
             </p>
-            {/* Socials */}
-            <div className="flex gap-2">
-              {socials.map(({ label, href, icon }) => (
+            <div className="flex flex-wrap gap-3">
+              {socialLinks.map(({ label, href }) => (
                 <Link
                   key={label}
                   href={href}
-                  aria-label={label}
-                  className="w-8 h-8 flex items-center justify-center border border-white/[0.07] rounded-lg text-zinc-600 hover:text-white hover:border-white/20 transition-all duration-200 text-sm"
+                  className="text-xs font-medium text-slate-500 hover:text-slate-200 transition-colors uppercase tracking-widest"
                 >
-                  {icon}
+                  {label}
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Link columns */}
-          {footerSections.map(({ title, links }) => (
+          {/* Nav columns */}
+          {navColumns.map(({ title, links }) => (
             <div key={title}>
-              <h4 className="text-xs font-bold uppercase tracking-[0.12em] text-zinc-500 mb-5">
+              <h4 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500 mb-5">
                 {title}
               </h4>
               <ul className="space-y-3">
@@ -95,7 +99,7 @@ export default function Footer() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-sm text-zinc-600 hover:text-zinc-300 transition-colors duration-200 font-medium"
+                      className="text-sm text-slate-500 hover:text-slate-200 transition-colors duration-200 font-medium"
                     >
                       {label}
                     </Link>
@@ -107,18 +111,27 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/[0.04] flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-zinc-700 font-medium">
-            © {new Date().getFullYear()} SCopyTrade. All rights reserved.
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-8 border-t border-slate-800/30">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+            © {new Date().getFullYear()} SCopyTrade Terminal. Engineered for
+            sovereign finance.
           </p>
-          <p className="text-xs text-zinc-800 font-medium">
-            Not financial advice. Trading crypto involves substantial risk.
-          </p>
+          <div className="flex flex-wrap gap-x-8 gap-y-2 md:justify-end">
+            {footerLinks.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="text-xs uppercase tracking-widest text-slate-500 hover:text-slate-200 transition-colors font-medium"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Bottom shimmer */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-emerald-500/15 to-transparent" />
+      <div className="w-full h-1 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
     </footer>
   );
 }
