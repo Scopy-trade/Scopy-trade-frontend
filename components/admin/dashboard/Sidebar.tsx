@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
 import { authAPI } from "@/lib/api/client";
 
 const navItems = [
@@ -19,6 +18,7 @@ const navItems = [
   },
   { label: "Trade Audit", href: "/admin/dashboard/logs", icon: "receipt_long" },
   { label: "Financials", href: "/admin/dashboard/finances", icon: "payments" },
+  { label: "Earnings", href: "/admin/dashboard/earnings", icon: "monitoring" },
   {
     label: "Withdrawals",
     href: "/admin/dashboard/withdrawal",
@@ -93,7 +93,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-0.5 px-3">
+        <nav className="flex-1 space-y-0.5 px-3 overflow-y-auto">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
