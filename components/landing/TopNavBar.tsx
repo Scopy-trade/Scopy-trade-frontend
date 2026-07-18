@@ -8,6 +8,7 @@ import {
   RiMenuLine,
   RiCloseLine,
 } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const navLinks = [
   { label: "Dashboard", href: "#" },
@@ -39,26 +40,7 @@ export default function TopNavBar() {
         {/* Wordmark */}
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M7 1L12 4V10L7 13L2 10V4L7 1Z"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-                <circle cx="7" cy="7" r="1.5" fill="white" />
-              </svg>
-            </div>
-            <span
-              className="text-xl font-bold tracking-tight text-white"
-              style={{
-                fontFamily: "var(--font-headline)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              SCopy<span className="text-emerald-400">Trade</span>
-            </span>
+            <BrandLogo className="h-12 w-40" priority />
           </Link>
 
           <div className="hidden lg:flex items-center gap-1 text-sm">

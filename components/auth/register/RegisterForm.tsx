@@ -17,6 +17,7 @@ import {
 } from "react-icons/ri";
 import { authAPI } from "@/lib/api/client";
 import { UserRole } from "@/lib";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 interface PasswordRequirement {
   label: string;
@@ -138,18 +139,8 @@ export default function RegisterForm() {
     <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 xl:p-14 overflow-y-auto bg-[var(--color-surface-container-lowest)]">
       <div className="w-full max-w-sm py-4">
         {/* Mobile logo */}
-        <div className="lg:hidden flex items-center gap-2 mb-7">
-          <div className="w-8 h-8 bg-[var(--color-secondary)] rounded-lg flex items-center justify-center">
-            <span className="text-[var(--color-on-secondary)] font-black text-sm">
-              S
-            </span>
-          </div>
-          <span
-            className="text-xl font-black tracking-tighter text-[var(--color-secondary)]"
-            style={{ fontFamily: "var(--font-headline)" }}
-          >
-            SCopyTrade
-          </span>
+        <div className="lg:hidden mb-7">
+          <BrandLogo className="h-12 w-40" priority />
         </div>
 
         {/* Heading */}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { RiShieldCheckLine } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const stats = [
   { value: "AES-256", label: "Encryption" },
@@ -22,12 +23,7 @@ export default function AdminLoginBrandingPanel() {
       </div>
 
       <div className="relative z-10">
-        <h1
-          className="text-3xl font-black tracking-tighter text-[var(--color-secondary)]"
-          style={{ fontFamily: "var(--font-headline)" }}
-        >
-          SCopyTrade
-        </h1>
+        <BrandLogo className="h-16 w-56" priority />
         <p className="text-[var(--color-on-surface-variant)] mt-2 font-medium">
           Admin Terminal
         </p>

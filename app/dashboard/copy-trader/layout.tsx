@@ -1,13 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { authAPI } from "@/lib/api/client";
+import { AuthProvider } from "@/components/auth/AuthContext";
 import CopyTraderSidebar from "@/components/copy-trader/CopyTraderSidebar";
 import CopyTraderHeader from "@/components/copy-trader/CopyTraderHeader";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
 
-export default function CopyTraderDashboardLayout({
+function CopyTraderDashboardShell({
   children,
 }: {
   children: React.ReactNode;
@@ -15,33 +14,9 @@ export default function CopyTraderDashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isValidating, setIsValidating] = useState(true);
   const [isExchangeModalOpen, setIsExchangeModalOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
-    const validate = async () => {
-      try {
-        const user = await authAPI.getUser();
-        const role = user.role?.trim();
-
-        if (role !== "CopyTrader" && role !== "Copy Trader") {
-          throw new Error("Unauthorized");
-        }
-      } catch {
-        router.replace("/login");
-      } finally {
-        setIsValidating(false);
-      }
-    };
-
-    validate();
-  }, [router]);
-
-  useEffect(() => {
-    setMounted(true);
-
     if (typeof window === "undefined") return;
 
     const checkScreenSize = () => {
@@ -94,8 +69,6 @@ export default function CopyTraderDashboardLayout({
     return "ml-64";
   };
 
-  if (!mounted || isValidating) return null;
-
   return (
     <div className="h-screen overflow-hidden bg-surface-container-lowest">
       <CopyTraderSidebar
@@ -108,8 +81,6 @@ export default function CopyTraderDashboardLayout({
       />
 
       <CopyTraderHeader
-        isOpen={sidebarOpen}
-        isCollapsed={sidebarCollapsed}
         onToggle={handleSidebarToggle}
       />
 
@@ -127,5 +98,17 @@ export default function CopyTraderDashboardLayout({
         onClose={() => setIsExchangeModalOpen(false)}
       />
     </div>
+  );
+}
+
+export default function CopyTraderDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthProvider requiredRole="CopyTrader">
+      <CopyTraderDashboardShell>{children}</CopyTraderDashboardShell>
+    </AuthProvider>
   );
 }

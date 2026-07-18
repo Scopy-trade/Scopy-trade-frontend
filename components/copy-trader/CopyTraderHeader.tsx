@@ -1,18 +1,18 @@
 "use client";
 
 import { MdAccountBalanceWallet, MdMenu } from "react-icons/md";
+import BrandLogo from "@/components/brand/BrandLogo";
+import { getAccountInitials, useAuth } from "@/components/auth/AuthContext";
 
 interface CopyTraderHeaderProps {
-  isOpen: boolean;
-  isCollapsed: boolean;
   onToggle: () => void;
 }
 
 export default function CopyTraderHeader({
-  isOpen,
-  isCollapsed,
   onToggle,
 }: CopyTraderHeaderProps) {
+  const { account } = useAuth();
+
   return (
     <header className="sticky md:hidden top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
       {/* Left Section - Mobile Menu Button */}
@@ -26,15 +26,7 @@ export default function CopyTraderHeader({
           <MdMenu size={20} />
         </button>
 
-        {/* Desktop title */}
-        <h1 className="text-lg font-bold tracking-tighter text-slate-100 hidden md:block">
-          {isCollapsed ? "SCT" : "SCopyTrade"}
-        </h1>
-
-        {/* Mobile title */}
-        <h1 className="text-lg font-bold tracking-tighter text-slate-100 md:hidden">
-          SCopyTrade
-        </h1>
+        <BrandLogo className="h-10 w-36 md:hidden" priority />
       </div>
 
       {/* Right Section - User Actions */}
@@ -50,7 +42,9 @@ export default function CopyTraderHeader({
         </button>
 
         <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 cursor-pointer hover:border-primary/40 transition-all bg-surface-container-high flex items-center justify-center">
-          <span className="text-xs font-bold text-secondary">CT</span>
+          <span className="text-xs font-bold text-secondary">
+            {getAccountInitials(account)}
+          </span>
         </div>
       </div>
     </header>

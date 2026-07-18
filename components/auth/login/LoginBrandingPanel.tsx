@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import { RiShieldCheckLine, RiFlaskLine, RiGlobalLine } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const features = [
   { Icon: RiFlaskLine, text: "Advanced Analytics" },
@@ -48,23 +49,11 @@ export default function LoginBrandingPanel() {
 
       {/* Top: Logo */}
       <div className="relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-secondary)] to-[var(--color-primary)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--color-secondary)]/20">
-            <span className="text-[var(--color-on-secondary)] font-black text-xl">
-              S
-            </span>
-          </div>
-          <div>
-            <h1
-              className="text-2xl font-black tracking-tighter text-[var(--color-on-surface)]"
-              style={{ fontFamily: "var(--font-headline)" }}
-            >
-              SCopyTrade
-            </h1>
-            <p className="text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
-              Sovereign Terminal
-            </p>
-          </div>
+        <div>
+          <BrandLogo className="h-14 w-48" priority />
+          <p className="ml-1 text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
+            Sovereign Terminal
+          </p>
         </div>
       </div>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import BrandLogo from "@/components/brand/BrandLogo";
+
 const footerLinks = [
   { label: "Risk Disclosure", href: "#" },
   { label: "Privacy Policy", href: "#" },
@@ -41,12 +43,7 @@ export default function DashboardFooter() {
       }}
     >
       <div>
-        <span
-          className="text-lg font-bold tracking-tighter"
-          style={{ fontFamily: "var(--font-headline)", color: "#cbd5e1" }}
-        >
-          SCopyTrade Terminal
-        </span>
+        <BrandLogo className="h-12 w-40" />
         <p
           className="text-[10px] uppercase tracking-widest mt-2"
           style={{ color: "#475569" }}

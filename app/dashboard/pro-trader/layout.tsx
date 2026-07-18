@@ -3,10 +3,9 @@
 import DashboardHeader from "@/components/pro-trader/DashboardHeader";
 import DashboardSidebar from "@/components/pro-trader/DashboardSidebar";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { authAPI } from "@/lib/api/client";
+import { AuthProvider } from "@/components/auth/AuthContext";
 
-export default function DashboardLayout({
+function ProTraderDashboardShell({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -14,32 +13,8 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isValidating, setIsValidating] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    const validate = async () => {
-      try {
-        const user = await authAPI.getUser();
-        const role = user.role?.trim();
-
-        if (role !== "Pro Trader") {
-          throw new Error("Unauthorized");
-        }
-      } catch {
-        router.replace("/login");
-      } finally {
-        setIsValidating(false);
-      }
-    };
-
-    validate();
-  }, [router]);
-
-  useEffect(() => {
-    setMounted(true);
-
     if (typeof window === "undefined") return;
 
     const checkScreenSize = () => {
@@ -94,8 +69,6 @@ export default function DashboardLayout({
     return "ml-64";
   };
 
-  if (!mounted || isValidating) return null;
-
   return (
     <div className="h-screen overflow-hidden">
       <DashboardSidebar
@@ -107,8 +80,6 @@ export default function DashboardLayout({
       />
 
       <DashboardHeader
-        isOpen={sidebarOpen}
-        isCollapsed={sidebarCollapsed}
         onToggle={handleSidebarToggle}
       />
 
@@ -122,5 +93,17 @@ export default function DashboardLayout({
         <div className="p-4 md:p-8">{children}</div>
       </main>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <AuthProvider requiredRole="Pro Trader">
+      <ProTraderDashboardShell>{children}</ProTraderDashboardShell>
+    </AuthProvider>
   );
 }

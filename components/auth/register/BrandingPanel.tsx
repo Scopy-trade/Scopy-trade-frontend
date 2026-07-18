@@ -3,11 +3,11 @@
 
 import Image from "next/image";
 import {
-  RiLockLine,
   RiShieldCheckLine,
   RiLineChartLine,
   RiUserFollowLine,
 } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const steps = [
   {
@@ -60,21 +60,11 @@ export default function BrandingPanel() {
 
       {/* Top: Logo */}
       <div className="relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[var(--color-secondary)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--color-secondary)]/20">
-            <RiLockLine className="text-[var(--color-on-secondary)] text-xl" />
-          </div>
-          <div>
-            <span
-              className="text-2xl font-black tracking-tighter text-[var(--color-secondary)]"
-              style={{ fontFamily: "var(--font-headline)" }}
-            >
-              SCopyTrade
-            </span>
-            <p className="text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
-              Sovereign Terminal
-            </p>
-          </div>
+        <div>
+          <BrandLogo className="h-14 w-48" priority />
+          <p className="ml-1 text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
+            Sovereign Terminal
+          </p>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   MdSettings,
   MdShowChart,
@@ -12,7 +12,8 @@ import {
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 
 import { useEffect, useRef } from "react";
-import { authAPI } from "@/lib/api/client";
+import { useAuth } from "@/components/auth/AuthContext";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ export default function CopyTraderSidebar({
   onOpenExchangeSettings,
 }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { logout } = useAuth();
   const sidebarRef = useRef<HTMLElement>(null);
 
   // Close sidebar when clicking outside
@@ -81,14 +82,9 @@ export default function CopyTraderSidebar({
 
   const handleLogout = async () => {
     try {
-      localStorage.clear();
-      await authAPI.logout();
-      router.replace("/login");
+      await logout();
     } catch (err) {
       console.error("Logout failed:", err);
-      // Even if API fails, clear local state
-      localStorage.clear();
-      router.replace("/login");
     }
   };
 
@@ -129,23 +125,16 @@ export default function CopyTraderSidebar({
           `}
         >
           <Link href="/dashboard/copy-trader" className="block">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-linear-to-br from-secondary to-secondary-container flex items-center justify-center shadow-lg shadow-secondary/20 shrink-0">
-                <span className="text-white font-bold text-sm">SCT</span>
+            {isCollapsed && !isMobile ? (
+              <BrandLogo compact className="h-9 w-9 rounded-lg" priority />
+            ) : (
+              <div>
+                <BrandLogo className="h-13 w-44" priority />
+                <p className="mt-1 ml-1 text-xs font-medium uppercase tracking-widest text-secondary opacity-80">
+                  Copy Trader
+                </p>
               </div>
-
-              {(!isCollapsed || isMobile) && (
-                <div>
-                  <h1 className="text-xl font-bold tracking-tighter text-slate-100">
-                    SCopyTrade
-                  </h1>
-
-                  <p className="text-xs text-secondary font-medium opacity-80 uppercase tracking-widest mt-0.5">
-                    Copy Trader
-                  </p>
-                </div>
-              )}
-            </div>
+            )}
           </Link>
         </div>
 

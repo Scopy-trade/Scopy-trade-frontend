@@ -1,10 +1,14 @@
 "use client";
 
+import { getAccountInitials, getAccountName, useAuth } from "@/components/auth/AuthContext";
+
 interface HeaderProps {
   onMenuToggle: () => void;
 }
 
 export default function Header({ onMenuToggle }: HeaderProps) {
+  const { account } = useAuth();
+
   return (
     <header className="sticky top-0 z-30 w-full bg-[#060e20]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 sm:px-8 py-4">
       {/* Left */}
@@ -45,12 +49,14 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
         <div className="flex items-center gap-2 sm:gap-3 border-l border-white/10 pl-3 sm:pl-5">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-bold text-[#dae2fd]">Admin_Root</p>
+            <p className="text-xs font-bold text-[#dae2fd]">
+              {getAccountName(account)}
+            </p>
             <p className="text-[10px] text-[#8f9098]">Superuser</p>
           </div>
           <div className="w-8 h-8 rounded-full bg-[#171f33] border border-[#4edea3]/20 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#4edea3] text-sm">
-              person
+            <span className="text-[10px] font-bold text-[#4edea3]">
+              {getAccountInitials(account)}
             </span>
           </div>
         </div>

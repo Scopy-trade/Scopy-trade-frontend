@@ -2,18 +2,18 @@
 "use client";
 
 import { MdAccountBalanceWallet, MdMenu } from "react-icons/md";
+import BrandLogo from "@/components/brand/BrandLogo";
+import { getAccountInitials, useAuth } from "@/components/auth/AuthContext";
 
 interface DashboardNavProps {
-  isOpen: boolean;
-  isCollapsed: boolean;
   onToggle: () => void;
 }
 
 export default function DashboardHeader({
-  isOpen,
-  isCollapsed,
   onToggle,
 }: DashboardNavProps) {
+  const { account } = useAuth();
+
   return (
     <header className="sticky md:hidden top-0 z-40 w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
       {/* Left Section - Mobile Menu Button */}
@@ -27,15 +27,7 @@ export default function DashboardHeader({
           <MdMenu size={20} />
         </button>
 
-        {/* Desktop title */}
-        <h1 className="text-lg font-bold tracking-tighter text-slate-100 hidden md:block">
-          {isCollapsed ? "SCT" : "SCopyTrade"}
-        </h1>
-
-        {/* Mobile title */}
-        <h1 className="text-lg font-bold tracking-tighter text-slate-100 md:hidden">
-          SCopyTrade
-        </h1>
+        <BrandLogo className="h-10 w-36 md:hidden" priority />
       </div>
 
       {/* Right Section - User Actions */}
@@ -50,12 +42,10 @@ export default function DashboardHeader({
           </span>
         </button>
 
-        <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 cursor-pointer hover:border-primary/40 transition-all">
-          <img
-            alt="User profile"
-            className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsRKVvzzeLux6KWRFk0PknaGZRr29YEKxbAtz75KmN6qUS-yKudcOp35mygGCfRk8WbsxBSqbQyazBOuvI-dd880joJEi-8cEsQgJU7rst4BfLHZ6KZ4jCVKEEVPw0Kx7ioGkD3b-WrtoyzgIrFsAuiDKi0mNOmOfMvkcPmLlGMW1lr39gnHlTupxZwSyQROuml4bxpdHDaDRhqPecdWIH8LcwaWRW0Hq-UrsibqrM3koeWRJdj4aaiY8WV9t8ahUB050bfSOWfg"
-          />
+        <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 cursor-pointer hover:border-primary/40 transition-all bg-surface-container-high flex items-center justify-center">
+          <span className="text-xs font-bold text-secondary">
+            {getAccountInitials(account)}
+          </span>
         </div>
       </div>
     </header>

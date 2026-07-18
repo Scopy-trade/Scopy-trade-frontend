@@ -15,6 +15,7 @@ import {
 } from "react-icons/ri";
 import { authAPI } from "@/lib/api/client";
 import { User } from "@/lib";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 export default function LoginForm() {
   const [email, setEmail] = useState(() => {
@@ -82,18 +83,8 @@ export default function LoginForm() {
     <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-14 overflow-y-auto bg-[var(--color-surface-container-lowest)]">
       <div className="w-full max-w-sm">
         {/* Mobile logo */}
-        <div className="md:hidden flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 bg-gradient-to-br from-[var(--color-secondary)] to-[var(--color-primary)] rounded-lg flex items-center justify-center">
-            <span className="text-[var(--color-on-secondary)] font-black text-sm">
-              S
-            </span>
-          </div>
-          <span
-            className="text-xl font-black tracking-tighter text-[var(--color-on-surface)]"
-            style={{ fontFamily: "var(--font-headline)" }}
-          >
-            SCopyTrade
-          </span>
+        <div className="md:hidden mb-8">
+          <BrandLogo className="h-12 w-40" priority />
         </div>
 
         {/* Heading */}

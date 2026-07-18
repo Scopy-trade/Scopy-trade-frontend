@@ -8,11 +8,14 @@ import {
   MdSettings,
   MdShowChart,
   MdSensors,
+  MdLogout,
 } from "react-icons/md";
 
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 
 import { useEffect, useRef } from "react";
+import { useAuth } from "@/components/auth/AuthContext";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const navItems = [
   {
@@ -53,6 +56,7 @@ export default function DashboardSidebar({
   onCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const sidebarRef = useRef<HTMLElement>(null);
 
@@ -123,24 +127,17 @@ export default function DashboardSidebar({
             px-6 mb-10
           `}
         >
-          <Link href="/dashboard" className="block">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-linear-to-br from-secondary to-secondary-container flex items-center justify-center shadow-lg shadow-secondary/20 shrink-0">
-                <span className="text-white font-bold text-sm">SCT</span>
+          <Link href="/dashboard/pro-trader" className="block">
+            {isCollapsed && !isMobile ? (
+              <BrandLogo compact className="h-9 w-9 rounded-lg" priority />
+            ) : (
+              <div>
+                <BrandLogo className="h-13 w-44" priority />
+                <p className="mt-1 ml-1 text-xs font-medium uppercase tracking-widest text-secondary opacity-80">
+                  Pro Trader
+                </p>
               </div>
-
-              {(!isCollapsed || isMobile) && (
-                <div>
-                  <h1 className="text-xl font-bold tracking-tighter text-slate-100">
-                    SCopyTrade
-                  </h1>
-
-                  <p className="text-xs text-secondary font-medium opacity-80 uppercase tracking-widest mt-0.5">
-                    Pro Trader
-                  </p>
-                </div>
-              )}
-            </div>
+            )}
           </Link>
         </div>
 
@@ -202,6 +199,15 @@ export default function DashboardSidebar({
 
             {(!isCollapsed || isMobile) && <span>Profile Settings</span>}
           </Link>
+          <button
+            type="button"
+            onClick={() => void logout()}
+            title={isCollapsed && !isMobile ? "Logout" : undefined}
+            className={`mt-3 w-full flex py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-slate-300 hover:text-tertiary font-bold text-sm transition-all active:scale-95 border border-white/5 items-center gap-3 ${isCollapsed && !isMobile ? "md:justify-center md:px-2" : "px-4"}`}
+          >
+            <MdLogout className="text-lg" />
+            {(!isCollapsed || isMobile) && <span>Logout</span>}
+          </button>
         </div>
 
         {/* Collapse Button */}

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
-import { authAPI } from "@/lib/api/client";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthContext";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const navItems = [
   { label: "Overview", href: "/admin/dashboard", icon: "dashboard" },
@@ -33,7 +33,7 @@ interface SidebarProps {
 
 export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/admin/dashboard") return pathname === href;
@@ -42,9 +42,9 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
   const handleLogout = async () => {
     try {
-      await authAPI.adminLogout();
-    } finally {
-      router.push("/admin/login");
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
   };
 
@@ -69,19 +69,10 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       >
         {/* Brand */}
         <div className="px-6 mb-10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#00311f] rounded-xl flex items-center justify-center border border-[#4edea3]/20">
-              <span className="material-symbols-outlined text-[#4edea3] text-xl">
-                account_balance_wallet
-              </span>
-            </div>
-            <div>
-              <div className="text-xl font-black text-[#4edea3] tracking-tighter font-[Manrope,sans-serif]">
-                SCopyTrade
-              </div>
-              <div className="text-[9px] text-[#8f9098] font-medium uppercase tracking-widest opacity-70">
-                Sovereign Terminal
-              </div>
+          <div>
+            <BrandLogo className="h-13 w-44" priority />
+            <div className="ml-1 mt-1 text-[9px] text-[#8f9098] font-medium uppercase tracking-widest opacity-70">
+              Sovereign Terminal
             </div>
           </div>
           <button

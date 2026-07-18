@@ -6,6 +6,7 @@ import {
   RiWallet3Line,
   RiArrowRightLine,
 } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const navLinks = [
   { label: "Dashboard", href: "/dashboard", active: true },
@@ -29,12 +30,7 @@ export default function DashboardNav() {
     >
       {/* Left: Logo + Links */}
       <div className="flex items-center gap-8">
-        <span
-          className="text-2xl font-black tracking-tighter"
-          style={{ fontFamily: "var(--font-headline)", color: "#f8fafc" }}
-        >
-          SCopyTrade
-        </span>
+        <BrandLogo className="h-12 w-40" priority />
         <div
           className="hidden md:flex gap-6 text-sm"
           style={{ fontFamily: "var(--font-headline)" }}

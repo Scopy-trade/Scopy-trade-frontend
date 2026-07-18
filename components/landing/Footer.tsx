@@ -1,4 +1,11 @@
 import Link from "next/link";
+import BrandLogo from "@/components/brand/BrandLogo";
+import {
+  RiDiscordFill,
+  RiGithubFill,
+  RiSendPlaneFill,
+  RiTwitterXFill,
+} from "react-icons/ri";
 
 const footerSections = [
   {
@@ -31,10 +38,10 @@ const footerSections = [
 ];
 
 const socials = [
-  { label: "Twitter", href: "#", icon: "𝕏" },
-  { label: "Telegram", href: "#", icon: "✈" },
-  { label: "GitHub", href: "#", icon: "⌥" },
-  { label: "Discord", href: "#", icon: "◈" },
+  { label: "Twitter", href: "#", Icon: RiTwitterXFill },
+  { label: "Telegram", href: "#", Icon: RiSendPlaneFill },
+  { label: "GitHub", href: "#", Icon: RiGithubFill },
+  { label: "Discord", href: "#", Icon: RiDiscordFill },
 ];
 
 export default function Footer() {
@@ -45,40 +52,21 @@ export default function Footer() {
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path
-                    d="M7 1L12 4V10L7 13L2 10V4L7 1Z"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="7" cy="7" r="1.5" fill="white" />
-                </svg>
-              </div>
-              <span
-                className="text-lg font-bold tracking-tight text-white"
-                style={{
-                  fontFamily: "var(--font-headline)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                SCopy<span className="text-emerald-400">Trade</span>
-              </span>
+              <BrandLogo className="h-12 w-40" />
             </div>
             <p className="text-zinc-600 text-xs leading-relaxed mb-6 font-medium max-w-[180px]">
               Institutional-grade copy trading. Your keys, your rules.
             </p>
             {/* Socials */}
             <div className="flex gap-2">
-              {socials.map(({ label, href, icon }) => (
+              {socials.map(({ label, href, Icon }) => (
                 <Link
                   key={label}
                   href={href}
                   aria-label={label}
                   className="w-8 h-8 flex items-center justify-center border border-white/[0.07] rounded-lg text-zinc-600 hover:text-white hover:border-white/20 transition-all duration-200 text-sm"
                 >
-                  {icon}
+                  <Icon aria-hidden="true" />
                 </Link>
               ))}
             </div>
