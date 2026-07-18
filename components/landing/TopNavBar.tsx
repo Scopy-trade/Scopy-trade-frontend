@@ -39,7 +39,7 @@ export default function TopNavBar() {
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-slate-950/80 backdrop-blur-md border-b border-white/[0.04] shadow-2xl shadow-slate-950/40"
+          ? "bg-slate-950/80 backdrop-blur-md border-b border-white/4 shadow-2xl shadow-slate-950/40"
           : "bg-transparent"
       }`}
     >
@@ -77,21 +77,6 @@ export default function TopNavBar() {
 
         {/* Right actions */}
         <div className="hidden md:flex items-center gap-3">
-          <button
-            aria-label="Notifications"
-            className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] rounded-full transition-all duration-200"
-          >
-            <RiBellLine className="text-lg" />
-          </button>
-          <button
-            aria-label="Wallet"
-            className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] rounded-full transition-all duration-200"
-          >
-            <RiWalletLine className="text-lg" />
-          </button>
-
-          <div className="w-px h-5 bg-white/10 mx-1" />
-
           <Link
             href="/login"
             className="px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-white/[0.06] transition-all duration-200"

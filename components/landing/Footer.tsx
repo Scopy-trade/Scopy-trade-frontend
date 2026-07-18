@@ -1,6 +1,26 @@
 import Link from "next/link";
+import BrandLogo from "@/components/brand/BrandLogo";
+import {
+  RiDiscordFill,
+  RiGithubFill,
+  RiSendPlaneFill,
+  RiTwitterXFill,
+} from "react-icons/ri";
 
-const footerSections = [
+const footerLinks = [
+  { label: "Risk Disclosure", href: "#" },
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+];
+
+const socialLinks = [
+  { label: "Twitter / X", href: "#", Icon: RiTwitterXFill },
+  { label: "Telegram", href: "#", Icon: RiSendPlaneFill },
+  { label: "GitHub", href: "#", Icon: RiGithubFill },
+  { label: "Discord", href: "#", Icon: RiDiscordFill },
+];
+
+const navColumns = [
   {
     title: "Product",
     links: [
@@ -30,13 +50,6 @@ const footerSections = [
   },
 ];
 
-const socials = [
-  { label: "Twitter", href: "#", Icon: RiTwitterXFill },
-  { label: "Telegram", href: "#", Icon: RiSendPlaneFill },
-  { label: "GitHub", href: "#", Icon: RiGithubFill },
-  { label: "Discord", href: "#", Icon: RiDiscordFill },
-];
-
 export default function Footer() {
   return (
     <footer className="bg-slate-950 w-full border-t border-slate-800/30">
@@ -50,15 +63,16 @@ export default function Footer() {
             <p className="text-slate-400 text-xs leading-relaxed mb-6 font-medium max-w-[180px]">
               Institutional-grade copy trading. Your keys, your rules.
             </p>
-            {/* Socials */}
-            <div className="flex gap-2">
-              {socials.map(({ label, href, Icon }) => (
+            <div className="flex flex-wrap gap-3">
+              {socialLinks.map(({ label, href, Icon }) => (
                 <Link
                   key={label}
                   href={href}
-                  className="text-xs font-medium text-slate-500 hover:text-slate-200 transition-colors uppercase tracking-widest"
+                  aria-label={label}
+                  title={label}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-800/60 text-slate-500 transition-colors hover:border-slate-700 hover:text-slate-200"
                 >
-                  <Icon aria-hidden="true" />
+                  <Icon className="text-base" aria-hidden="true" />
                 </Link>
               ))}
             </div>
