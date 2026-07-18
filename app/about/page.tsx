@@ -74,19 +74,6 @@ const values = [
   },
 ];
 
-const milestones = [
-  { year: "2021", event: "SCopyTrade founded in London by Arjan & Sofia" },
-  {
-    year: "2022",
-    event: "Seed round closed. First 100 beta traders onboarded",
-  },
-  { year: "2022", event: "Binance and OKX integrations launched" },
-  { year: "2023", event: "Crossed $100M in monthly trading volume" },
-  { year: "2023", event: "Series A — $12M raised to scale the signal network" },
-  { year: "2024", event: "2,500+ active traders. $2.4B+ cumulative volume" },
-  { year: "2025", event: "Launched API analytics suite and mobile app" },
-];
-
 const accentMap: Record<string, { ring: string; bg: string; text: string }> = {
   emerald: {
     ring: "ring-emerald-500/20",
@@ -482,52 +469,8 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ─── TIMELINE ─────────────────────────────────────────── */}
-        <section className="py-24 px-6 lg:px-16 relative">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-14 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-4">
-                Our Journey
-              </p>
-              <h2
-                className="text-4xl md:text-5xl font-black text-white tracking-tight"
-                style={{
-                  fontFamily: "var(--font-headline)",
-                  letterSpacing: "-0.03em",
-                }}
-              >
-                Milestones
-              </h2>
-            </div>
-
-            <div className="relative">
-              <div className="absolute left-[72px] top-0 bottom-0 w-px bg-gradient-to-b from-emerald-500/30 via-white/[0.04] to-transparent" />
-              <div className="space-y-8">
-                {milestones.map(({ year, event }, i) => (
-                  <div key={i} className="flex gap-8 items-start group">
-                    <div className="flex-shrink-0 w-[72px] text-right">
-                      <span className="text-xs font-black text-zinc-700 font-mono group-hover:text-emerald-500 transition-colors">
-                        {year}
-                      </span>
-                    </div>
-                    <div className="flex-shrink-0 relative z-10 mt-0.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#080C10] border-2 border-zinc-700 group-hover:border-emerald-500 transition-colors" />
-                    </div>
-                    <div className="flex-1 pb-2">
-                      <p className="text-sm text-zinc-500 font-medium group-hover:text-zinc-300 transition-colors leading-relaxed">
-                        {event}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* ─── TEAM ─────────────────────────────────────────────── */}
-        <section className="py-24 px-6 lg:px-16 relative bg-[#060A0E]">
+        <section className="py-24 px-6 lg:px-16 relative">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
           <div className="max-w-7xl mx-auto">
             <div className="mb-14">
@@ -585,7 +528,7 @@ export default function AboutPage() {
         </section>
 
         {/* ─── JOIN US CTA ──────────────────────────────────────── */}
-        <section className="py-24 px-6 lg:px-16 relative">
+        {/* <section className="py-24 px-6 lg:px-16 relative">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-5">
@@ -621,7 +564,7 @@ export default function AboutPage() {
               </Link>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
