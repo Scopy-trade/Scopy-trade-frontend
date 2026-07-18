@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
 import BrandLogo from "@/components/brand/BrandLogo";
+=======
+import { useRouter, usePathname } from "next/navigation";
+import { authAPI } from "@/lib/api/client";
+>>>>>>> 38f76e1ff046e627aa250dc524d63e57fa59f1e4
 
 const navItems = [
   { label: "Overview", href: "/admin/dashboard", icon: "dashboard" },
@@ -19,6 +24,7 @@ const navItems = [
   },
   { label: "Trade Audit", href: "/admin/dashboard/logs", icon: "receipt_long" },
   { label: "Financials", href: "/admin/dashboard/finances", icon: "payments" },
+  { label: "Earnings", href: "/admin/dashboard/earnings", icon: "monitoring" },
   {
     label: "Withdrawals",
     href: "/admin/dashboard/withdrawal",
@@ -84,7 +90,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-0.5 px-3">
+        <nav className="flex-1 space-y-0.5 px-3 overflow-y-auto">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
