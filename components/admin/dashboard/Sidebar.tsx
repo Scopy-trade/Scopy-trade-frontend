@@ -1,14 +1,9 @@
 "use client";
 
 import Link from "next/link";
-<<<<<<< HEAD
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
 import BrandLogo from "@/components/brand/BrandLogo";
-=======
-import { useRouter, usePathname } from "next/navigation";
-import { authAPI } from "@/lib/api/client";
->>>>>>> 38f76e1ff046e627aa250dc524d63e57fa59f1e4
 
 const navItems = [
   { label: "Overview", href: "/admin/dashboard", icon: "dashboard" },
