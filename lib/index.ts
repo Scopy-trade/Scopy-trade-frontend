@@ -65,6 +65,16 @@ export interface ActiveProTrade {
   status: "pending" | "filled" | "closed" | "cancelled" | "failed";
   tradeOrigin: "pro";
   exchangeOrderId?: string | null;
+  wsMonitoringActive?: boolean;
+  monitoringStatus?:
+    | "connecting"
+    | "connected"
+    | "reconnecting"
+    | "disconnected"
+    | "unsupported";
+  monitoringError?: string | null;
+  monitoringConnectedAt?: string | null;
+  lastCheckedAt?: string | null;
   exchangeConnectionId:
     | string
     | {

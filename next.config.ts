@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/ws/trades",
+        destination: `${process.env.BACKEND_URL}/ws/trades`,
+      },
+      {
         source: "/api/:path*",
         destination: `${process.env.BACKEND_URL}/api/:path*`,
       },

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdArrowForward, MdPendingActions, MdShowChart } from "react-icons/md";
 import { ActiveProTrade } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import TradesTable from "@/components/pro-trader/signalsPage/TradesTable";
 import TradeDetailsModal from "@/components/pro-trader/signalsPage/TradeDetailsModal";
+import { useTradeUpdates } from "@/lib/hooks/useTradeUpdates";
 
 export default function ProTraderDashboard() {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
@@ -14,9 +15,11 @@ export default function ProTraderDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
 
+  const fetchTrades = useCallback(() => tradeService.getProTrades(), []);
+
   useEffect(() => {
     let cancelled = false;
-    void tradeService.getProTrades()
+    void fetchTrades()
       .then((response) => {
         if (!cancelled) setTrades(response.trades);
       })
@@ -29,7 +32,26 @@ export default function ProTraderDashboard() {
     return () => {
       cancelled = true;
     };
+  }, [fetchTrades]);
+
+  const applyLiveUpdate = useCallback((update: Partial<ActiveProTrade> & { _id: string }) => {
+    setTrades((current) =>
+      current.map((trade) => trade._id === update._id ? { ...trade, ...update } : trade),
+    );
+    setSelectedTrade((current) =>
+      current?._id === update._id ? { ...current, ...update } : current,
+    );
   }, []);
+
+  useTradeUpdates({
+    tradeIds: trades.map((trade) => trade._id),
+    onUpdate: applyLiveUpdate,
+    onReconnect: () => {
+      void fetchTrades()
+        .then((response) => setTrades(response.trades))
+        .catch((err) => setError(err instanceof Error ? err.message : "Failed to refresh trades"));
+    },
+  });
 
   const activeTrades = trades.filter(
     (trade) => trade.status === "pending" || trade.status === "filled",

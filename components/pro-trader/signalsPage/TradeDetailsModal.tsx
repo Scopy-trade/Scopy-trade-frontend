@@ -93,6 +93,17 @@ export default function TradeDetailsModal({
         <form onSubmit={(event) => void save(event)} className="space-y-6 p-6">
           {error && <p className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary">{error}</p>}
 
+          <div className="rounded-lg border border-white/10 bg-surface-container-high p-3 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-slate-400">Exchange monitoring</span>
+              <span className={`font-semibold capitalize ${trade.monitoringStatus === "connected" ? "text-secondary" : trade.monitoringStatus === "connecting" || trade.monitoringStatus === "reconnecting" ? "text-amber-400" : "text-tertiary"}`}>
+                {trade.monitoringStatus || (trade.wsMonitoringActive ? "connected" : "disconnected")}
+              </span>
+            </div>
+            {trade.monitoringError && <p className="mt-2 text-xs text-tertiary">{trade.monitoringError}</p>}
+            {trade.lastCheckedAt && <p className="mt-1 text-xs text-slate-500">Last reconciled {new Date(trade.lastCheckedAt).toLocaleString()}</p>}
+          </div>
+
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div><p className="text-[10px] uppercase text-slate-500">Quantity</p><p className="mt-1 font-mono text-sm">{trade.quantity}</p></div>
             <div><p className="text-[10px] uppercase text-slate-500">Fill price</p><p className="mt-1 font-mono text-sm">{trade.entryFillPrice || "Not filled"}</p></div>

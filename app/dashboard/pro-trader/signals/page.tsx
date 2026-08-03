@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdAdd, MdSettings } from "react-icons/md";
 import { ActiveProTrade } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
@@ -8,6 +8,7 @@ import OpenTradeModal from "@/components/pro-trader/signalsPage/OpenTradeModal";
 import TradesTable from "@/components/pro-trader/signalsPage/TradesTable";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
 import TradeDetailsModal from "@/components/pro-trader/signalsPage/TradeDetailsModal";
+import { useTradeUpdates } from "@/lib/hooks/useTradeUpdates";
 
 export default function TradesPage() {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
@@ -18,9 +19,11 @@ export default function TradesPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
 
+  const fetchTrades = useCallback(() => tradeService.getProTrades(), []);
+
   useEffect(() => {
     let cancelled = false;
-    void tradeService.getProTrades()
+    void fetchTrades()
       .then((response) => {
         if (!cancelled) setTrades(response.trades);
       })
@@ -33,7 +36,26 @@ export default function TradesPage() {
     return () => {
       cancelled = true;
     };
-  }, [refreshKey]);
+  }, [refreshKey, fetchTrades]);
+
+  const applyLiveUpdate = useCallback((update: Partial<ActiveProTrade> & { _id: string }) => {
+    setTrades((current) =>
+      current.map((trade) => trade._id === update._id ? { ...trade, ...update } : trade),
+    );
+    setSelectedTrade((current) =>
+      current?._id === update._id ? { ...current, ...update } : current,
+    );
+  }, []);
+
+  useTradeUpdates({
+    tradeIds: trades.map((trade) => trade._id),
+    onUpdate: applyLiveUpdate,
+    onReconnect: () => {
+      void fetchTrades()
+        .then((response) => setTrades(response.trades))
+        .catch((err) => setError(err instanceof Error ? err.message : "Failed to refresh trades"));
+    },
+  });
 
   const active = trades.filter((trade) => trade.status === "pending" || trade.status === "filled").length;
   const closed = trades.filter((trade) => trade.status === "closed").length;

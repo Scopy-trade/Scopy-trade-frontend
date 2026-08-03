@@ -10,7 +10,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative min-h-[700px] flex items-center justify-center overflow-hidden px-6 lg:px-24 pt-24 pb-0"
+      className="relative min-h-175 flex items-center justify-center overflow-hidden px-6 lg:px-24 pt-24 pb-0"
     >
       {/* Background blobs */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -22,7 +22,7 @@ export default function HeroSection() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2d3449] rounded-full border border-white/10 mx-auto">
           <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-          <span className="text-xs font-medium tracking-widest uppercase text-[#c5c6ce]">
+          <span className="text-xs font-medium tracking-widest uppercase text-on-surface-variant">
             Dual-Side Trading Marketplace
           </span>
         </div>
@@ -33,12 +33,12 @@ export default function HeroSection() {
           style={{ fontFamily: "var(--font-headline)" }}
         >
           The Sovereign Terminal for <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-[#b6c4ff]">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-[#b6c4ff]">
             Both Sides of the Trade.
           </span>
         </h1>
 
-        <p className="text-xl text-[#c5c6ce] max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
           Whether you&apos;re following elite signals or providing them,
           SCopyTrade provides the institutional infrastructure to trade with
           total control and zero custody.
@@ -54,7 +54,7 @@ export default function HeroSection() {
               >
                 {value}
               </p>
-              <p className="text-xs uppercase tracking-widest text-[#c5c6ce] font-semibold mt-1">
+              <p className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold mt-1">
                 {label}
               </p>
             </div>

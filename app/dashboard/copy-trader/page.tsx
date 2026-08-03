@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import SignalFilters from "@/components/copy-trader/SignalFilters";
 import SignalGrid from "@/components/copy-trader/SignalGrid";
 import ExecuteTradeModal from "@/components/copy-trader/ExecuteTradeModal";
 import { ActiveProTrade } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
+import { useTradeUpdates } from "@/lib/hooks/useTradeUpdates";
 
 export default function CopyTraderPage() {
   const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
@@ -16,13 +17,17 @@ export default function CopyTraderPage() {
 
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const fetchTrades = useCallback(async () => {
+    const response = await tradeService.getActiveProTrades();
+    setTrades(response.trades || []);
+  }, []);
+
   useEffect(() => {
-    async function fetchTrades() {
+    async function loadTrades() {
       try {
         setLoading(true);
         setError(null);
-        const response = await tradeService.getActiveProTrades();
-        setTrades(response.trades || []);
+        await fetchTrades();
       } catch (err) {
         console.error("Failed to fetch pro trades:", err);
         setError(err instanceof Error ? err.message : "Failed to load active pro trades.");
@@ -32,8 +37,29 @@ export default function CopyTraderPage() {
       }
     }
 
-    void fetchTrades();
-  }, [refreshKey]);
+    void loadTrades();
+  }, [fetchTrades, refreshKey]);
+
+  const applyLiveUpdate = useCallback((update: Partial<ActiveProTrade> & { _id: string }) => {
+    setTrades((current) => {
+      if (update.status && !["pending", "filled"].includes(update.status)) {
+        return current.filter((trade) => trade._id !== update._id);
+      }
+      return current.map((trade) =>
+        trade._id === update._id ? { ...trade, ...update } : trade,
+      );
+    });
+  }, []);
+
+  useTradeUpdates({
+    tradeIds: trades.map((trade) => trade._id),
+    onUpdate: applyLiveUpdate,
+    onReconnect: () => {
+      void fetchTrades().catch((err) =>
+        setError(err instanceof Error ? err.message : "Failed to refresh trades"),
+      );
+    },
+  });
 
   function handleExecute(trade: ActiveProTrade) {
     setSelectedTrade(trade);

@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import {
-  RiBellLine,
-  RiWalletLine,
-  RiMenuLine,
-  RiCloseLine,
-} from "react-icons/ri";
+import { RiMenuLine, RiCloseLine } from "react-icons/ri";
 import BrandLogo from "@/components/brand/BrandLogo";
 
 const navLinks = [
@@ -16,7 +11,6 @@ const navLinks = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "Documentation", href: "/docs" },
 ];
 
 export default function TopNavBar() {
@@ -61,13 +55,13 @@ export default function TopNavBar() {
                   className={`relative px-3 py-2 rounded-lg transition-all duration-200 font-medium whitespace-nowrap group ${
                     active
                       ? "text-white"
-                      : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                      : "text-slate-400 hover:text-white hover:bg-white/6"
                   }`}
                 >
                   {label}
                   {/* Active underline */}
                   {active && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-[2px] rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 rounded-full bg-linear-to-r from-emerald-400 to-teal-400" />
                   )}
                 </Link>
               );
@@ -79,13 +73,13 @@ export default function TopNavBar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-white/[0.06] transition-all duration-200"
+            className="px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-white/6 transition-all duration-200"
           >
             Log In
           </Link>
           <Link
             href="/register"
-            className="px-5 py-2 text-sm font-bold bg-emerald-400 text-[#003824] rounded-md hover:bg-emerald-300 active:scale-95 transition-all duration-200 shadow-lg shadow-emerald-500/20"
+            className="px-5 py-2 text-sm font-bold bg-emerald-400 text-on-secondary rounded-md hover:bg-emerald-300 active:scale-95 transition-all duration-200 shadow-lg shadow-emerald-500/20"
           >
             Sign Up Free
           </Link>
@@ -93,7 +87,7 @@ export default function TopNavBar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-9 h-9 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
+          className="md:hidden w-9 h-9 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/6 rounded-lg transition-colors"
           onClick={() => setMobileOpen((o) => !o)}
           aria-label="Toggle menu"
         >
@@ -107,7 +101,7 @@ export default function TopNavBar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-slate-950/98 backdrop-blur-xl border-t border-white/[0.05] px-8 py-6 flex flex-col gap-2">
+        <div className="md:hidden bg-slate-950/98 backdrop-blur-xl border-t border-white/5 px-8 py-6 flex flex-col gap-2">
           {navLinks.map(({ label, href }) => {
             const active = isActive(href);
             return (
@@ -116,31 +110,31 @@ export default function TopNavBar() {
                 href={href}
                 className={`py-3 px-4 rounded-lg transition-colors font-medium text-sm flex items-center gap-3 ${
                   active
-                    ? "text-white bg-white/[0.06]"
-                    : "text-slate-400 hover:text-white hover:bg-white/[0.05]"
+                    ? "text-white bg-white/6"
+                    : "text-slate-400 hover:text-white hover:bg-white/6"
                 }`}
                 onClick={() => setMobileOpen(false)}
               >
                 {/* Active dot indicator for mobile */}
                 {active && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                 )}
                 {label}
               </Link>
             );
           })}
-          <div className="h-px bg-white/[0.06] my-2" />
+          <div className="h-px bg-white/6 my-2" />
           <div className="flex gap-3">
             <Link
               href="/login"
-              className="flex-1 py-3 px-4 border border-white/10 text-slate-300 font-semibold text-sm rounded-lg text-center hover:bg-white/[0.04] transition-all"
+              className="flex-1 py-3 px-4 border border-white/10 text-slate-300 font-semibold text-sm rounded-lg text-center hover:bg-white/6 transition-all"
               onClick={() => setMobileOpen(false)}
             >
               Log In
             </Link>
             <Link
               href="/register"
-              className="flex-1 py-3 px-4 bg-emerald-400 text-[#003824] font-bold text-sm rounded-lg text-center active:scale-95 transition-transform shadow-lg shadow-emerald-500/20"
+              className="flex-1 py-3 px-4 bg-emerald-400 text-on-secondary font-bold text-sm rounded-lg text-center active:scale-95 transition-transform shadow-lg shadow-emerald-500/20"
               onClick={() => setMobileOpen(false)}
             >
               Sign Up Free
