@@ -7,6 +7,7 @@ import { tradeService } from "@/lib/api/trades";
 import OpenTradeModal from "@/components/pro-trader/signalsPage/OpenTradeModal";
 import TradesTable from "@/components/pro-trader/signalsPage/TradesTable";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
+import TradeDetailsModal from "@/components/pro-trader/signalsPage/TradeDetailsModal";
 
 export default function TradesPage() {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
@@ -15,6 +16,7 @@ export default function TradesPage() {
   const [openTrade, setOpenTrade] = useState(false);
   const [exchangeSettings, setExchangeSettings] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +51,15 @@ export default function TradesPage() {
         <div className="p-5 rounded-xl bg-surface-container border border-white/5"><p className="text-xs text-slate-500 uppercase">Closed</p><p className="text-3xl font-bold mt-2">{closed}</p></div>
       </div>
 
-      <TradesTable trades={trades} loading={loading} error={error} />
+      <TradesTable trades={trades} loading={loading} error={error} onSelect={setSelectedTrade} />
+      <TradeDetailsModal
+        trade={selectedTrade}
+        onClose={() => setSelectedTrade(null)}
+        onUpdated={(updated) => {
+          setTrades((current) => current.map((trade) => trade._id === updated._id ? updated : trade));
+          setSelectedTrade(updated);
+        }}
+      />
       <OpenTradeModal isOpen={openTrade} onClose={() => setOpenTrade(false)} onTradeOpened={() => { setLoading(true); setError(null); setRefreshKey((value) => value + 1); }} />
       <ExchangeSettingsModal isOpen={exchangeSettings} onClose={() => setExchangeSettings(false)} />
     </>

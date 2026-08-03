@@ -64,6 +64,14 @@ export interface ActiveProTrade {
   quantity: string;
   status: "pending" | "filled" | "closed" | "cancelled" | "failed";
   tradeOrigin: "pro";
+  exchangeOrderId?: string | null;
+  exchangeConnectionId:
+    | string
+    | {
+        _id: string;
+        exchange: string;
+        label?: string;
+      };
   signalId?: { _id: string; notes?: string } | string;
   copiers?: number;
   myTrade?: {

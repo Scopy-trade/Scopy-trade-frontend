@@ -42,6 +42,16 @@ export const tradeService = {
     );
   },
 
+  updateProTrade(
+    tradeId: string,
+    data: { entryPrice?: number; tp: number; sl: number },
+  ) {
+    return userApi.patch<TradeMutationResponse>(
+      `/pro-trader/dashboard/trades/${tradeId}`,
+      data,
+    );
+  },
+
   copyTrade(sourceTradeId: string, exchangeConnectionId: string, balance: number) {
     return userApi.post<TradeMutationResponse>("/trades", {
       sourceTradeId,
