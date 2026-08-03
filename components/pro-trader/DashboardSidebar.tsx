@@ -24,7 +24,7 @@ const navItems = [
     href: "/dashboard/pro-trader",
   },
   {
-    name: "Trade Signals",
+    name: "My Trades",
     icon: MdSensors,
     href: "/dashboard/pro-trader/signals",
   },

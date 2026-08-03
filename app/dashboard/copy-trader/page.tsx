@@ -4,47 +4,45 @@ import { useState, useEffect } from "react";
 import SignalFilters from "@/components/copy-trader/SignalFilters";
 import SignalGrid from "@/components/copy-trader/SignalGrid";
 import ExecuteTradeModal from "@/components/copy-trader/ExecuteTradeModal";
-import { userApi } from "@/lib/api/client";
-import { Signal } from "@/lib";
+import { ActiveProTrade } from "@/lib";
+import { tradeService } from "@/lib/api/trades";
 
 export default function CopyTraderPage() {
-  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+  const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [signals, setSignals] = useState<Signal[]>([]);
+  const [trades, setTrades] = useState<ActiveProTrade[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
   useEffect(() => {
-    async function fetchSignals() {
+    async function fetchTrades() {
       try {
         setLoading(true);
         setError(null);
-        // Using the existing userApi helper to call GET /api/signals
-        const response = await userApi.get<{ signals: Signal[] } | Signal[]>("/signals");
-        
-        // Handle both possible response shapes: { signals: [...] } or just [...]
-        const data = Array.isArray(response) ? response : response.signals;
-        setSignals(data || []);
+        const response = await tradeService.getActiveProTrades();
+        setTrades(response.trades || []);
       } catch (err) {
-        console.error("Failed to fetch signals:", err);
-        setError("Failed to connect to the signal feed. Displaying cached data instead.");
-        setSignals([]);
+        console.error("Failed to fetch pro trades:", err);
+        setError(err instanceof Error ? err.message : "Failed to load active pro trades.");
+        setTrades([]);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchSignals();
-  }, []);
+    void fetchTrades();
+  }, [refreshKey]);
 
-  function handleExecute(signal: Signal) {
-    setSelectedSignal(signal);
+  function handleExecute(trade: ActiveProTrade) {
+    setSelectedTrade(trade);
     setIsModalOpen(true);
   }
 
   function handleCloseModal() {
     setIsModalOpen(false);
-    setSelectedSignal(null);
+    setSelectedTrade(null);
   }
 
   return (
@@ -55,10 +53,10 @@ export default function CopyTraderPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight mb-1 font-headline text-slate-100 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-              Signal Factory
+              Active Pro Trades
             </h1>
             <p className="text-xs text-slate-400 max-w-[600px] uppercase tracking-wider">
-              Live algorithmic execution feed &bull; Elite trader syndicates
+              Live positions opened by verified pro traders
             </p>
           </div>
         </header>
@@ -70,8 +68,8 @@ export default function CopyTraderPage() {
 
         {/* Signal Grid / Terminal Data */}
         <div className="bg-surface-container-low rounded-lg border border-white/5 overflow-hidden flex-1">
-          <SignalGrid 
-            signals={signals}
+          <SignalGrid
+            trades={trades}
             loading={loading}
             error={error}
             onExecute={handleExecute} 
@@ -80,10 +78,11 @@ export default function CopyTraderPage() {
       </main>
 
       {/* Execute Trade Modal */}
-      {isModalOpen && selectedSignal && (
+      {isModalOpen && selectedTrade && (
         <ExecuteTradeModal
-          signal={selectedSignal}
+          trade={selectedTrade}
           onClose={handleCloseModal}
+          onExecuted={() => setRefreshKey((value) => value + 1)}
         />
       )}
     </div>

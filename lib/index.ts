@@ -44,6 +44,45 @@ export interface Signal {
   createdAt?: string;
 }
 
+export interface TradeOwner {
+  _id: string;
+  firstName?: string;
+  lastName?: string;
+  traderID?: string;
+  profilePhoto?: string;
+}
+
+export interface ActiveProTrade {
+  _id: string;
+  userId: TradeOwner;
+  pair: string;
+  direction: "buy" | "sell";
+  entryPrice: string;
+  entryFillPrice?: string | null;
+  tp: string;
+  sl: string;
+  quantity: string;
+  status: "pending" | "filled" | "closed" | "cancelled" | "failed";
+  tradeOrigin: "pro";
+  signalId?: { _id: string; notes?: string } | string;
+  copiers?: number;
+  myTrade?: {
+    _id: string;
+    status: string;
+    tradeResult?: string | null;
+  } | null;
+  createdAt: string;
+}
+
+export interface ExchangeBalance {
+  connectionId: string;
+  exchange: string;
+  label: string;
+  status: "ok" | "error";
+  totalUsdtEquivalent: string | number | null;
+  error?: string;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
