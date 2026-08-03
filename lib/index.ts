@@ -159,6 +159,15 @@ export interface ExchangeConnectionsResponse {
   message?: string;
 }
 
+export interface ConnectExchangeResponse {
+  success: boolean;
+  connection: Omit<ConnectionSummary, "_id"> & {
+    _id?: string;
+    id: string;
+  };
+  message?: string;
+}
+
 // User management types
 export interface UserManagementUser extends User {
   id: string;

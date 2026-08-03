@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdSecurity, MdWarning } from "react-icons/md";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import { authAPI } from "@/lib/api/client";
 import { ExchangeListItem, ConnectionSummary } from "@/lib";
 import { exchangeService } from "@/lib/api/exchanges";
 
@@ -219,8 +218,11 @@ export function ExchangeConnectionModal({
 
       const response = await exchangeService.connectExchange(payload);
 
-      if (response.success && response.connections) {
-        onSuccess(response.connections[0]);
+      if (response.success && response.connection) {
+        onSuccess({
+          ...response.connection,
+          _id: response.connection._id ?? String(response.connection.id),
+        });
         onClose();
       } else {
         setGeneralError(response.message || "Failed to connect exchange");
@@ -242,7 +244,7 @@ export function ExchangeConnectionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-5xl bg-surface-container rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-outline/20 bg-surface-container-highest">
@@ -511,7 +513,7 @@ export function ExchangeConnectionModal({
                 <div className="flex items-start gap-2 p-3 bg-info/10 rounded-lg">
                   <MdInfo className="w-4 h-4 text-info mt-0.5" />
                   <p className="text-xs text-on-surface-variant">
-                    After creating your API keys, return to the "API Form" tab
+                    After creating your API keys, return to the &quot;API Form&quot; tab
                     to enter your credentials and connect your account.
                   </p>
                 </div>
@@ -522,7 +524,7 @@ export function ExchangeConnectionModal({
                   Instructions for {exchange.name} coming soon.
                 </p>
                 <p className="text-sm text-on-surface-variant mt-2">
-                  Please refer to the exchange's API documentation.
+                  Please refer to the exchange&apos;s API documentation.
                 </p>
               </div>
             )}

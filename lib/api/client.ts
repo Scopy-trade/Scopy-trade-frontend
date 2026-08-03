@@ -98,13 +98,22 @@ attachResponseInterceptor(adminAxios, {
 interface ErrorResponseData {
   message?: string;
   error?: string;
+  errors?: string[];
+  hint?: string;
 }
 
 function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ErrorResponseData | undefined;
 
-    return data?.message ?? data?.error ?? error.message ?? fallback;
+    return (
+      data?.message ??
+      data?.errors?.join(" ") ??
+      data?.error ??
+      data?.hint ??
+      error.message ??
+      fallback
+    );
   }
   return fallback;
 }

@@ -1,77 +1,81 @@
 "use client";
 
-import ActiveConnections from "@/components/copy-trader/exchange/ActiveConnections";
-import SetupConnectionForm from "@/components/copy-trader/exchange/SetupConnectionForm";
-import SecurityBanner from "@/components/copy-trader/exchange/SecurityBanner";
-import { MdClose } from "react-icons/md";
 import { useEffect } from "react";
+import { MdClose } from "react-icons/md";
+import { ExchangeSettings } from "@/components/onboarding/ExchangeSettings";
 
 interface ExchangeSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConnectionChange?: () => void;
 }
 
 export default function ExchangeSettingsModal({
   isOpen,
   onClose,
+  onConnectionChange,
 }: ExchangeSettingsModalProps) {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
     }
+
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="exchange-settings-title"
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/80 backdrop-blur-md"
         onClick={onClose}
-      ></div>
+        aria-label="Close exchange settings"
+      />
 
-      {/* Modal Content */}
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-surface-container-lowest border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-surface-container-low/50">
+      <section className="relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface-container-lowest shadow-2xl">
+        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-white/5 bg-surface-container-low/70 px-5 py-4 sm:px-7 sm:py-5">
           <div>
-            <h2 className="text-2xl font-bold font-headline text-slate-100">
-              Exchange Settings
+            <h2
+              id="exchange-settings-title"
+              className="text-xl font-bold text-slate-100 sm:text-2xl"
+            >
+              Exchange Connections
             </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Connect your exchange API keys to enable automated copy trading.
+            <p className="mt-1 max-w-2xl text-sm text-slate-400">
+              Connect, verify, and remove trading API connections. Credentials
+              are validated before they are encrypted and stored.
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="rounded-full p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Close exchange settings"
           >
             <MdClose size={24} />
           </button>
-        </div>
+        </header>
 
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left column */}
-            <section className="lg:col-span-7 space-y-6">
-              <ActiveConnections />
-              <SecurityBanner />
-            </section>
-
-            {/* Right column */}
-            <aside className="lg:col-span-5">
-              <SetupConnectionForm />
-            </aside>
-          </div>
+        <div className="overflow-y-auto p-4 sm:p-6">
+          <ExchangeSettings onConnectionChange={onConnectionChange} />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

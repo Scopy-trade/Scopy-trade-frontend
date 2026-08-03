@@ -17,9 +17,20 @@ export default function TradesPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    void tradeService.getProTrades().then((response) => setTrades(response.trades)).catch((err) => setError(err instanceof Error ? err.message : "Failed to load trades")).finally(() => setLoading(false));
+    let cancelled = false;
+    void tradeService.getProTrades()
+      .then((response) => {
+        if (!cancelled) setTrades(response.trades);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load trades");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [refreshKey]);
 
   const active = trades.filter((trade) => trade.status === "pending" || trade.status === "filled").length;
@@ -39,7 +50,7 @@ export default function TradesPage() {
       </div>
 
       <TradesTable trades={trades} loading={loading} error={error} />
-      <OpenTradeModal isOpen={openTrade} onClose={() => setOpenTrade(false)} onTradeOpened={() => setRefreshKey((value) => value + 1)} />
+      <OpenTradeModal isOpen={openTrade} onClose={() => setOpenTrade(false)} onTradeOpened={() => { setLoading(true); setError(null); setRefreshKey((value) => value + 1); }} />
       <ExchangeSettingsModal isOpen={exchangeSettings} onClose={() => setExchangeSettings(false)} />
     </>
   );

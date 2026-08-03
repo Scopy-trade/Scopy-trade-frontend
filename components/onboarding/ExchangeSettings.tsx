@@ -9,7 +9,6 @@ import {
   MdCheckCircle,
   MdError,
 } from "react-icons/md";
-import { userApi, authAPI } from "@/lib/api/client";
 import { ConnectedExchange } from "./ConnectedExchange";
 import { AvailableIntegration } from "./AvailableIntegration";
 import { ConnectionSummary, ExchangeListItem } from "@/lib";
@@ -109,9 +108,7 @@ export function ExchangeSettings({
     setTestingConnectionId(connectionId);
 
     try {
-      const response = (await userApi.post(
-        `/exchanges/connections/${connectionId}/test`,
-      )) as {
+      const response = (await exchangeService.testConnection(connectionId)) as {
         success: boolean;
         message: string;
         accountInfo?: Record<string, unknown>;
@@ -164,9 +161,7 @@ export function ExchangeSettings({
 
     try {
       const connection = connectedExchanges.find((c) => c._id === connectionId);
-      const response = (await userApi.delete(
-        `/exchanges/connections/${connectionId}`,
-      )) as {
+      const response = (await exchangeService.removeConnection(connectionId)) as {
         success: boolean;
         message: string;
       };
@@ -174,6 +169,12 @@ export function ExchangeSettings({
       if (response.success) {
         await fetchData();
         onConnectionChange?.();
+        setSuccessMessage(
+          connection
+            ? `${connection.label} disconnected successfully`
+            : "Exchange disconnected successfully",
+        );
+        setTimeout(() => setSuccessMessage(null), 3000);
 
         // Show success message
         const event = new CustomEvent("show-toast", {
@@ -188,6 +189,9 @@ export function ExchangeSettings({
       }
     } catch (err) {
       console.error("[ExchangeSettings] Error removing connection:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to remove connection",
+      );
       const event = new CustomEvent("show-toast", {
         detail: {
           message:
@@ -321,8 +325,7 @@ export function ExchangeSettings({
                     All available exchanges are connected
                   </p>
                   <p className="text-xs text-on-surface-variant/70 mt-1">
-                    You can connect multiple accounts of the same exchange using
-                    different API keys
+                    Disconnect an exchange before replacing its API credentials.
                   </p>
                 </div>
               )}

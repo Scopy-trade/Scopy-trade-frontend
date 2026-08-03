@@ -1,4 +1,8 @@
-import { ExchangeConnectionsResponse, SupportedExchangesResponse } from "..";
+import {
+  ConnectExchangeResponse,
+  ExchangeConnectionsResponse,
+  SupportedExchangesResponse,
+} from "..";
 import { userApi } from "./client";
 
 export const exchangeService = {
@@ -12,8 +16,8 @@ export const exchangeService = {
 
   connectExchange(
     payload: Record<string, unknown>,
-  ): Promise<ExchangeConnectionsResponse> {
-    return userApi.post<ExchangeConnectionsResponse>(
+  ): Promise<ConnectExchangeResponse> {
+    return userApi.post<ConnectExchangeResponse>(
       "/exchanges/connect",
       payload,
     );
