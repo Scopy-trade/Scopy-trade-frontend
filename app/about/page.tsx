@@ -1,49 +1,36 @@
 import TopNavBar from "@/components/landing/TopNavBar";
 import Footer from "@/components/landing/Footer";
 import Link from "next/link";
+import Image from "next/image";
 
 const team = [
   {
-    name: "Arjan Mehta",
-    role: "Co-Founder & CEO",
-    bio: "Former quant at Two Sigma with 12 years in algorithmic trading. Passionate about democratizing institutional tools for retail traders.",
-    initials: "AM",
+    name: "Akwarandu Princewell",
+    role: "Founder & CEO",
+    bio: "Founder of SCopyTrade, an Africa-first non-custodial crypto copy-trading platform. Driven by firsthand experience with scam platforms, fake trading results, and exchange failures, he is building a safer way to mirror verified strategies while users retain control of their funds.",
+    image: "/Princewell.jpg",
     accent: "emerald",
   },
   {
-    name: "Sofia Chen",
-    role: "Co-Founder & CTO",
-    bio: "Ex-Coinbase security engineer. Built the zero-trust API architecture that powers our non-custodial infrastructure.",
-    initials: "SC",
+    name: "Kingsley",
+    role: "Technical Co-Founder & CTO",
+    bio: "Full-stack software developer with 4+ years of experience turning ideas into production-ready web2 and web3 products. He leads SCopyTrade's technical direction across frontend development, backend architecture, APIs, databases, and deployment.",
+    image: "/Kingsley1.jpg",
     accent: "sky",
   },
   {
-    name: "Olumide Adesanya",
-    role: "Head of Signal Network",
-    bio: "10+ years running prop desks in Lagos and London. Curates and vets every trader on the SCopyTrade signal network.",
-    initials: "OA",
+    name: "Adewumi Doyin Josephine",
+    role: "Frontend Software Engineer",
+    bio: "Frontend software engineer with 4 years of industry experience. Working with Python and JavaScript, she builds scalable, thoughtful product experiences and collaborates on web3 products.",
+    image: "/Josephine.jpg",
     accent: "violet",
   },
   {
-    name: "Priya Natarajan",
-    role: "Head of Risk",
-    bio: "PhD in financial mathematics from MIT. Designed the real-time drawdown monitoring and position-sizing engine.",
-    initials: "PN",
+    name: "Daniel",
+    role: "Full-Stack Developer",
+    bio: "Full-stack developer contributing across SCopyTrade's product stack, helping shape reliable, scalable features for the platform.",
+    image: "/Daniel.jpg",
     accent: "amber",
-  },
-  {
-    name: "Marco Ricci",
-    role: "Head of Product",
-    bio: "Former lead designer at Kraken. Obsessed with making complex trading workflows feel effortless.",
-    initials: "MR",
-    accent: "rose",
-  },
-  {
-    name: "Yuki Tanaka",
-    role: "Lead Engineer",
-    bio: "Systems engineer who optimized SCopyTrade's execution pipeline to sub-100ms latency across all integrated exchanges.",
-    initials: "YT",
-    accent: "teal",
   },
 ];
 
@@ -207,7 +194,7 @@ export default function AboutPage() {
                 <div className="flex gap-8">
                   {[
                     { v: "2021", l: "Founded" },
-                    { v: "34", l: "Team Members" },
+                    { v: "4", l: "Team Members" },
                     { v: "12", l: "Countries" },
                   ].map(({ v, l }) => (
                     <div key={l}>
@@ -489,7 +476,7 @@ export default function AboutPage() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {team.map(({ name, role, bio, initials, accent }) => {
+              {team.map(({ name, role, bio, image, accent }) => {
                 const colors = accentMap[accent] || accentMap.emerald;
                 return (
                   <div
@@ -497,14 +484,15 @@ export default function AboutPage() {
                     className="group bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300"
                   >
                     <div
-                      className={`w-14 h-14 rounded-2xl ${colors.bg} ring-1 ${colors.ring} flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300`}
+                      className={`relative w-14 h-14 overflow-hidden rounded-2xl ${colors.bg} ring-1 ${colors.ring} mb-5 group-hover:scale-105 transition-transform duration-300`}
                     >
-                      <span
-                        className={`text-lg font-black ${colors.text}`}
-                        style={{ fontFamily: "var(--font-headline)" }}
-                      >
-                        {initials}
-                      </span>
+                      <Image
+                        src={image}
+                        alt={`Portrait of ${name}`}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
                     </div>
                     <h3
                       className="text-base font-bold text-white mb-1"
