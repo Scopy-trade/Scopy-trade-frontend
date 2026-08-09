@@ -8,6 +8,23 @@ import {
   GetAllSignalsResponse,
 } from "..";
 import { adminApi } from "./client";
+import { ActiveProTrade } from "..";
+
+export const adminTradeService = {
+  getTrades(status: "all" | "active" | "history" = "all", page = 1) {
+    return adminApi.get<{
+      success: boolean;
+      trades: ActiveProTrade[];
+      pagination: { total: number; page: number; limit: number; pages: number };
+    }>("/dashboard/trades", { params: { status, page } });
+  },
+
+  getTrade(tradeId: string) {
+    return adminApi.get<{ success: boolean; trade: ActiveProTrade }>(
+      `/dashboard/trades/${tradeId}`,
+    );
+  },
+};
 
 export const adminUserService = {
   getAllUsers(params?: {

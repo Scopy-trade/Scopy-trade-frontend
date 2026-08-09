@@ -1,5 +1,5 @@
 import TradeListScreen from "@/components/trades/TradeListScreen";
 
 export default function TradeHistoryPage() {
-  return <TradeListScreen scope="copy" mode="history" />;
+  return <TradeListScreen scope="admin" mode="history" />;
 }

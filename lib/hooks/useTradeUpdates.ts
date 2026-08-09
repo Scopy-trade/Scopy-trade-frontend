@@ -43,6 +43,17 @@ function toTradePatch(data: Record<string, unknown>): TradePatch | null {
     "monitoringConnectedAt",
     "lastCheckedAt",
     "createdAt",
+    "exitPrice",
+    "realizedPnl",
+    "platformFee",
+    "platformShare",
+    "proTraderShare",
+    "feeStatus",
+    "tradeResult",
+    "closedVia",
+    "closedAt",
+    "parameterSyncStatus",
+    "parameterSyncError",
   ];
   for (const field of fields) {
     if (data[field] !== undefined) {

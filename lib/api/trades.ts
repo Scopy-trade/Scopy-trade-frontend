@@ -25,14 +25,26 @@ export const tradeService = {
     );
   },
 
-  getProTrades(page = 1) {
+  getProTrades(page = 1, status: "all" | "active" | "history" = "all") {
     return userApi.get<{
       success: boolean;
       message: string;
       trades: ActiveProTrade[];
       page: number;
       pages: number;
-    }>("/pro-trader/dashboard/trades", { params: { page } });
+    }>("/pro-trader/dashboard/trades", { params: { page, status } });
+  },
+
+  getUserTrades(status: "all" | "active" | "history" = "all", page = 1) {
+    return userApi.get<{
+      success: boolean;
+      trades: ActiveProTrade[];
+      pagination: { total: number; page: number; limit: number; pages: number };
+    }>("/trades", { params: { status, page } });
+  },
+
+  getTrade(tradeId: string) {
+    return userApi.get<{ success: boolean; trade: ActiveProTrade }>(`/trades/${tradeId}`);
   },
 
   openProTrade(data: OpenProTradeData) {

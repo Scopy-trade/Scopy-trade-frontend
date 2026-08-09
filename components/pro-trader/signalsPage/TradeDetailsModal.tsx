@@ -14,10 +14,12 @@ export default function TradeDetailsModal({
   trade,
   onClose,
   onUpdated,
+  canEdit = true,
 }: {
   trade: ActiveProTrade | null;
   onClose: () => void;
   onUpdated: (trade: ActiveProTrade) => void;
+  canEdit?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [entryPrice, setEntryPrice] = useState("");
@@ -110,6 +112,22 @@ export default function TradeDetailsModal({
             <div className="col-span-2"><p className="text-[10px] uppercase text-slate-500">Exchange order ID</p><p className="mt-1 truncate font-mono text-sm">{trade.exchangeOrderId || "Unavailable"}</p></div>
           </div>
 
+          {(trade.status === "closed" || trade.copyStats) && (
+            <div className="grid gap-3 rounded-xl border border-white/10 bg-surface-container-high p-4 sm:grid-cols-4">
+              {trade.status === "closed" && <>
+                <div><p className="text-[10px] uppercase text-slate-500">Exit price</p><p className="mt-1 font-mono text-sm">{trade.exitPrice || "—"}</p></div>
+                <div><p className="text-[10px] uppercase text-slate-500">Realized P&amp;L</p><p className={`mt-1 font-mono text-sm font-bold ${Number(trade.realizedPnl) >= 0 ? "text-secondary" : "text-tertiary"}`}>{trade.realizedPnl ?? "—"} USDT</p></div>
+              </>}
+              {trade.copyStats && <>
+                <div><p className="text-[10px] uppercase text-slate-500">Total copiers</p><p className="mt-1 text-sm font-bold">{trade.copyStats.total}</p></div>
+                <div><p className="text-[10px] uppercase text-slate-500">Active / profitable</p><p className="mt-1 text-sm font-bold">{trade.copyStats.active} / {trade.copyStats.profitable}</p></div>
+              </>}
+              {trade.tradeOrigin === "copy" && trade.platformFee && (
+                <div><p className="text-[10px] uppercase text-slate-500">20% settlement</p><p className="mt-1 text-sm font-bold">{trade.platformFee} USDT · {trade.feeStatus}</p></div>
+              )}
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="text-sm text-slate-400">Entry price<input type="number" min="0" step="any" disabled={!editing || !entryEditable} value={entryPrice} onChange={(event) => setEntryPrice(event.target.value)} className={`${inputClass} mt-2`} /></label>
             <label className="text-sm text-slate-400">Take profit<input type="number" min="0" step="any" disabled={!editing} value={tp} onChange={(event) => setTp(event.target.value)} className={`${inputClass} mt-2`} /></label>
@@ -119,7 +137,8 @@ export default function TradeDetailsModal({
           {!entryEditable && <div className="flex items-start gap-2 rounded-lg bg-white/5 p-3 text-xs text-slate-400"><MdLock className="mt-0.5 shrink-0" />Entry price is locked because this order has started filling. TP and SL can still be amended where supported by the connected exchange.</div>}
 
           <div className="flex justify-end gap-3 border-t border-white/10 pt-5">
-            {editing ? <><button type="button" onClick={() => { setEditing(false); setEntryPrice(trade.entryPrice); setTp(trade.tp); setSl(trade.sl); setError(null); }} className="rounded-lg border border-white/10 px-4 py-2 text-sm">Cancel</button><button disabled={saving} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary disabled:opacity-50"><MdSave />{saving ? "Updating exchange..." : "Save changes"}</button></> : <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary"><MdEdit />Edit parameters</button>}
+            {canEdit && (editing ? <><button type="button" onClick={() => { setEditing(false); setEntryPrice(trade.entryPrice); setTp(trade.tp); setSl(trade.sl); setError(null); }} className="rounded-lg border border-white/10 px-4 py-2 text-sm">Cancel</button><button disabled={saving} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary disabled:opacity-50"><MdSave />{saving ? "Updating exchange..." : "Save changes"}</button></> : <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary"><MdEdit />Edit parameters</button>)}
+            {!canEdit && <button type="button" onClick={onClose} className="rounded-lg border border-white/10 px-5 py-2 text-sm">Close</button>}
           </div>
         </form>
       </section>

@@ -17,6 +17,8 @@ const navItems = [
     href: "/admin/dashboard/signals",
     icon: "security",
   },
+  { label: "Active Trades", href: "/admin/dashboard/active-trades", icon: "show_chart" },
+  { label: "Trade History", href: "/admin/dashboard/trade-history", icon: "history" },
   { label: "Trade Audit", href: "/admin/dashboard/logs", icon: "receipt_long" },
   { label: "Financials", href: "/admin/dashboard/finances", icon: "payments" },
   { label: "Earnings", href: "/admin/dashboard/earnings", icon: "monitoring" },

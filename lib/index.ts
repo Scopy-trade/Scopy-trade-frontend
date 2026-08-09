@@ -54,7 +54,7 @@ export interface TradeOwner {
 
 export interface ActiveProTrade {
   _id: string;
-  userId: TradeOwner;
+  userId: TradeOwner | string;
   pair: string;
   direction: "buy" | "sell";
   entryPrice: string;
@@ -63,7 +63,15 @@ export interface ActiveProTrade {
   sl: string;
   quantity: string;
   status: "pending" | "filled" | "closed" | "cancelled" | "failed";
-  tradeOrigin: "pro";
+  tradeOrigin: "pro" | "copy";
+  sourceTradeId?:
+    | string
+    | null
+    | {
+        _id: string;
+        pair?: string;
+        userId?: TradeOwner | string;
+      };
   exchangeOrderId?: string | null;
   wsMonitoringActive?: boolean;
   monitoringStatus?:
@@ -84,12 +92,31 @@ export interface ActiveProTrade {
       };
   signalId?: { _id: string; notes?: string } | string;
   copiers?: number;
+  copyStats?: {
+    total: number;
+    active: number;
+    profitable: number;
+    copiedVolume?: number;
+  } | null;
   myTrade?: {
     _id: string;
     status: string;
     tradeResult?: string | null;
   } | null;
   createdAt: string;
+  closedAt?: string | null;
+  exitPrice?: string | null;
+  realizedPnl?: string | null;
+  platformFee?: string | null;
+  platformShare?: string | null;
+  proTraderShare?: string | null;
+  feeStatus?: "pending" | "processing" | "collected" | "failed" | "waived" | null;
+  tradeResult?: "profit" | "loss" | "breakeven" | null;
+  closedVia?: "tp" | "sl" | "manual" | null;
+  settlementNetwork?: string | null;
+  settlementTransactionId?: string | null;
+  parameterSyncStatus?: "pending" | "synced" | "failed" | null;
+  parameterSyncError?: string | null;
 }
 
 export interface ExchangeBalance {

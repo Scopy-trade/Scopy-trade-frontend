@@ -9,6 +9,7 @@ import {
   MdShowChart,
   MdSensors,
   MdLogout,
+  MdHistory,
 } from "react-icons/md";
 
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
@@ -24,9 +25,19 @@ const navItems = [
     href: "/dashboard/pro-trader",
   },
   {
-    name: "My Trades",
+    name: "Open a Trade",
     icon: MdSensors,
     href: "/dashboard/pro-trader/signals",
+  },
+  {
+    name: "Active Trades",
+    icon: MdShowChart,
+    href: "/dashboard/pro-trader/active-trades",
+  },
+  {
+    name: "Trade History",
+    icon: MdHistory,
+    href: "/dashboard/pro-trader/trade-history",
   },
   {
     name: "Market Terminal",
