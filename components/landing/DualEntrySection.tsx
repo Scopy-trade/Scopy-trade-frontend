@@ -52,8 +52,9 @@ export default function DualEntrySection() {
             </h2>
 
             <p className="text-[#c5c6ce] text-lg leading-relaxed">
-              Access verified, high-performance signals and execute across 15+
-              exchanges without ever moving your funds from your own wallet.
+              Discover reviewed signal providers and, as integrations expand,
+              execute across a target network of 15+ exchanges while your funds
+              remain in your own exchange account.
             </p>
 
             <ul className="space-y-3">
@@ -142,8 +143,8 @@ export default function DualEntrySection() {
             </h2>
 
             <p className="text-[#c5c6ce] text-lg leading-relaxed">
-              Broadcast signals to thousands of traders and earn commissions
-              automatically. Professional tools built for signal providers.
+              Build toward broadcasting signals to thousands of traders and
+              earning commissions automatically with tools for signal providers.
             </p>
 
             <ul className="space-y-3">

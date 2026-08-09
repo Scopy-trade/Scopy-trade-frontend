@@ -47,12 +47,15 @@ export default function CtaSection() {
             </div>
 
             {/* Bottom trust signals */}
-            <div className="mt-14 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-8">
+            <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.2em] text-[#b6c4ff]/60">
+              Our growth targets
+            </p>
+            <div className="mt-3 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { v: "2,500+", l: "Active Traders" },
-                { v: "$2.4B+", l: "Volume Processed" },
-                { v: "200+", l: "Signal Providers" },
-                { v: "6", l: "Supported Exchanges" },
+                { v: "2,500+", l: "Projected Active Traders" },
+                { v: "$2.4B+", l: "Projected Volume" },
+                { v: "200+", l: "Target Signal Providers" },
+                { v: "6", l: "Target Exchange Integrations" },
               ].map(({ v, l }) => (
                 <div key={l} className="text-center">
                   <p

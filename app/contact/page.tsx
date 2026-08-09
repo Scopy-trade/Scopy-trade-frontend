@@ -239,12 +239,12 @@ export default function ContactPage() {
             <div className="flex items-center gap-4">
               <div className="w-3 h-3 bg-secondary rounded-full animate-pulse shadow-[0_0_10px_#4edea3]" />
               <p className="font-headline font-bold text-2xl">
-                Network Infrastructure 100% Operational
+                Infrastructure built for high availability
               </p>
             </div>
             <p className="text-on-surface-variant mt-2 max-w-md">
-              Our global low-latency servers are distributed across Tier-3+ data
-              centers for maximum redundancy.
+              Our roadmap prioritizes geographically distributed infrastructure
+              and redundancy as the platform scales.
             </p>
           </div>
         </section>

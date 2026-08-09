@@ -48,7 +48,7 @@ export default function CapabilitiesSection() {
               {[
                 {
                   title: "Zero-Custody Trust",
-                  desc: "No 'Transfer to Wallet' required. Keep 100% control of your funds on your preferred exchange at all times.",
+                  desc: "No 'Transfer to Wallet' required. Your funds remain in your own account at your preferred exchange.",
                   icon: (
                     <path
                       d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
@@ -60,7 +60,7 @@ export default function CapabilitiesSection() {
                 },
                 {
                   title: "Instant Signal Mirroring",
-                  desc: "Execution latency under 100ms across all connected exchanges. Never miss an entry or exit point.",
+                  desc: "The platform is being built toward sub-100ms execution across supported exchanges, subject to exchange and network conditions.",
                   icon: (
                     <path
                       d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
@@ -137,7 +137,7 @@ export default function CapabilitiesSection() {
               {[
                 {
                   title: "Mass Distribution",
-                  desc: "One trade from your master account broadcasted to thousands of followers instantly via our secure bridge.",
+                  desc: "Designed to broadcast one trade from your master account to a future network of thousands of followers through our secure bridge.",
                   icon: (
                     <>
                       <circle

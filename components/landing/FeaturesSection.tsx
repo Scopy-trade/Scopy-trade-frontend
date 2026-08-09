@@ -12,8 +12,8 @@ const features = [
     tag: "Security",
     title: "Non-Custodial by Design",
     description:
-      "Your funds never leave your exchange wallet. We transmit only encrypted API instructions — complete sovereignty, zero counterparty exposure.",
-    metric: "0% custody risk",
+      "Your funds remain in your exchange account while SCopyTrade transmits encrypted API instructions, reducing platform custody exposure.",
+    metric: "No platform custody",
   },
   {
     Icon: RiSignalTowerLine,
@@ -21,8 +21,8 @@ const features = [
     tag: "Intelligence",
     title: "Verified Expert Signals",
     description:
-      "Access a curated network of high-performance algorithmic traders and fundamental analysts, each with audited live track records.",
-    metric: "200+ verified traders",
+      "Our goal is a curated network of algorithmic traders and fundamental analysts with transparent, reviewable track records.",
+    metric: "Target: 200+ traders",
   },
   {
     Icon: RiFlashlightLine,
@@ -30,8 +30,8 @@ const features = [
     tag: "Execution",
     title: "Instant One-Click Trading",
     description:
-      "Sub-100ms order placement with automated risk parameters. Stop-losses and take-profits configured to your exact risk tolerance.",
-    metric: "<100ms execution",
+      "Built toward sub-100ms order placement with automated risk parameters. Stop-losses and take-profits follow your configured risk tolerance.",
+    metric: "Target: <100ms",
   },
   {
     Icon: RiBarChartBoxLine,
@@ -163,21 +163,21 @@ export default function FeaturesSection() {
           <div className="flex gap-16 items-center text-xs font-bold uppercase tracking-[0.15em] text-[#44474d] whitespace-nowrap animate-[scroll_20s_linear_infinite]">
             {[
               "Non-Custodial",
-              "Sub-100ms Execution",
+              "Sub-100ms Target",
               "256-bit Encryption",
               "Live Signal Feed",
               "Multi-Exchange",
               "Risk Management",
               "API Key Security",
-              "99.8% Uptime",
+              "99.8% Uptime Target",
               "Non-Custodial",
-              "Sub-100ms Execution",
+              "Sub-100ms Target",
               "256-bit Encryption",
               "Live Signal Feed",
               "Multi-Exchange",
               "Risk Management",
               "API Key Security",
-              "99.8% Uptime",
+              "99.8% Uptime Target",
             ].map((item, i) => (
               <span key={i} className="flex items-center gap-4">
                 {item}

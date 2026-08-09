@@ -85,7 +85,7 @@ export default function ExchangesSection() {
             </div>
 
             <p className="text-xs text-[#8f9098] mt-4 font-medium">
-              + 12 more exchanges in beta integration
+              Roadmap target: 12 additional exchange integrations
             </p>
           </div>
 
@@ -156,7 +156,7 @@ export default function ExchangesSection() {
                   Secure API Tunnels
                 </span>
                 <span className="text-sm font-bold text-emerald-400">
-                  ACTIVE — 99.8% UPTIME
+                  TARGET — 99.8% UPTIME
                 </span>
               </div>
               <div
@@ -164,7 +164,7 @@ export default function ExchangesSection() {
                 style={{ background: "rgba(34, 42, 61, 0.9)" }}
               >
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-xs font-bold text-emerald-400">LIVE</span>
+                <span className="text-xs font-bold text-emerald-400">ROADMAP</span>
               </div>
             </div>
           </div>

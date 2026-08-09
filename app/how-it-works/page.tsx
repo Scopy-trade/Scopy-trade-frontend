@@ -19,7 +19,7 @@ const copyTraderSteps = [
   {
     n: "02",
     title: "Choose Pro Trader",
-    body: "Browse verified performance metrics. Select strategies that align with your risk appetite and target ROI.",
+    body: "Browse clearly presented performance metrics. Select strategies that align with your risk appetite and target ROI.",
   },
   {
     n: "03",
@@ -186,8 +186,8 @@ export default function HowItWorksPage() {
             {/* Subtle stat strip — replaces avatar cluster */}
             <div className="flex items-center justify-center gap-8 pt-4">
               {[
-                { v: "<100ms", l: "Execution" },
-                { v: "99.99%", l: "Uptime" },
+                { v: "<100ms", l: "Execution Target" },
+                { v: "99.99%", l: "Uptime Target" },
                 { v: "AES-256", l: "Encryption" },
               ].map(({ v, l }) => (
                 <div key={l} className="text-center">

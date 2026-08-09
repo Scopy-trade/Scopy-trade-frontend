@@ -1,9 +1,7 @@
-import Link from "next/link";
-
 const stats = [
-  { value: "$1.2B+", label: "Total Copy Volume", color: "text-emerald-400" },
-  { value: "450+", label: "Active Pro Traders", color: "text-[#b6c4ff]" },
-  { value: "12k+", label: "Terminal Users", color: "text-white" },
+  { value: "$1.2B+", label: "Projected Copy Volume", color: "text-emerald-400" },
+  { value: "450+", label: "Target Pro Traders", color: "text-[#b6c4ff]" },
+  { value: "12k+", label: "Target Terminal Users", color: "text-white" },
 ];
 
 export default function HeroSection() {
@@ -45,7 +43,10 @@ export default function HeroSection() {
         </p>
 
         {/* Metrics */}
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 pt-12">
+        <p className="pt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+          Startup growth projections — targets, not historical results
+        </p>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 pt-2">
           {stats.map(({ value, label, color }) => (
             <div key={label} className="text-center">
               <p

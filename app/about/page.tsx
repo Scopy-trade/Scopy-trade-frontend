@@ -58,7 +58,7 @@ const values = [
     icon: "◎",
     title: "Radical Transparency",
     description:
-      "Every signal provider's live track record is audited and publicly displayed. No airbrushed backtests. No black-box performance claims.",
+      "Our goal is to publish transparent, reviewable track records for every signal provider, clearly separating live results from backtests.",
   },
   {
     icon: "◈",
@@ -103,8 +103,8 @@ const accentMap: Record<string, { ring: string; bg: string; text: string }> = {
   },
 };
 
-// Simulated live feed entries for the hero visual panel
-const liveFeed = [
+// Illustrative feed entries for the hero visual panel
+const illustrativeFeed = [
   {
     pair: "BTC/USDT",
     action: "LONG 20x",
@@ -225,7 +225,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Right: live terminal visual */}
+              {/* Right: illustrative terminal visual */}
               <div className="relative">
                 {/* Outer glow */}
                 <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-white/[0.07] to-transparent pointer-events-none" />
@@ -239,12 +239,12 @@ export default function AboutPage() {
                       <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
                     </div>
                     <span className="text-xs text-zinc-600 font-mono tracking-wider">
-                      SCOPY — LIVE FEED
+                      SCOPY — PRODUCT PREVIEW
                     </span>
                     <div className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                       <span className="text-[11px] text-emerald-500 font-bold font-mono">
-                        LIVE
+                        DEMO
                       </span>
                     </div>
                   </div>
@@ -294,13 +294,13 @@ export default function AboutPage() {
                       </div>
                     </div>
 
-                    {/* Live signal feed */}
+                    {/* Illustrative signal feed */}
                     <div>
                       <p className="text-[11px] text-zinc-700 font-bold uppercase tracking-widest mb-3">
-                        Recent Signal Activity
+                        Illustrative Signal Activity
                       </p>
                       <div className="space-y-2">
-                        {liveFeed.map(
+                        {illustrativeFeed.map(
                           ({ pair, action, pnl, color, dot }, i) => (
                             <div
                               key={i}
@@ -331,9 +331,9 @@ export default function AboutPage() {
                     {/* Bottom metric strip */}
                     <div className="grid grid-cols-3 gap-3 pt-1">
                       {[
-                        { v: "$2.4B+", l: "Volume" },
-                        { v: "74.2%", l: "Win Rate" },
-                        { v: "99.8%", l: "Uptime" },
+                        { v: "$2.4B+", l: "Projected Volume" },
+                        { v: "74.2%", l: "Illustrative Win Rate" },
+                        { v: "99.8%", l: "Uptime Target" },
                       ].map(({ v, l }) => (
                         <div
                           key={l}
@@ -397,9 +397,9 @@ export default function AboutPage() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { v: "2021", l: "Founded" },
-                  { v: "$2.4B+", l: "Volume Traded" },
-                  { v: "2,500+", l: "Active Traders" },
-                  { v: "6", l: "Exchanges Integrated" },
+                  { v: "$2.4B+", l: "Projected Volume" },
+                  { v: "2,500+", l: "Target Active Traders" },
+                  { v: "6", l: "Target Exchange Integrations" },
                 ].map(({ v, l }) => (
                   <div
                     key={l}
