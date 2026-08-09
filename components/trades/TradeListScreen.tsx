@@ -67,10 +67,10 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
   }, [mode]);
 
   useTradeUpdates({
-    tradeIds: scope === "admin" ? [] : trades.map((trade) => trade._id),
+    tradeIds: trades.map((trade) => trade._id),
     onUpdate: applyUpdate,
     onReconnect: () => { void load(); },
-    enabled: scope !== "admin",
+    enabled: mode === "active",
   });
 
   const totals = useMemo(() => ({

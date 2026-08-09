@@ -4,10 +4,15 @@ import { ActiveProTrade } from "@/lib";
 import { MdContentCopy, MdPeople, MdTrendingUp } from "react-icons/md";
 
 function traderName(trade: ActiveProTrade) {
-  const name = [trade.userId?.firstName, trade.userId?.lastName]
+  const owner = typeof trade.userId === "string" ? undefined : trade.userId;
+  const name = [owner?.firstName, owner?.lastName]
     .filter(Boolean)
     .join(" ");
-  return name || trade.userId?.traderID || "Pro Trader";
+  return name || owner?.traderID || "Pro Trader";
+}
+
+function traderId(trade: ActiveProTrade) {
+  return typeof trade.userId === "string" ? undefined : trade.userId?.traderID;
 }
 
 function TradeCard({
@@ -30,7 +35,7 @@ function TradeCard({
           <div className="min-w-0">
             <p className="font-bold text-slate-100 truncate">{traderName(trade)}</p>
             <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-              {trade.userId?.traderID || "Verified pro"}
+              {traderId(trade) || "Verified pro"}
             </p>
           </div>
         </div>
