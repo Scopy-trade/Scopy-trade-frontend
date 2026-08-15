@@ -228,7 +228,7 @@ export interface UserManagementUser extends User {
   uid?: string;
   name?: string;
   initials?: string;
-  status?: "Active" | "Offline" | "Banned";
+  status?: "active" | "suspended" | "waitlist";
   trades?: string;
   lastActive?: string;
   location?: string;
