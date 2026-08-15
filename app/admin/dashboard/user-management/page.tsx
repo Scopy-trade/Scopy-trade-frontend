@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { adminUserService } from "@/lib/api/admin";
 
-type UserStatus = "Active" | "Offline" | "Banned";
+type UserStatus = "active" | "suspended" | "waitlist";
 type UserRole = "Pro Trader" | "Copy Trader";
 
 interface User {
@@ -27,14 +27,14 @@ interface User {
 type Filter = "All Users" | "Pro Trader" | "Copy Trader";
 
 const statusStyle: Record<UserStatus, string> = {
-  Active: "text-[#4edea3]",
-  Offline: "text-[#8f9098]",
-  Banned: "text-[#ffb4ab]",
+  active: "text-[#4edea3]",
+  suspended: "text-[#ffb4ab]",
+  waitlist: "text-[#8f9098]",
 };
 const statusDot: Record<UserStatus, string> = {
-  Active: "bg-[#4edea3] animate-pulse",
-  Offline: "bg-[#8f9098]",
-  Banned: "bg-[#ffb4ab]",
+  active: "bg-[#4edea3] animate-pulse",
+  suspended: "bg-[#ffb4ab]",
+  waitlist: "bg-[#8f9098]",
 };
 const roleStyle: Record<UserRole, string> = {
   "Pro Trader": "bg-[#00311f]/40 text-[#4edea3] border border-[#4edea3]/20",
@@ -135,7 +135,7 @@ export default function UserManagementPage() {
         role: (user.role === "CopyTrader"
           ? "Copy Trader"
           : user.role || "Copy Trader") as UserRole,
-        status: user.status || "Offline",
+        status: (user.status as UserStatus) || "active",
         trades: user.trades || "0 Trades",
         lastActive:
           user.lastActive ||
