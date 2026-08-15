@@ -383,7 +383,7 @@ export default function AboutPage() {
               {/* Stats block */}
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { v: "2021", l: "Founded" },
+                  { v: "2026", l: "Founded" },
                   { v: "$2.4B+", l: "Projected Volume" },
                   { v: "2,500+", l: "Target Active Traders" },
                   { v: "6", l: "Target Exchange Integrations" },
