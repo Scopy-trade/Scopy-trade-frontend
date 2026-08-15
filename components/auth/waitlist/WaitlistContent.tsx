@@ -183,22 +183,22 @@ export default function WaitlistContent() {
                 disabled={isLoading}
                 className="w-full py-3.5 mt-3 px-4 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Signing out..." : "Sign Out"}
+                <span>{isLoading ? "Signing out..." : "Sign Out"}</span>
               </button>
             ) : (
-              // <Link
-              //   href="/login"
-              //   className="w-full mt-3 py-3.5 px-4 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors"
-              // >
-              //   Sign In
-              // </Link>
               <Link
                 href="/login"
-                className="w-full mb-3 button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full mt-3 py-3.5 px-4 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors"
               >
                 <span>Sign In</span>
-                <RiArrowRightLine className="text-lg" />
               </Link>
+              // <Link
+              //   href="/login"
+              //   className="w-full mb-3 button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              // >
+              //   <span>Sign In</span>
+              //   <RiArrowRightLine className="text-lg" />
+              // </Link>
             )}
           </div>
         </div>
