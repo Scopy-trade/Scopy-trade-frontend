@@ -357,7 +357,7 @@ export default function UserManagementPage() {
                   <tr
                     key={user.id}
                     className={`transition-colors group ${
-                      user.status === "Banned"
+                      user.status === "suspended"
                         ? "bg-[#93000a]/5 hover:bg-[#93000a]/10 opacity-70"
                         : "hover:bg-[#171f33]/40"
                     }`}
@@ -375,7 +375,7 @@ export default function UserManagementPage() {
                         <div>
                           <p
                             className={`text-sm font-bold text-[#dae2fd] group-hover:text-[#4edea3] transition-colors ${
-                              user.status === "Banned" ? "line-through" : ""
+                              user.status === "suspended" ? "line-through" : ""
                             }`}
                           >
                             {user.name}
@@ -446,7 +446,7 @@ export default function UserManagementPage() {
                     {/* Actions */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center justify-center gap-1.5">
-                        {user.status === "Banned" ? (
+                        {user.status === "suspended" ? (
                           <button
                             onClick={() => handleUnbanUser(user.id)}
                             disabled={actionLoading === user.id}
