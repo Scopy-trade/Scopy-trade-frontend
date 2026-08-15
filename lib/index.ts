@@ -110,7 +110,13 @@ export interface ActiveProTrade {
   platformFee?: string | null;
   platformShare?: string | null;
   proTraderShare?: string | null;
-  feeStatus?: "pending" | "processing" | "collected" | "failed" | "waived" | null;
+  feeStatus?:
+    | "pending"
+    | "processing"
+    | "collected"
+    | "failed"
+    | "waived"
+    | null;
   tradeResult?: "profit" | "loss" | "breakeven" | null;
   closedVia?: "tp" | "sl" | "manual" | null;
   settlementNetwork?: string | null;
@@ -142,6 +148,7 @@ export interface RegisterData {
   confirmPassword: string;
   role: UserRole;
   accessCode?: string;
+  sponsored?: boolean;
 }
 
 export type UserRole = "CopyTrader" | "Pro Trader";
@@ -155,6 +162,7 @@ export interface User {
   role?: UserRole;
   traderID?: string;
   hasOnboarded?: boolean;
+  status?: "active" | "suspended" | "waitlist";
 }
 
 export interface AuthResponse {

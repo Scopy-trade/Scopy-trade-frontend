@@ -1,0 +1,110 @@
+"use client";
+
+import Image from "next/image";
+import { RiBattery2ChargeLine, RiGiftLine, RiTimeLine } from "react-icons/ri";
+import BrandLogo from "@/components/brand/BrandLogo";
+
+const features = [
+  { Icon: RiBattery2ChargeLine, text: "Early Access Benefits" },
+  { Icon: RiGiftLine, text: "Exclusive Features" },
+  { Icon: RiTimeLine, text: "Priority Support" },
+];
+
+export default function WaitlistBrandingPanel() {
+  return (
+    <div className="hidden md:flex md:w-1/2 relative flex-col justify-between p-10 lg:p-14 bg-[var(--color-surface-container)] overflow-hidden">
+      {/* Ambient glows */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-[var(--color-secondary)]/10 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-[var(--color-primary)]/10 rounded-full blur-[120px]" />
+      </div>
+
+      {/* Background image */}
+      <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
+        <Image
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnqhpW3VjP16UVmJbK8K7NGZU7WE30ZuTee_lv64OrfX9o-x551OQ6FejcwLoUoI8dxfiNqtvLCHl95h-RZtp1S47Nji2rnrM1OyoS5FM4r_Z4l9JMqQftxyAkKo3HtGTXaLZPEAZtpVUIJYO6vSmelFZCBcZKdAuNc_o5I_f1abO4bBIhO1QQcqgIoRgcqUTclJqADZbj62tfiDVM5RazM6F-SIsmhu0Ww6QXSW4UC7UpOYbSulKi5RpV2VmYo1i9XAza7MFv4g"
+          alt="Abstract digital visualization"
+          fill
+          className="object-cover"
+          unoptimized
+        />
+      </div>
+
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #4edea3 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
+
+      {/* Top: Logo */}
+      <div className="relative z-10">
+        <div>
+          <BrandLogo className="h-14 w-48" priority />
+          <p className="ml-1 text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
+            Sovereign Terminal
+          </p>
+        </div>
+      </div>
+
+      {/* Middle: Hero */}
+      <div className="relative z-10">
+        <div className="inline-flex items-center gap-2 bg-[var(--color-secondary)]/10 border border-[var(--color-secondary)]/20 px-3 py-1.5 rounded-full mb-6">
+          <span className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-pulse" />
+          <span className="text-xs font-bold tracking-wider text-[var(--color-secondary)] uppercase">
+            Coming Soon
+          </span>
+        </div>
+
+        <h2
+          className="text-4xl xl:text-5xl font-bold text-[var(--color-on-surface)] leading-tight mb-5"
+          style={{ fontFamily: "var(--font-headline)" }}
+        >
+          Be Among the{" "}
+          <span
+            className="text-transparent bg-clip-text"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, var(--color-secondary), var(--color-primary))",
+            }}
+          >
+            First
+          </span>{" "}
+          to Trade
+        </h2>
+
+        <p className="text-[var(--color-on-surface-variant)] text-base max-w-sm leading-relaxed mb-8">
+          We're preparing to launch with exclusive features and
+          institutional-grade tools. Early access members get special benefits
+          and priority support.
+        </p>
+
+        {/* Feature pills */}
+        <div className="flex flex-wrap gap-2.5">
+          {features.map(({ Icon, text }) => (
+            <div
+              key={text}
+              className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2"
+            >
+              <Icon className="text-[var(--color-secondary)] text-sm flex-shrink-0" />
+              <span className="text-sm text-[var(--color-on-surface)]">
+                {text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom: Info */}
+      <div className="relative z-10 pt-8 border-t border-white/8">
+        <p className="text-sm text-[var(--color-on-surface-variant)] max-w-sm leading-relaxed">
+          Join our waitlist and stay updated on launch dates, new features, and
+          exclusive beta opportunities.
+        </p>
+      </div>
+    </div>
+  );
+}

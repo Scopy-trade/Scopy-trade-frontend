@@ -216,6 +216,11 @@ class AuthAPI {
   }
 
   async getPostLoginRedirect(user: User): Promise<string> {
+    // Check if user is on waitlist
+    if (user.status === "waitlist") {
+      return "/waitlist";
+    }
+
     if (!user.role) return "/register";
 
     const normalizedRole = user.role.trim();
