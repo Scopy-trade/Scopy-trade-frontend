@@ -11,11 +11,13 @@ import {
   RiShieldCheckLine,
 } from "react-icons/ri";
 import BrandLogo from "@/components/brand/BrandLogo";
+import { authAPI } from "@/lib/api/client";
 
 export default function WaitlistContent() {
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (registered === "true") {
@@ -26,7 +28,30 @@ export default function WaitlistContent() {
     }
   }, [registered]);
 
-  const isNewRegistration = registered === "true";
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkAuth() {
+      try {
+        await authAPI.getUser();
+        if (!mounted) return;
+        setIsAuthenticated(true);
+      } catch {
+        if (!mounted) return;
+        setIsAuthenticated(false);
+      }
+    }
+
+    void checkAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const isNewRegistrationParam = registered === "true";
+  const showRegistrationMessage =
+    isNewRegistrationParam && isAuthenticated === false;
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -66,11 +91,13 @@ export default function WaitlistContent() {
               className="text-3xl font-black tracking-tight text-[var(--color-on-surface)] mb-3"
               style={{ fontFamily: "var(--font-headline)" }}
             >
-              {isNewRegistration ? "Welcome to the Waitlist!" : "Welcome Back!"}
+              {showRegistrationMessage
+                ? "Registration successful"
+                : "Welcome Back!"}
             </h2>
             <p className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed">
-              {isNewRegistration
-                ? "Your account has been created successfully. You've been added to our waitlist and will be among the first to access SCopyTrade when we launch."
+              {showRegistrationMessage
+                ? "Your registration was successful and you've been added to the waitlist. We'll notify you by email when access is available."
                 : "Your login was successful, but we're not live just yet. You'll be notified as soon as we launch and your access is activated."}
             </p>
           </div>
@@ -81,7 +108,7 @@ export default function WaitlistContent() {
               {
                 icon: RiTimeLine,
                 title: "Limited Access Period",
-                description: isNewRegistration
+                description: isNewRegistrationParam
                   ? "We're taking a limited number of traders during our beta launch"
                   : "We are currently in the final stages of preparation",
               },
@@ -142,14 +169,22 @@ export default function WaitlistContent() {
               <span>Return to Home</span>
               <RiArrowRightLine className="text-lg" />
             </Link>
-
-            <button
-              onClick={handleLogout}
-              disabled={isLoading}
-              className="w-full py-3.5 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Signing out..." : "Sign Out"}
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                disabled={isLoading}
+                className="w-full py-3.5 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Signing out..." : "Sign Out"}
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full py-3.5 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
 
