@@ -12,7 +12,7 @@ const team = [
     accent: "emerald",
   },
   {
-    name: "Kingsley",
+    name: "Agbam Kingsley",
     role: "Technical Co-Founder & CTO",
     bio: "Full-stack software developer with 4+ years of experience turning ideas into production-ready web2 and web3 products. He leads SCopyTrade's technical direction across frontend development, backend architecture, APIs, databases, and deployment.",
     image: "/Kingsley1.jpg",
@@ -193,7 +193,7 @@ export default function AboutPage() {
                 {/* Quick stats row */}
                 <div className="flex gap-8">
                   {[
-                    { v: "2021", l: "Founded" },
+                    { v: "2026", l: "Founded" },
                     { v: "4", l: "Team Members" },
                     { v: "12", l: "Countries" },
                   ].map(({ v, l }) => (
@@ -265,7 +265,7 @@ export default function AboutPage() {
                           </h3>
                           <p className="text-zinc-600 text-xs leading-relaxed">
                             Non-custodial copy trading infrastructure. Founded
-                            2021 · London, UK
+                            2026 · Lagos, Nigeria
                           </p>
                           <div className="flex gap-2 mt-3">
                             {["Fintech", "DeFi", "Web3"].map((tag) => (
@@ -369,11 +369,11 @@ export default function AboutPage() {
                 </p>
                 <div className="mt-8 pl-8 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20 flex items-center justify-center text-sm font-black text-emerald-400">
-                    AM
+                    AP
                   </div>
                   <div>
                     <p className="text-sm font-bold text-zinc-300">
-                      Arjan Mehta
+                      Akwarandu Princewell
                     </p>
                     <p className="text-xs text-zinc-600">Co-Founder & CEO</p>
                   </div>
