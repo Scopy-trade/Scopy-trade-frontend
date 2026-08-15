@@ -172,7 +172,7 @@ export default function WaitlistContent() {
           <div className="space-y-3">
             <Link
               href="/"
-              className="w-full button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mb-5 button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               <span>Return to Home</span>
               <RiArrowRightLine className="text-lg" />
@@ -181,7 +181,7 @@ export default function WaitlistContent() {
               <button
                 onClick={handleLogout}
                 disabled={isLoading}
-                className="w-full py-3.5 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 mt-3 px-4 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Signing out..." : "Sign Out"}
               </button>
