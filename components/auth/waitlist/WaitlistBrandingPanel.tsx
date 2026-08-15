@@ -1,7 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
-import { RiBattery2ChargeLine, RiGiftLine, RiTimeLine } from "react-icons/ri";
+import {
+  RiArrowLeftLine,
+  RiBattery2ChargeLine,
+  RiGiftLine,
+  RiTimeLine,
+} from "react-icons/ri";
 import BrandLogo from "@/components/brand/BrandLogo";
 
 const features = [
@@ -42,7 +48,15 @@ export default function WaitlistBrandingPanel() {
 
       {/* Top: Logo */}
       <div className="relative z-10">
-        <div>
+        <Link
+          href="/"
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] transition hover:border-[var(--color-secondary)]/30 hover:text-[var(--color-on-surface)]"
+        >
+          <RiArrowLeftLine className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Back to home</span>
+        </Link>
+
+        <div className="mt-6">
           <BrandLogo className="h-14 w-48" priority />
           <p className="ml-1 text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
             Sovereign Terminal
@@ -77,7 +91,7 @@ export default function WaitlistBrandingPanel() {
         </h2>
 
         <p className="text-[var(--color-on-surface-variant)] text-base max-w-sm leading-relaxed mb-8">
-          We're preparing to launch with exclusive features and
+          We&apos;re preparing to launch with exclusive features and
           institutional-grade tools. Early access members get special benefits
           and priority support.
         </p>

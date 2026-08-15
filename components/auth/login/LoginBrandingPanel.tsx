@@ -1,8 +1,14 @@
 // components/auth/login/LoginBrandingPanel.tsx
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
-import { RiShieldCheckLine, RiFlaskLine, RiGlobalLine } from "react-icons/ri";
+import {
+  RiArrowLeftLine,
+  RiShieldCheckLine,
+  RiFlaskLine,
+  RiGlobalLine,
+} from "react-icons/ri";
 import BrandLogo from "@/components/brand/BrandLogo";
 
 const features = [
@@ -49,7 +55,15 @@ export default function LoginBrandingPanel() {
 
       {/* Top: Logo */}
       <div className="relative z-10">
-        <div>
+        <Link
+          href="/"
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] transition hover:border-[var(--color-secondary)]/30 hover:text-[var(--color-on-surface)]"
+        >
+          <RiArrowLeftLine className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Back to home</span>
+        </Link>
+
+        <div className="mt-6">
           <BrandLogo className="h-14 w-48" priority />
           <p className="ml-1 text-[10px] uppercase tracking-widest text-[var(--color-on-surface-variant)] opacity-60">
             Sovereign Terminal
