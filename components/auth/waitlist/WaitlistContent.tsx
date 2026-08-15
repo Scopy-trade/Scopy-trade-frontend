@@ -53,6 +53,18 @@ export default function WaitlistContent() {
   const showRegistrationMessage =
     isNewRegistrationParam && isAuthenticated === false;
 
+  const messageTitle = showRegistrationMessage
+    ? "Registration successful"
+    : isAuthenticated === true
+      ? "Welcome Back!"
+      : "Welcome to the Waitlist!";
+
+  const messageBody = showRegistrationMessage
+    ? "Your registration was successful and you've been added to the waitlist. We'll notify you by email when access is available."
+    : isAuthenticated === true
+      ? "Your login was successful, but we're not live just yet. You'll be notified as soon as we launch and your access is activated."
+      : "We're not live yet. Join the waitlist or sign in to be notified when access becomes available.";
+
   const handleLogout = async () => {
     setIsLoading(true);
     try {
@@ -91,14 +103,10 @@ export default function WaitlistContent() {
               className="text-3xl font-black tracking-tight text-[var(--color-on-surface)] mb-3"
               style={{ fontFamily: "var(--font-headline)" }}
             >
-              {showRegistrationMessage
-                ? "Registration successful"
-                : "Welcome Back!"}
+              {messageTitle}
             </h2>
             <p className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed">
-              {showRegistrationMessage
-                ? "Your registration was successful and you've been added to the waitlist. We'll notify you by email when access is available."
-                : "Your login was successful, but we're not live just yet. You'll be notified as soon as we launch and your access is activated."}
+              {messageBody}
             </p>
           </div>
 
@@ -180,7 +188,7 @@ export default function WaitlistContent() {
             ) : (
               <Link
                 href="/login"
-                className="w-full py-3.5 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors"
+                className="w-full mt-3 py-3.5 px-4 rounded-xl border border-[var(--color-outline)]/20 text-[var(--color-on-surface)] font-semibold hover:bg-[var(--color-surface-container-highest)] transition-colors"
               >
                 Sign In
               </Link>
