@@ -5,6 +5,22 @@ import { ExchangeBalance } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import { MdClose } from "react-icons/md";
 
+const SUPPORTED_TRADE_PAIRS = [
+  { value: "BTCUSDT", label: "BTC / USDT" },
+  { value: "ETHUSDT", label: "ETH / USDT" },
+  { value: "SOLUSDT", label: "SOL / USDT" },
+  { value: "XRPUSDT", label: "XRP / USDT" },
+  { value: "DOGEUSDT", label: "DOGE / USDT" },
+  { value: "BNBUSDT", label: "BNB / USDT" },
+  { value: "SUIUSDT", label: "SUI / USDT" },
+] as const;
+
+function exchangeSymbol(pair: string, exchange?: string) {
+  return exchange?.toLowerCase() === "okx"
+    ? `${pair.slice(0, -4)}-USDT`
+    : pair;
+}
+
 export default function OpenTradeModal({ isOpen, onClose, onTradeOpened }: { isOpen: boolean; onClose: () => void; onTradeOpened: () => void }) {
   const [form, setForm] = useState({ pair: "", entry: "", tp: "", sl: "", direction: "buy" as "buy" | "sell", notes: "", exchangeConnectionId: "", balance: "" });
   const [balances, setBalances] = useState<ExchangeBalance[]>([]);
@@ -43,6 +59,9 @@ export default function OpenTradeModal({ isOpen, onClose, onTradeOpened }: { isO
 
   if (!isOpen) return null;
   const inputClass = "w-full px-4 py-2.5 rounded-lg bg-surface-container-highest border border-white/10 text-on-surface outline-none focus:border-secondary";
+  const selectedExchange = balances.find((item) => item.connectionId === form.exchangeConnectionId);
+  const selectedPair = SUPPORTED_TRADE_PAIRS.find((item) => item.value === form.pair);
+  const formattedPair = selectedPair && exchangeSymbol(selectedPair.value, selectedExchange?.exchange);
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-surface-container rounded-2xl w-full max-w-xl border border-white/10 shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -51,7 +70,22 @@ export default function OpenTradeModal({ isOpen, onClose, onTradeOpened }: { isO
           {error && <p className="p-3 rounded-lg bg-tertiary/10 text-tertiary text-sm">{error}</p>}
           {!balances.length && <p className="p-3 rounded-lg bg-amber-500/10 text-amber-300 text-sm">Connect and verify an exchange before opening a trade.</p>}
           <div><label className="block text-sm text-slate-400 mb-2">Connected exchange</label><select required value={form.exchangeConnectionId} onChange={(e) => chooseExchange(e.target.value)} className={inputClass}><option value="">Select exchange</option>{balances.map((item) => <option key={item.connectionId} value={item.connectionId}>{item.label || item.exchange}</option>)}</select></div>
-          <div><label className="block text-sm text-slate-400 mb-2">Trading pair</label><input required value={form.pair} onChange={(e) => setForm({ ...form, pair: e.target.value.toUpperCase() })} placeholder="BTC/USDT" className={inputClass} /></div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Trading pair</label>
+            <select required value={form.pair} onChange={(e) => setForm({ ...form, pair: e.target.value })} className={inputClass}>
+              <option value="">Select trading pair</option>
+              {SUPPORTED_TRADE_PAIRS.map((pair) => (
+                <option key={pair.value} value={pair.value}>
+                  {pair.label} ({exchangeSymbol(pair.value, selectedExchange?.exchange)})
+                </option>
+              ))}
+            </select>
+            {selectedPair && selectedExchange && (
+              <p className="mt-2 text-xs text-slate-500">
+                {selectedExchange.label || selectedExchange.exchange} order symbol: {formattedPair}
+              </p>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm text-slate-400 mb-2">Direction</label><select value={form.direction} onChange={(e) => setForm({ ...form, direction: e.target.value as "buy" | "sell" })} className={inputClass}><option value="buy">Buy / Long</option><option value="sell">Sell / Short</option></select></div><div><label className="block text-sm text-slate-400 mb-2">Entry price</label><input required type="number" min="0" step="any" value={form.entry} onChange={(e) => setForm({ ...form, entry: e.target.value })} className={inputClass} /></div></div>
           <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm text-slate-400 mb-2">Take profit</label><input required type="number" min="0" step="any" value={form.tp} onChange={(e) => setForm({ ...form, tp: e.target.value })} className={inputClass} /></div><div><label className="block text-sm text-slate-400 mb-2">Stop loss</label><input required type="number" min="0" step="any" value={form.sl} onChange={(e) => setForm({ ...form, sl: e.target.value })} className={inputClass} /></div></div>
           <div><label className="block text-sm text-slate-400 mb-2">Balance used for 2% risk sizing (USDT)</label><input required type="number" min="0" step="any" value={form.balance} onChange={(e) => setForm({ ...form, balance: e.target.value })} className={inputClass} /></div>
