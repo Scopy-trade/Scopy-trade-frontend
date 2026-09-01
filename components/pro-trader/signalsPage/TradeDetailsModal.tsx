@@ -28,6 +28,7 @@ export default function TradeDetailsModal({
   const [saving, setSaving] = useState(false);
   const [closing, setClosing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!trade) return;
@@ -36,7 +37,8 @@ export default function TradeDetailsModal({
     setSl(trade.sl);
     setEditing(false);
     setError(null);
-  }, [trade]);
+    setNotice(null);
+  }, [trade?._id]);
 
   useEffect(() => {
     if (!trade) return;
@@ -81,10 +83,11 @@ export default function TradeDetailsModal({
     if (!trade || !window.confirm("Close this trade now? Copied trades will be asked to close in the background.")) return;
     setClosing(true);
     setError(null);
+    setNotice(null);
     try {
       const response = await tradeService.closeProTrade(trade._id);
       onUpdated(response.trade);
-      onClose();
+      setNotice(response.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to close trade");
     } finally {
@@ -110,6 +113,7 @@ export default function TradeDetailsModal({
 
         <form onSubmit={(event) => void save(event)} className="space-y-6 p-6">
           {error && <p className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary">{error}</p>}
+          {notice && <p className="rounded-lg border border-secondary/20 bg-secondary/10 p-3 text-sm text-secondary">{notice}</p>}
 
           <div className="rounded-lg border border-white/10 bg-surface-container-high p-3 text-sm">
             <div className="flex items-center justify-between gap-3">

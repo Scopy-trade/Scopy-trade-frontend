@@ -65,12 +65,13 @@ export default function OpenTradeModal({ isOpen, onClose, onTradeOpened }: { isO
   const selectedExchange = balances.find((item) => item.connectionId === form.exchangeConnectionId);
   const selectedPair = SUPPORTED_TRADE_PAIRS.find((item) => item.value === form.pair);
   const formattedPair = selectedPair && exchangeSymbol(selectedPair.value, selectedExchange?.exchange);
+  const duplicatePairError = error?.includes("already exists");
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-surface-container rounded-2xl w-full max-w-xl border border-white/10 shadow-2xl max-h-[92vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-white/10"><div><h2 className="text-xl font-bold">Open a Pro Trade</h2><p className="text-xs text-slate-400 mt-1">This places a real order and makes the open trade available to copy.</p></div><button type="button" onClick={onClose} className="p-2"><MdClose size={20} /></button></div>
         <form onSubmit={(event) => void submit(event)} className="p-6 space-y-4">
-          {error && <p className="p-3 rounded-lg bg-tertiary/10 text-tertiary text-sm">{error}</p>}
+          {error && <div role="alert" className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary"><p>{error}</p>{duplicatePairError && <p className="mt-1 text-xs text-slate-300">Choose a different pair or close the existing trade on this exchange connection first.</p>}</div>}
           {!balances.length && <p className="p-3 rounded-lg bg-amber-500/10 text-amber-300 text-sm">Connect and verify an exchange before opening a trade.</p>}
           <div><label className="block text-sm text-slate-400 mb-2">Connected exchange</label><select required value={form.exchangeConnectionId} onChange={(e) => chooseExchange(e.target.value)} className={inputClass}><option value="">Select exchange</option>{balances.map((item) => <option key={item.connectionId} value={item.connectionId}>{item.label || item.exchange}</option>)}</select></div>
           <div>
