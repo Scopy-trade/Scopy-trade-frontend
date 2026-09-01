@@ -109,6 +109,7 @@ export default function TradeDetailsModal({
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div><p className="text-[10px] uppercase text-slate-500">Quantity</p><p className="mt-1 font-mono text-sm">{trade.quantity}</p></div>
             <div><p className="text-[10px] uppercase text-slate-500">Fill price</p><p className="mt-1 font-mono text-sm">{trade.entryFillPrice || "Not filled"}</p></div>
+            <div><p className="text-[10px] uppercase text-slate-500">Market price</p><p className="mt-1 font-mono text-sm">{trade.currentMarketPrice || "Unavailable"}</p></div>
             <div className="col-span-2"><p className="text-[10px] uppercase text-slate-500">Exchange order ID</p><p className="mt-1 truncate font-mono text-sm">{trade.exchangeOrderId || "Unavailable"}</p></div>
           </div>
 

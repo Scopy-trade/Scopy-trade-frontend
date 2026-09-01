@@ -40,6 +40,7 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
         ? await tradeService.getUserTrades(mode)
         : await adminTradeService.getTrades(mode);
     setTrades(response.trades);
+    return response;
   }, [mode, scope]);
 
   useEffect(() => {
@@ -55,6 +56,23 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
       });
     return () => { cancelled = true; };
   }, [load]);
+
+  useEffect(() => {
+    if (mode !== "active") return;
+    const interval = window.setInterval(() => {
+      void load()
+        .then((response) => {
+          setTrades(response.trades);
+          setSelected((current) =>
+            current ? response.trades.find((trade) => trade._id === current._id) ?? null : null,
+          );
+        })
+        .catch(() => {
+          // Retain the last successful quote and avoid disrupting the table.
+        });
+    }, 15_000);
+    return () => window.clearInterval(interval);
+  }, [load, mode]);
 
   const applyUpdate = useCallback((update: Partial<ActiveProTrade> & { _id: string }) => {
     setTrades((current) => {
@@ -104,9 +122,9 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
           : error ? <div className="p-12 text-center text-tertiary">{error}</div>
           : !trades.length ? <div className="p-12 text-center text-slate-400">No {mode} trades found.</div>
           : <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left">
+              <table className="w-full min-w-[1020px] text-left">
                 <thead className="bg-surface-container-high text-[10px] uppercase tracking-widest text-slate-500"><tr>
-                  <th className="p-4">Pair / owner</th><th className="p-4">Origin</th><th className="p-4">Side</th><th className="p-4">Entry / exit</th><th className="p-4">TP / SL</th><th className="p-4">{mode === "active" ? "Status" : "Result / P&L"}</th>{scope !== "copy" && <th className="p-4">Copied</th>}<th className="p-4">{mode === "active" ? "Opened" : "Closed"}</th>
+                  <th className="p-4">Pair / owner</th><th className="p-4">Origin</th><th className="p-4">Side</th><th className="p-4">Entry / exit</th>{mode === "active" && <th className="p-4">Market price</th>}<th className="p-4">TP / SL</th><th className="p-4">{mode === "active" ? "Status" : "Result / P&L"}</th>{scope !== "copy" && <th className="p-4">Copied</th>}<th className="p-4">{mode === "active" ? "Opened" : "Closed"}</th>
                 </tr></thead>
                 <tbody>{trades.map((trade) => (
                   <tr key={trade._id} tabIndex={0} onClick={() => setSelected(trade)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelected(trade); } }} className="cursor-pointer border-t border-white/5 text-sm transition-colors hover:bg-white/5 focus:bg-white/5 focus:outline-none">
@@ -114,6 +132,7 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
                     <td className="p-4"><span className="rounded bg-white/5 px-2 py-1 text-[10px] font-bold uppercase text-slate-300">{trade.tradeOrigin}</span></td>
                     <td className={`p-4 font-bold uppercase ${trade.direction === "buy" ? "text-secondary" : "text-tertiary"}`}>{trade.direction}</td>
                     <td className="p-4 font-mono text-xs">{trade.entryFillPrice || trade.entryPrice}{mode === "history" && <> <span className="text-slate-600">→</span> {trade.exitPrice || "—"}</>}</td>
+                    {mode === "active" && <td className="p-4 font-mono text-xs text-slate-100">{trade.currentMarketPrice || "—"}</td>}
                     <td className="p-4 font-mono text-xs"><span className="text-secondary">{trade.tp}</span><span className="text-slate-600"> / </span><span className="text-tertiary">{trade.sl}</span></td>
                     <td className="p-4">{mode === "active" ? <span className="text-xs font-bold uppercase">{trade.status}</span> : <><p className={`text-xs font-bold uppercase ${trade.tradeResult === "profit" ? "text-secondary" : trade.tradeResult === "loss" ? "text-tertiary" : "text-slate-400"}`}>{trade.tradeResult || trade.status}</p><p className="mt-1 font-mono text-xs">{trade.realizedPnl ?? "—"} USDT</p></>}</td>
                     {scope !== "copy" && <td className="p-4"><p className="font-bold">{trade.copyStats?.total ?? 0}</p><p className="text-[10px] text-slate-500">{trade.copyStats?.active ?? 0} active</p></td>}

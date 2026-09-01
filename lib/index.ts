@@ -59,6 +59,8 @@ export interface ActiveProTrade {
   direction: "buy" | "sell";
   entryPrice: string;
   entryFillPrice?: string | null;
+  currentMarketPrice?: string | null;
+  currentMarketPriceUpdatedAt?: string | null;
   tp: string;
   sl: string;
   quantity: string;
