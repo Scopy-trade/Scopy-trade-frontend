@@ -61,7 +61,9 @@ export default function ProTraderDashboard() {
 
   function applyUpdate(updated: ActiveProTrade) {
     setTrades((current) =>
-      current.map((trade) => (trade._id === updated._id ? updated : trade)),
+      ["pending", "filled"].includes(updated.status)
+        ? current.map((trade) => (trade._id === updated._id ? updated : trade))
+        : current.filter((trade) => trade._id !== updated._id),
     );
     setSelectedTrade(updated);
   }

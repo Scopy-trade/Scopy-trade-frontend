@@ -26,6 +26,7 @@ export default function TradeDetailsModal({
   const [tp, setTp] = useState("");
   const [sl, setSl] = useState("");
   const [saving, setSaving] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -73,6 +74,21 @@ export default function TradeDetailsModal({
       setError(err instanceof Error ? err.message : "Failed to update trade");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function closeTrade() {
+    if (!trade || !window.confirm("Close this trade now? Copied trades will be asked to close in the background.")) return;
+    setClosing(true);
+    setError(null);
+    try {
+      const response = await tradeService.closeProTrade(trade._id);
+      onUpdated(response.trade);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to close trade");
+    } finally {
+      setClosing(false);
     }
   }
 
@@ -138,7 +154,7 @@ export default function TradeDetailsModal({
           {!entryEditable && <div className="flex items-start gap-2 rounded-lg bg-white/5 p-3 text-xs text-slate-400"><MdLock className="mt-0.5 shrink-0" />Entry price is locked because this order has started filling. TP and SL can still be amended where supported by the connected exchange.</div>}
 
           <div className="flex justify-end gap-3 border-t border-white/10 pt-5">
-            {canEdit && (editing ? <><button type="button" onClick={() => { setEditing(false); setEntryPrice(trade.entryPrice); setTp(trade.tp); setSl(trade.sl); setError(null); }} className="rounded-lg border border-white/10 px-4 py-2 text-sm">Cancel</button><button disabled={saving} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary disabled:opacity-50"><MdSave />{saving ? "Updating exchange..." : "Save changes"}</button></> : <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary"><MdEdit />Edit parameters</button>)}
+            {canEdit && (editing ? <><button type="button" onClick={() => { setEditing(false); setEntryPrice(trade.entryPrice); setTp(trade.tp); setSl(trade.sl); setError(null); }} className="rounded-lg border border-white/10 px-4 py-2 text-sm">Cancel</button><button disabled={saving} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary disabled:opacity-50"><MdSave />{saving ? "Updating exchange..." : "Save changes"}</button></> : <><button type="button" disabled={closing} onClick={() => void closeTrade()} className="rounded-lg border border-tertiary/40 px-5 py-2 text-sm font-bold text-tertiary disabled:opacity-50">{closing ? "Closing trade..." : "Close trade"}</button><button type="button" onClick={() => setEditing(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2 text-sm font-bold text-on-secondary"><MdEdit />Edit parameters</button></>)}
             {!canEdit && <button type="button" onClick={onClose} className="rounded-lg border border-white/10 px-5 py-2 text-sm">Close</button>}
           </div>
         </form>

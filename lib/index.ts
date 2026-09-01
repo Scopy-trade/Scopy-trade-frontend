@@ -125,6 +125,8 @@ export interface ActiveProTrade {
   settlementTransactionId?: string | null;
   parameterSyncStatus?: "pending" | "synced" | "failed" | null;
   parameterSyncError?: string | null;
+  sourceTradeClosedAt?: string | null;
+  sourceTradeCloseMessage?: string | null;
 }
 
 export interface ExchangeBalance {

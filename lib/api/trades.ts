@@ -64,6 +64,12 @@ export const tradeService = {
     );
   },
 
+  closeProTrade(tradeId: string) {
+    return userApi.post<TradeMutationResponse>(
+      `/pro-trader/dashboard/trades/${tradeId}/close`,
+    );
+  },
+
   copyTrade(sourceTradeId: string, exchangeConnectionId: string, balance: number) {
     return userApi.post<TradeMutationResponse>("/trades", {
       sourceTradeId,

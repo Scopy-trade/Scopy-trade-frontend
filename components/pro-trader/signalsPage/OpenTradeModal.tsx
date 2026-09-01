@@ -12,7 +12,10 @@ const SUPPORTED_TRADE_PAIRS = [
   { value: "XRPUSDT", label: "XRP / USDT" },
   { value: "DOGEUSDT", label: "DOGE / USDT" },
   { value: "BNBUSDT", label: "BNB / USDT" },
+  { value: "LINKUSDT", label: "LINK / USDT" },
   { value: "SUIUSDT", label: "SUI / USDT" },
+  { value: "AVAXUSDT", label: "AVAX / USDT" },
+  { value: "ADAUSDT", label: "ADA / USDT" },
 ] as const;
 
 function exchangeSymbol(pair: string, exchange?: string) {
