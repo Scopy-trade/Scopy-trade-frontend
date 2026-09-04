@@ -28,6 +28,27 @@ const SHARED_CONFIG = {
   headers: { "Content-Type": "application/json" },
 } as const;
 
+function csrfToken(): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  return document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("csrf_token="))
+    ?.split("=")
+    .slice(1)
+    .join("=");
+}
+
+function attachCsrfInterceptor(instance: AxiosInstance): void {
+  instance.interceptors.request.use((config) => {
+    const method = config.method?.toUpperCase();
+    if (method && !["GET", "HEAD", "OPTIONS"].includes(method)) {
+      const token = csrfToken();
+      if (token) config.headers.set("X-CSRF-Token", decodeURIComponent(token));
+    }
+    return config;
+  });
+}
+
 export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   ...SHARED_CONFIG,
@@ -37,6 +58,9 @@ export const adminAxios: AxiosInstance = axios.create({
   baseURL: `${API_BASE_URL}/admin`,
   ...SHARED_CONFIG,
 });
+
+attachCsrfInterceptor(api);
+attachCsrfInterceptor(adminAxios);
 
 // ─── Interceptor ───────────────────────────────────────────────────────
 

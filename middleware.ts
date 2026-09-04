@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { decodeJwt } from "jose";
 
-async function verifyToken(token: string) {
+function hasExpectedTokenType(token: string, type: "user_access" | "admin_access") {
   try {
-    await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
-    return true;
-  } catch (err) {
-    console.error("Token verification failed:", err); // see the real reason
-
+    const payload = decodeJwt(token);
+    return payload.tokenType === type && typeof payload.exp === "number" && payload.exp * 1000 > Date.now();
+  } catch {
     return false;
   }
 }
@@ -28,7 +26,7 @@ export async function middleware(request: NextRequest) {
   // USER FLOW
   if (isUserDashboard || isUserAuthPage) {
     const isUserAuthenticated = userToken
-      ? await verifyToken(userToken)
+      ? hasExpectedTokenType(userToken, "user_access")
       : false;
 
     if (isUserDashboard && !isUserAuthenticated) {
@@ -41,7 +39,7 @@ export async function middleware(request: NextRequest) {
   // ADMIN FLOW
   if (isAdminDashboard || isAdminAuthPage) {
     const isAdminAuthenticated = adminToken
-      ? await verifyToken(adminToken)
+      ? hasExpectedTokenType(adminToken, "admin_access")
       : false;
 
     if (isAdminDashboard && !isAdminAuthenticated) {
