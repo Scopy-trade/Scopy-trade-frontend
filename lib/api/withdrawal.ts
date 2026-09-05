@@ -5,6 +5,7 @@ import {
   GetWalletAddressResponse,
   SaveWalletAddressResponse,
   WithdrawFundsResponse,
+  WithdrawalHistoryResponse,
 } from "..";
 
 export const withdrawalService = {
@@ -25,5 +26,13 @@ export const withdrawalService = {
     return userApi.post<WithdrawFundsResponse>("/pro-trader/dashboard/withdraw", {
       amount,
     });
+  },
+
+  /** Fetch a page of the current user's completed withdrawal history. */
+  getWithdrawalHistory(page = 1) {
+    return userApi.get<WithdrawalHistoryResponse>(
+      "/pro-trader/dashboard/withdraw/history",
+      { params: { page } },
+    );
   },
 };

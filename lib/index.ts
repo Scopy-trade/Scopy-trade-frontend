@@ -351,3 +351,22 @@ export interface WithdrawFundsResponse {
   transactionId: string;
   remainingBalance: number;
 }
+
+export interface WithdrawalHistoryItem {
+  id: string;
+  date: string;
+  amount: number | null;
+  transactionId: string | null;
+  destinationAddress: string | null;
+  status: "COMPLETED";
+}
+
+export interface WithdrawalHistoryResponse {
+  success: boolean;
+  withdrawals: WithdrawalHistoryItem[];
+  page: number;
+  limit: number;
+  pageSize: number;
+  pages: number;
+  total: number;
+}
