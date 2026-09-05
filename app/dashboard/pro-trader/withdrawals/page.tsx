@@ -9,7 +9,7 @@ export default function WithdrawalsPage() {
     <>
       <div className="mb-10">
         <Link
-          href="/dashboard/earnings"
+          href="/dashboard/pro-trader/earnings"
           className="inline-flex items-center text-sm text-on-surface-variant hover:text-secondary mb-4 transition-colors"
         >
           <MdArrowBack className="mr-1" />
