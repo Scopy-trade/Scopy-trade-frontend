@@ -1,68 +1,199 @@
 // components/dashboard/earnings/WithdrawalModal.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { MdClose, MdExpandMore } from "react-icons/md";
+import { useEffect, useState } from "react";
+import {
+  MdClose,
+  MdCheckCircle,
+  MdErrorOutline,
+  MdArrowBack,
+  MdContentCopy,
+} from "react-icons/md";
+import { withdrawalService } from "@/lib/api/withdrawal";
+import { WalletRequirements } from "@/lib";
 
 interface WithdrawalModalProps {
-  isOpen: boolean;
   onClose: () => void;
+  /** Called once a withdrawal succeeds, with the user's new available balance. */
+  onSuccess?: (remainingBalance: number) => void;
 }
 
-interface WithdrawalFormData {
-  method: string;
-  amount: number;
-}
+type Step = "loading" | "load-error" | "address" | "withdraw" | "success";
 
-const payoutMethods = [
-  { value: "usdc_eth", label: "USDC (Ethereum Mainnet)" },
-  { value: "usdt_trc20", label: "USDT (TRC-20)" },
-  { value: "bank_sepa", label: "Direct Bank Transfer (SEPA)" },
-];
+// Mirrors the backend's own precision check: a positive number with at
+// most 6 decimal places (USDT/TRC-20 precision).
+const AMOUNT_PATTERN = /^\d+(\.\d{1,6})?$/;
 
-export default function WithdrawalModal({
-  isOpen,
-  onClose,
-}: WithdrawalModalProps) {
-  const [formData, setFormData] = useState<WithdrawalFormData>({
-    method: "usdc_eth",
-    amount: 0,
+function formatUsdt(value: number): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 6,
   });
+}
 
+// Rendered only while the withdrawal flow is open — the parent mounts
+// this component conditionally (`{isModalOpen && <WithdrawalModal .../>}`)
+// rather than passing an `isOpen` flag, so each open is a fresh mount with
+// clean state and a single wallet/balance fetch.
+export default function WithdrawalModal({
+  onClose,
+  onSuccess,
+}: WithdrawalModalProps) {
+  const [step, setStep] = useState<Step>("loading");
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const [balance, setBalance] = useState(0);
+  const [savedAddress, setSavedAddress] = useState<string | null>(null);
+  const [requirements, setRequirements] = useState<WalletRequirements | null>(
+    null,
+  );
+
+  const [addressInput, setAddressInput] = useState("");
+  const [addressSubmitting, setAddressSubmitting] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
+
+  const [amountInput, setAmountInput] = useState("");
+  const [withdrawSubmitting, setWithdrawSubmitting] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
+
+  const [successInfo, setSuccessInfo] = useState<{
+    transactionId: string;
+    remainingBalance: number;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  // Lock background scroll for as long as the modal is mounted, and load
+  // the wallet/balance data once on mount (a fresh mount happens each time
+  // the parent opens the modal, so this always reflects the latest state).
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = "hidden";
+
+    let cancelled = false;
+    withdrawalService
+      .getWalletAddress()
+      .then((res) => {
+        if (cancelled) return;
+        setBalance(res.proEarningsBalance);
+        setSavedAddress(res.withdrawalAddress);
+        setRequirements(res.requirements);
+        setAddressInput(res.withdrawalAddress ?? "");
+        setStep(res.withdrawalAddress ? "withdraw" : "address");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setLoadError(
+          err instanceof Error ? err.message : "Failed to load wallet details",
+        );
+        setStep("load-error");
+      });
+
     return () => {
       document.body.style.overflow = "unset";
+      cancelled = true;
     };
-  }, [isOpen]);
+  }, []);
 
-  const networkFee = 12.5;
-  const maxAmount = 42890.4;
-  const minAmount = 100;
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFormData({ ...formData, amount: value });
+  const retryLoad = () => {
+    setStep("loading");
+    setLoadError(null);
+    withdrawalService
+      .getWalletAddress()
+      .then((res) => {
+        setBalance(res.proEarningsBalance);
+        setSavedAddress(res.withdrawalAddress);
+        setRequirements(res.requirements);
+        setAddressInput(res.withdrawalAddress ?? "");
+        setStep(res.withdrawalAddress ? "withdraw" : "address");
+      })
+      .catch((err) => {
+        setLoadError(
+          err instanceof Error ? err.message : "Failed to load wallet details",
+        );
+        setStep("load-error");
+      });
   };
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddressError(null);
+
+    if (!addressInput.trim()) {
+      setAddressError("A wallet address is required.");
+      return;
+    }
+
+    setAddressSubmitting(true);
+    try {
+      const res = await withdrawalService.saveWalletAddress(
+        addressInput.trim(),
+      );
+      setSavedAddress(res.withdrawalAddress);
+      setStep("withdraw");
+    } catch (err) {
+      setAddressError(
+        err instanceof Error ? err.message : "Failed to save wallet address",
+      );
+    } finally {
+      setAddressSubmitting(false);
+    }
+  };
+
+  const numericAmount = Number(amountInput);
+  const amountIsValid =
+    amountInput.trim() !== "" &&
+    AMOUNT_PATTERN.test(amountInput.trim()) &&
+    numericAmount > 0 &&
+    numericAmount <= balance;
 
   const handleMaxClick = () => {
-    setFormData({ ...formData, amount: maxAmount });
+    // Balance already carries at most 6 decimals server-side, so this is
+    // safe to drop straight into the amount field.
+    setAmountInput(String(balance));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Withdrawal request:", formData);
-    // Handle withdrawal logic here
-    onClose();
+    setWithdrawError(null);
+
+    if (!amountIsValid) {
+      setWithdrawError(
+        numericAmount > balance
+          ? "Amount exceeds your available balance."
+          : "Enter a valid amount (up to 6 decimal places).",
+      );
+      return;
+    }
+
+    setWithdrawSubmitting(true);
+    try {
+      const res = await withdrawalService.withdrawFunds(numericAmount);
+      setSuccessInfo({
+        transactionId: res.transactionId,
+        remainingBalance: res.remainingBalance,
+      });
+      setBalance(res.remainingBalance);
+      onSuccess?.(res.remainingBalance);
+      setStep("success");
+    } catch (err) {
+      setWithdrawError(
+        err instanceof Error ? err.message : "Failed to process withdrawal",
+      );
+    } finally {
+      setWithdrawSubmitting(false);
+    }
   };
 
-  const youReceive = Math.max(0, formData.amount - networkFee);
-
-  if (!isOpen) return null;
+  const handleCopyTxId = async () => {
+    if (!successInfo) return;
+    try {
+      await navigator.clipboard.writeText(successInfo.transactionId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard access can fail silently (permissions/insecure context);
+      // the transaction id is still visible on screen either way.
+    }
+  };
 
   return (
     <>
@@ -82,7 +213,7 @@ export default function WithdrawalModal({
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/5">
               <h3 className="text-xl font-bold text-on-surface">
-                Withdraw Funds
+                {step === "address" ? "Set Withdrawal Address" : "Withdraw Funds"}
               </h3>
               <button
                 onClick={onClose}
@@ -92,89 +223,223 @@ export default function WithdrawalModal({
               </button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-                  Payout Method
-                </label>
-                <div className="relative">
-                  <select
-                    value={formData.method}
-                    onChange={(e) =>
-                      setFormData({ ...formData, method: e.target.value })
-                    }
-                    className="w-full bg-surface-container-highest border-none rounded-lg text-on-surface py-3 px-4 appearance-none focus:ring-1 focus:ring-primary/20"
-                  >
-                    {payoutMethods.map((method) => (
-                      <option key={method.value} value={method.value}>
-                        {method.label}
-                      </option>
-                    ))}
-                  </select>
-                  <MdExpandMore className="absolute right-3 top-3 text-on-surface-variant pointer-events-none text-xl" />
-                </div>
+            {/* Loading */}
+            {step === "loading" && (
+              <div className="p-10 flex flex-col items-center justify-center gap-3 text-on-surface-variant">
+                <div className="h-8 w-8 rounded-full border-2 border-secondary border-t-transparent animate-spin" />
+                <p className="text-sm">Loading your wallet details…</p>
               </div>
+            )}
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-                  Withdrawal Amount
-                </label>
-                <div className="relative group">
+            {/* Load error */}
+            {step === "load-error" && (
+              <div className="p-6 flex flex-col items-center gap-4 text-center">
+                <MdErrorOutline className="text-4xl text-rose-400" />
+                <p className="text-sm text-on-surface-variant">
+                  {loadError ?? "Something went wrong loading your wallet details."}
+                </p>
+                <button
+                  onClick={retryLoad}
+                  className="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary font-bold text-sm"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {/* Step: set/edit wallet address */}
+            {step === "address" && (
+              <form onSubmit={handleSaveAddress} className="p-6 space-y-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                    TRC-20 (Tron) Wallet Address
+                  </label>
                   <input
-                    type="number"
-                    value={formData.amount || ""}
-                    onChange={handleAmountChange}
-                    placeholder="0.00"
-                    className="w-full bg-surface-container-highest border-none rounded-lg text-2xl font-bold text-on-surface py-4 px-4 focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/20"
-                    step="0.01"
-                    min={minAmount}
-                    max={maxAmount}
+                    type="text"
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.target.value)}
+                    placeholder={requirements?.example ?? "T..."}
+                    className="w-full bg-surface-container-highest border-none rounded-lg text-on-surface py-3 px-4 font-mono text-sm focus:ring-1 focus:ring-primary/20"
                   />
-                  <span className="absolute right-4 top-5 font-bold text-on-surface-variant">
-                    USD
-                  </span>
+                  {requirements && (
+                    <p className="mt-2 text-[10px] text-on-surface-variant/70 leading-relaxed">
+                      Must be a {requirements.format} address, starting with
+                      &ldquo;{requirements.mustStartWith}&rdquo;,{" "}
+                      {requirements.length} characters long.
+                    </p>
+                  )}
                 </div>
-                <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-tighter">
-                  <span className="text-on-surface-variant">
-                    Min: ${minAmount.toFixed(2)}
-                  </span>
-                  <span
-                    onClick={handleMaxClick}
-                    className="text-secondary cursor-pointer hover:underline"
+
+                {addressError && (
+                  <p className="text-xs text-rose-400 flex items-center gap-1.5">
+                    <MdErrorOutline className="text-sm shrink-0" />
+                    {addressError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={addressSubmitting}
+                  className="w-full py-4 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-extrabold uppercase tracking-widest text-xs hover:opacity-90 transition-all duration-300 disabled:opacity-50"
+                >
+                  {addressSubmitting ? "Saving…" : "Save Address & Continue"}
+                </button>
+
+                <p className="text-[10px] text-center text-on-surface-variant/60 leading-relaxed">
+                  Withdrawals only ever go to this address. Double-check it
+                  before saving — blockchain transactions cannot be reversed.
+                </p>
+              </form>
+            )}
+
+            {/* Step: withdraw */}
+            {step === "withdraw" && (
+              <form onSubmit={handleWithdraw} className="p-6 space-y-6">
+                <div className="p-4 bg-surface-container rounded-lg border border-outline-variant/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                      Available Balance
+                    </p>
+                    <p className="text-lg font-bold text-on-surface">
+                      {formatUsdt(balance)} USDT
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setStep("address")}
+                    className="text-xs font-bold text-secondary hover:underline"
                   >
-                    Max: ${maxAmount.toFixed(2)}
-                  </span>
+                    Change Address
+                  </button>
                 </div>
-              </div>
 
-              <div className="p-4 bg-surface-container rounded-lg border border-outline-variant/10">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-on-surface-variant">Network Fee</span>
-                  <span className="text-on-surface">
-                    ${networkFee.toFixed(2)}
-                  </span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                    Sending To
+                  </p>
+                  <p className="text-xs font-mono text-on-surface-variant break-all">
+                    {savedAddress}
+                  </p>
                 </div>
-                <div className="flex justify-between text-sm font-bold">
-                  <span className="text-on-surface">You'll Receive</span>
-                  <span className="text-secondary">
-                    ${youReceive.toFixed(2)}
-                  </span>
-                </div>
-              </div>
 
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                    Withdrawal Amount
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={amountInput}
+                      onChange={(e) => setAmountInput(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full bg-surface-container-highest border-none rounded-lg text-2xl font-bold text-on-surface py-4 px-4 focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/20"
+                    />
+                    <span className="absolute right-4 top-5 font-bold text-on-surface-variant">
+                      USDT
+                    </span>
+                  </div>
+                  <div className="mt-2 flex justify-end text-[10px] font-bold uppercase tracking-tighter">
+                    <span
+                      onClick={handleMaxClick}
+                      className="text-secondary cursor-pointer hover:underline"
+                    >
+                      Max: {formatUsdt(balance)} USDT
+                    </span>
+                  </div>
+                </div>
+
+                {withdrawError && (
+                  <p className="text-xs text-rose-400 flex items-center gap-1.5">
+                    <MdErrorOutline className="text-sm shrink-0" />
+                    {withdrawError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={withdrawSubmitting || balance <= 0}
+                  className="w-full py-4 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-extrabold uppercase tracking-widest text-xs hover:opacity-90 transition-all duration-300 disabled:opacity-50"
+                >
+                  {withdrawSubmitting
+                    ? "Processing…"
+                    : balance <= 0
+                      ? "No Balance Available"
+                      : "Withdraw Funds"}
+                </button>
+
+                <p className="text-[10px] text-center text-on-surface-variant/60 leading-relaxed">
+                  By proceeding, you acknowledge that blockchain transactions
+                  are irreversible. Ensure the destination wallet address is
+                  correct.
+                </p>
+              </form>
+            )}
+
+            {/* Step: success */}
+            {step === "success" && successInfo && (
+              <div className="p-6 space-y-6 text-center">
+                <MdCheckCircle className="text-5xl text-secondary mx-auto" />
+                <div>
+                  <p className="text-lg font-bold text-on-surface mb-1">
+                    Withdrawal Initiated
+                  </p>
+                  <p className="text-sm text-on-surface-variant">
+                    Your funds are on their way to your wallet.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-surface-container rounded-lg border border-outline-variant/10 text-left space-y-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                      Transaction ID
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-mono text-on-surface break-all">
+                        {successInfo.transactionId}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleCopyTxId}
+                        className="shrink-0 text-on-surface-variant hover:text-secondary transition-colors"
+                      >
+                        <MdContentCopy className="text-sm" />
+                      </button>
+                    </div>
+                    {copied && (
+                      <p className="text-[10px] text-secondary mt-1">Copied!</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                      Remaining Balance
+                    </p>
+                    <p className="text-sm font-bold text-on-surface">
+                      {formatUsdt(successInfo.remainingBalance)} USDT
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={onClose}
+                  className="w-full py-4 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-extrabold uppercase tracking-widest text-xs hover:opacity-90 transition-all duration-300"
+                >
+                  Done
+                </button>
+              </div>
+            )}
+
+            {/* Back link when editing an already-saved address */}
+            {step === "address" && savedAddress && (
               <button
-                type="submit"
-                className="w-full py-4 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-extrabold uppercase tracking-widest text-xs hover:opacity-90 transition-all duration-300"
+                type="button"
+                onClick={() => setStep("withdraw")}
+                className="absolute top-6 left-6 text-on-surface-variant hover:text-on-surface transition-colors"
+                aria-label="Back"
               >
-                Initialize Sovereign Payout
+                <MdArrowBack className="text-xl" />
               </button>
-
-              <p className="text-[10px] text-center text-on-surface-variant/60 leading-relaxed">
-                By proceeding, you acknowledge that blockchain transactions are
-                irreversible. Ensure the destination wallet address is correct.
-              </p>
-            </form>
+            )}
           </div>
         </div>
       </div>
