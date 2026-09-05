@@ -1,19 +1,28 @@
 // components/dashboard/earnings/StatsBentoGrid.tsx
 import {
   MdTrendingUp,
-  MdSchedule,
-  MdStars,
   MdCalendarToday,
-  MdSync,
 } from "react-icons/md";
 
 interface StatsBentoGridProps {
   onWithdrawClick: () => void;
+  balance: number;
+  balanceLoading: boolean;
+}
+
+function formatUsdt(value: number): { whole: string; decimals: string } {
+  const [whole, decimals = "00"] = value.toFixed(2).split(".");
+  const wholeWithCommas = Number(whole).toLocaleString();
+  return { whole: wholeWithCommas, decimals };
 }
 
 export default function StatsBentoGrid({
   onWithdrawClick,
+  balance,
+  balanceLoading,
 }: StatsBentoGridProps) {
+  const { whole, decimals } = formatUsdt(balance);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       {/* Main Balance Card */}
@@ -22,12 +31,16 @@ export default function StatsBentoGrid({
           <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4 block">
             Available for Withdrawal
           </span>
-          <h3 className="text-2xl sm:text-3xl font-bold text-on-surface tracking-tighter -ml-1">
-            $42,890
-            <span className="text-xl sm:text-2xl text-on-surface-variant font-medium">
-              .40
-            </span>
-          </h3>
+          {balanceLoading ? (
+            <div className="h-8 sm:h-9 w-32 rounded bg-surface-container-highest animate-pulse" />
+          ) : (
+            <h3 className="text-2xl sm:text-3xl font-bold text-on-surface tracking-tighter -ml-1">
+              ${whole}
+              <span className="text-xl sm:text-2xl text-on-surface-variant font-medium">
+                .{decimals}
+              </span>
+            </h3>
+          )}
         </div>
         <button
           onClick={onWithdrawClick}
@@ -65,3 +78,4 @@ export default function StatsBentoGrid({
     </div>
   );
 }
+
