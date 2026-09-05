@@ -322,3 +322,32 @@ export interface UpdateSignalResponse {
   message: string;
   signal: SignalInterface;
 }
+
+// ─── Withdrawal (Pro Trader) ───────────────────────────────────────────
+
+export interface WalletRequirements {
+  format: string;
+  mustStartWith: string;
+  length: number;
+  example: string;
+}
+
+export interface GetWalletAddressResponse {
+  success: boolean;
+  withdrawalAddress: string | null;
+  proEarningsBalance: number;
+  requirements: WalletRequirements;
+}
+
+export interface SaveWalletAddressResponse {
+  success: boolean;
+  message: string;
+  withdrawalAddress: string;
+}
+
+export interface WithdrawFundsResponse {
+  success: boolean;
+  message: string;
+  transactionId: string;
+  remainingBalance: number;
+}
