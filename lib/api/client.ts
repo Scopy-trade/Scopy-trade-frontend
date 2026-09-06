@@ -171,6 +171,39 @@ class AuthAPI {
     }
   }
 
+  async verifySignup(email: string, otp: string): Promise<"active" | "waitlist"> {
+    try {
+      const { data: body } = await api.post<{ data?: { status?: "active" | "waitlist" } }>("/auth/verify-signup", { email, otp });
+      return body.data?.status === "active" ? "active" : "waitlist";
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Email verification failed"));
+    }
+  }
+
+  async resendSignupOtp(email: string): Promise<void> {
+    try {
+      await api.post("/auth/resend-signup-otp", { email });
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Could not resend the verification code"));
+    }
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    try {
+      await api.post("/auth/forgot-password", { email });
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Could not request a password reset"));
+    }
+  }
+
+  async resetPassword(email: string, otp: string, password: string, confirmPassword: string): Promise<void> {
+    try {
+      await api.post("/auth/reset-password", { email, otp, password, confirmPassword });
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, "Could not reset your password"));
+    }
+  }
+
   async login(credentials: LoginCredentials): Promise<User> {
     try {
       const { data: body } = await api.post<AuthResponse>(
@@ -190,6 +223,10 @@ class AuthAPI {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 403) {
+          const data = error.response.data as { code?: string; message?: string } | undefined;
+          if (data?.code === "EMAIL_NOT_VERIFIED") {
+            throw new Error(data.message || "Verify your email before signing in.");
+          }
           throw new Error(
             "Your account has been suspended. Please contact support.",
           );

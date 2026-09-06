@@ -121,7 +121,7 @@ export default function RegisterForm() {
         role,
         sponsored: role === "CopyTrader" ? sponsored : undefined,
       });
-      window.location.href = "/waitlist?registered=true";
+      window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
     } catch (err: unknown) {
       let msg = "Registration failed. Please try again.";
       if (

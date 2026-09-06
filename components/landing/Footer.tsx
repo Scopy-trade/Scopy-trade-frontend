@@ -8,9 +8,10 @@ import {
 } from "react-icons/ri";
 
 const footerLinks = [
-  { label: "Risk Disclosure", href: "#" },
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
+  { label: "Risk Disclosure", href: "/risk-disclosure" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "/terms-of-service" },
+  { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
 const socialLinks = [
@@ -42,10 +43,10 @@ const navColumns = [
   {
     title: "Legal",
     links: [
-      { label: "Risk Disclosure", href: "#" },
-      { label: "Privacy Policy", href: "#" },
-      { label: "Terms of Service", href: "#" },
-      { label: "Cookie Policy", href: "#" },
+      { label: "Risk Disclosure", href: "/risk-disclosure" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms-of-service" },
+      { label: "Cookie Policy", href: "/cookie-policy" },
     ],
   },
 ];

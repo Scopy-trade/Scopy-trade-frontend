@@ -1,183 +1,60 @@
-// components/dashboard/earnings/WithdrawalModal.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { MdClose, MdExpandMore } from "react-icons/md";
+import { FormEvent, useEffect, useState } from "react";
+import { MdClose, MdOutlineMarkEmailRead } from "react-icons/md";
+import { proTraderWithdrawalService } from "@/lib/api/pro-trader";
 
-interface WithdrawalModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface WithdrawalModalProps { isOpen: boolean; onClose: () => void; }
 
-interface WithdrawalFormData {
-  method: string;
-  amount: number;
-}
-
-const payoutMethods = [
-  { value: "usdc_eth", label: "USDC (Ethereum Mainnet)" },
-  { value: "usdt_trc20", label: "USDT (TRC-20)" },
-  { value: "bank_sepa", label: "Direct Bank Transfer (SEPA)" },
-];
-
-export default function WithdrawalModal({
-  isOpen,
-  onClose,
-}: WithdrawalModalProps) {
-  const [formData, setFormData] = useState<WithdrawalFormData>({
-    method: "usdc_eth",
-    amount: 0,
-  });
+export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
+  const [amount, setAmount] = useState("");
+  const [otp, setOtp] = useState("");
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [step, setStep] = useState<"amount" | "otp" | "success">("amount");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [transactionId, setTransactionId] = useState("");
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    if (!isOpen) { document.body.style.overflow = "unset"; return; }
+    document.body.style.overflow = "hidden";
+    setStep("amount"); setOtp(""); setError(""); setTransactionId("");
+    void proTraderWithdrawalService.getWallet().then((response) => setWallet(response.withdrawalAddress)).catch((err) => setError(err instanceof Error ? err.message : "Could not load your wallet"));
+    return () => { document.body.style.overflow = "unset"; };
   }, [isOpen]);
 
-  const networkFee = 12.5;
-  const maxAmount = 42890.4;
-  const minAmount = 100;
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFormData({ ...formData, amount: value });
-  };
-
-  const handleMaxClick = () => {
-    setFormData({ ...formData, amount: maxAmount });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Withdrawal request:", formData);
-    // Handle withdrawal logic here
-    onClose();
-  };
-
-  const youReceive = Math.max(0, formData.amount - networkFee);
+  async function submit(event: FormEvent) {
+    event.preventDefault(); setError(""); setLoading(true);
+    const numericAmount = Number(amount);
+    try {
+      if (step === "amount") {
+        await proTraderWithdrawalService.requestOtp(numericAmount);
+        setStep("otp");
+      } else if (step === "otp") {
+        const result = await proTraderWithdrawalService.withdraw(numericAmount, otp);
+        setTransactionId(result.transactionId);
+        setStep("success");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Withdrawal request failed");
+    } finally { setLoading(false); }
+  }
 
   if (!isOpen) return null;
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <div
-            className="relative bg-surface-container-low rounded-xl w-full max-w-md border border-white/5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <h3 className="text-xl font-bold text-on-surface">
-                Withdraw Funds
-              </h3>
-              <button
-                onClick={onClose}
-                className="text-on-surface-variant hover:text-on-surface transition-colors"
-              >
-                <MdClose className="text-2xl" />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-                  Payout Method
-                </label>
-                <div className="relative">
-                  <select
-                    value={formData.method}
-                    onChange={(e) =>
-                      setFormData({ ...formData, method: e.target.value })
-                    }
-                    className="w-full bg-surface-container-highest border-none rounded-lg text-on-surface py-3 px-4 appearance-none focus:ring-1 focus:ring-primary/20"
-                  >
-                    {payoutMethods.map((method) => (
-                      <option key={method.value} value={method.value}>
-                        {method.label}
-                      </option>
-                    ))}
-                  </select>
-                  <MdExpandMore className="absolute right-3 top-3 text-on-surface-variant pointer-events-none text-xl" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-                  Withdrawal Amount
-                </label>
-                <div className="relative group">
-                  <input
-                    type="number"
-                    value={formData.amount || ""}
-                    onChange={handleAmountChange}
-                    placeholder="0.00"
-                    className="w-full bg-surface-container-highest border-none rounded-lg text-2xl font-bold text-on-surface py-4 px-4 focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/20"
-                    step="0.01"
-                    min={minAmount}
-                    max={maxAmount}
-                  />
-                  <span className="absolute right-4 top-5 font-bold text-on-surface-variant">
-                    USD
-                  </span>
-                </div>
-                <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-tighter">
-                  <span className="text-on-surface-variant">
-                    Min: ${minAmount.toFixed(2)}
-                  </span>
-                  <span
-                    onClick={handleMaxClick}
-                    className="text-secondary cursor-pointer hover:underline"
-                  >
-                    Max: ${maxAmount.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-surface-container rounded-lg border border-outline-variant/10">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-on-surface-variant">Network Fee</span>
-                  <span className="text-on-surface">
-                    ${networkFee.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm font-bold">
-                  <span className="text-on-surface">You'll Receive</span>
-                  <span className="text-secondary">
-                    ${youReceive.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-4 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-extrabold uppercase tracking-widest text-xs hover:opacity-90 transition-all duration-300"
-              >
-                Initialize Sovereign Payout
-              </button>
-
-              <p className="text-[10px] text-center text-on-surface-variant/60 leading-relaxed">
-                By proceeding, you acknowledge that blockchain transactions are
-                irreversible. Ensure the destination wallet address is correct.
-              </p>
-            </form>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+  return <>
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 overflow-y-auto"><div className="flex min-h-full items-center justify-center p-4"><div className="relative w-full max-w-md rounded-xl border border-white/5 bg-surface-container-low shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between border-b border-white/5 p-6"><h3 className="text-xl font-bold text-on-surface">Withdraw earnings</h3><button type="button" onClick={onClose} aria-label="Close" className="text-on-surface-variant hover:text-on-surface"><MdClose className="text-2xl" /></button></div>
+      {step === "success" ? <div className="p-8 text-center"><MdOutlineMarkEmailRead className="mx-auto mb-4 text-5xl text-secondary" /><h4 className="text-xl font-bold text-on-surface">Withdrawal submitted</h4><p className="mt-2 text-sm text-on-surface-variant">A confirmation email is on its way.</p><p className="mt-4 break-all rounded-lg bg-surface-container-highest p-3 text-xs text-on-surface-variant">Transaction ID: {transactionId}</p><button onClick={onClose} className="mt-6 w-full rounded-lg bg-secondary py-3 font-bold text-on-secondary">Done</button></div> :
+      <form onSubmit={submit} className="space-y-6 p-6">
+        {error && <p className="rounded-lg bg-error/10 p-3 text-sm text-error">{error}</p>}
+        <div><label className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Payout method</label><div className="rounded-lg bg-surface-container-highest px-4 py-3 text-sm text-on-surface">USDT (TRC-20)</div></div>
+        <div><label className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Destination wallet</label><div className="break-all rounded-lg bg-surface-container-highest px-4 py-3 text-sm text-on-surface">{wallet || "No wallet address saved"}</div></div>
+        <div><label htmlFor="withdrawalAmount" className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Withdrawal amount (USDT)</label><input id="withdrawalAmount" type="number" min="0.000001" step="0.000001" required disabled={step === "otp"} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full rounded-lg bg-surface-container-highest px-4 py-4 text-2xl font-bold text-on-surface outline-none focus:ring-1 focus:ring-secondary/30 disabled:opacity-60" /></div>
+        {step === "otp" && <div><label htmlFor="withdrawalOtp" className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Email verification code</label><input id="withdrawalOtp" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} placeholder="000000" className="w-full rounded-lg bg-surface-container-highest px-4 py-4 text-center text-2xl font-bold tracking-[0.4em] text-on-surface outline-none focus:ring-1 focus:ring-secondary/30" /><p className="mt-2 text-xs text-on-surface-variant">The code is tied to this amount. Go back and request a new code if the amount changes.</p></div>}
+        <div className="flex gap-3">{step === "otp" && <button type="button" onClick={() => { setStep("amount"); setOtp(""); }} className="w-1/3 rounded-lg bg-surface-container-highest py-4 text-xs font-bold uppercase text-on-surface">Back</button>}<button type="submit" disabled={loading || !wallet || Number(amount) <= 0 || (step === "otp" && otp.length !== 6)} className="flex-1 rounded-lg bg-gradient-to-r from-secondary to-secondary-container py-4 text-xs font-extrabold uppercase tracking-widest text-on-secondary disabled:opacity-50">{loading ? "Please wait..." : step === "amount" ? "Email verification code" : "Confirm withdrawal"}</button></div>
+        <p className="text-center text-[10px] leading-relaxed text-on-surface-variant/60">Blockchain transactions are irreversible. Confirm your saved wallet before continuing.</p>
+      </form>}
+    </div></div></div>
+  </>;
 }

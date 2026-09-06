@@ -28,6 +28,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => {
     if (typeof window !== "undefined") {
       return !!localStorage.getItem("savedEmail");
@@ -54,6 +55,7 @@ export default function LoginForm() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setNeedsVerification(false);
     setIsLoading(true);
     try {
       const user: User = await authAPI.login({ email, password, rememberMe });
@@ -75,6 +77,7 @@ export default function LoginForm() {
         errorMessage = (err as { message: string }).message;
       }
       setError(errorMessage);
+      setNeedsVerification(errorMessage.toLowerCase().includes("verify your email"));
       setIsLoading(false);
     }
   }
@@ -110,7 +113,7 @@ export default function LoginForm() {
         {/* Error */}
         {error && (
           <div className="mb-5 p-3.5 bg-[var(--color-error-container)]/30 border border-[var(--color-error)]/20 rounded-xl text-[var(--color-error)] text-sm">
-            {error}
+            {error}{needsVerification && <Link href={`/verify-email?email=${encodeURIComponent(email)}`} className="ml-1 font-bold underline">Enter your code</Link>}
           </div>
         )}
 

@@ -37,3 +37,15 @@ export const proTradersignalService = {
     );
   },
 };
+
+export const proTraderWithdrawalService = {
+  getWallet() {
+    return userApi.get<{ success: true; withdrawalAddress: string | null }>("/pro-trader/dashboard/wallet");
+  },
+  requestOtp(amount: number) {
+    return userApi.post<{ success: true; message: string }>("/pro-trader/dashboard/withdraw/request-otp", { amount });
+  },
+  withdraw(amount: number, otp: string) {
+    return userApi.post<{ success: true; message: string; transactionId: string }>("/pro-trader/dashboard/withdraw", { amount, otp });
+  },
+};
