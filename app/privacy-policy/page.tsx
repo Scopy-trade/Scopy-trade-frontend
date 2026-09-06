@@ -191,7 +191,7 @@ const sections: LegalSection[] = [
         </p>
         <p>
           We may need to verify your identity and may retain information where an
-          exception or legal obligation applies. Submit a request through our
+          exception or legal obligation applies. Submit a request through our{" "}
           <Link href="/contact">contact page</Link>. You may also update certain
           account details through the product where that feature is available.
         </p>
@@ -221,7 +221,7 @@ const sections: LegalSection[] = [
     title: "Contact us",
     content: (
       <p>
-        For privacy questions, complaints, or rights requests, use our
+        For privacy questions, complaints, or rights requests, use our{" "}
         <Link href="/contact">contact page</Link> and identify the request as
         “Privacy”. If you are not satisfied with our response, you may contact
         the data protection authority available in your jurisdiction.

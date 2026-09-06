@@ -21,7 +21,7 @@ const sections: LegalSection[] = [
           feature, to cache limited account details for the signed-in experience.
         </p>
         <p>
-          This policy should be read with our
+          This policy should be read with our{" "}
           <Link href="/privacy-policy">Privacy Policy</Link>, which explains how
           we handle personal information more broadly.
         </p>
@@ -125,7 +125,7 @@ const sections: LegalSection[] = [
       <p>
         We may update this policy when our storage technologies or legal
         obligations change. The updated date above identifies the latest version.
-        For questions about cookies or site data, use our
+        For questions about cookies or site data, use our{" "}
         <Link href="/contact">contact page</Link>.
       </p>
     ),

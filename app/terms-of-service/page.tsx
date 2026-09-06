@@ -18,8 +18,8 @@ const sections: LegalSection[] = [
         SCopyTrade. They govern your access to our websites, dashboards, APIs,
         signals, exchange integrations, trade-execution tools, and related
         services. By creating an account or using the service, you confirm that
-        you have read and accepted these terms, the
-        <Link href="/risk-disclosure">Risk Disclosure</Link>, and the
+        you have read and accepted these terms, the{" "}
+        <Link href="/risk-disclosure">Risk Disclosure</Link>, and the{" "}
         <Link href="/privacy-policy">Privacy Policy</Link>. If you do not agree,
         do not use the service.
       </p>
@@ -136,7 +136,7 @@ const sections: LegalSection[] = [
         <p>
           Copy traders decide whether and how much to trade. You understand that
           a copied order can differ from the source trade and that a source
-          change or closure may fail to synchronise. Review the
+          change or closure may fail to synchronise. Review the{" "}
           <Link href="/risk-disclosure">Risk Disclosure</Link> before using copy
           trading.
         </p>
@@ -321,7 +321,7 @@ const sections: LegalSection[] = [
     title: "Contact",
     content: (
       <p>
-        Questions or legal notices concerning these terms may be submitted
+        Questions or legal notices concerning these terms may be submitted{" "}
         through our <Link href="/contact">contact page</Link>.
       </p>
     ),
