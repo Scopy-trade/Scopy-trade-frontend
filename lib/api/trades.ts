@@ -12,6 +12,18 @@ export interface OpenProTradeData {
   balance: number;
 }
 
+export interface ProfitShareSummary {
+  pendingAmount: string;
+  threshold: string;
+  withdrawalRequired: boolean;
+  processing: boolean;
+  connections: Array<{
+    connectionId: string;
+    exchange: string;
+    label: string;
+  }>;
+}
+
 interface TradeMutationResponse {
   success: boolean;
   message: string;
@@ -82,5 +94,21 @@ export const tradeService = {
     return userApi.get<{ success: boolean; balances: ExchangeBalance[] }>(
       "/trades/balances",
     );
+  },
+
+  getProfitShare() {
+    return userApi.get<{ success: boolean; profitShare: ProfitShareSummary }>(
+      "/copy-trader/dashboard/profit-share",
+    );
+  },
+
+  approveProfitShareWithdrawal(exchangeConnectionId: string) {
+    return userApi.post<{
+      success: boolean;
+      message: string;
+      profitShare: ProfitShareSummary;
+    }>("/copy-trader/dashboard/profit-share/approve", {
+      exchangeConnectionId,
+    });
   },
 };

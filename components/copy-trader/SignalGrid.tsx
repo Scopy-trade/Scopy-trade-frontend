@@ -18,9 +18,11 @@ function traderId(trade: ActiveProTrade) {
 function TradeCard({
   trade,
   onExecute,
+  copyingBlocked,
 }: {
   trade: ActiveProTrade;
   onExecute: (trade: ActiveProTrade) => void;
+  copyingBlocked: boolean;
 }) {
   const isLong = trade.direction === "buy";
   const alreadyCopied = Boolean(trade.myTrade);
@@ -79,11 +81,11 @@ function TradeCard({
 
       <button
         type="button"
-        disabled={alreadyCopied}
+        disabled={alreadyCopied || copyingBlocked}
         onClick={() => onExecute(trade)}
         className="w-full py-2.5 rounded-lg bg-secondary text-on-secondary font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-45 disabled:cursor-not-allowed"
       >
-        <MdContentCopy /> {alreadyCopied ? "Already copied" : "Copy this trade"}
+        <MdContentCopy /> {alreadyCopied ? "Already copied" : copyingBlocked ? "Profit share approval required" : "Copy this trade"}
       </button>
     </article>
   );
@@ -94,11 +96,13 @@ export default function SignalGrid({
   loading,
   error,
   onExecute,
+  copyingBlocked = false,
 }: {
   trades: ActiveProTrade[];
   loading: boolean;
   error: string | null;
   onExecute: (trade: ActiveProTrade) => void;
+  copyingBlocked?: boolean;
 }) {
   if (loading) {
     return <div className="p-12 text-center text-slate-400">Loading active pro trades...</div>;
@@ -121,7 +125,7 @@ export default function SignalGrid({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4">
       {trades.map((trade) => (
-        <TradeCard key={trade._id} trade={trade} onExecute={onExecute} />
+        <TradeCard key={trade._id} trade={trade} onExecute={onExecute} copyingBlocked={copyingBlocked} />
       ))}
     </div>
   );

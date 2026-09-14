@@ -76,7 +76,7 @@ export default function ProTraderDashboard() {
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-100">Pro Trader Dashboard</h1>
           <p className="mt-2 text-slate-400">Monitor open positions and adjust live trade parameters.</p>
         </div>
-        <Link href="/dashboard/pro-trader/signals" className="flex items-center gap-2 self-start rounded-lg bg-secondary px-5 py-2.5 text-sm font-bold text-on-secondary md:self-auto">Manage all trades <MdArrowForward /></Link>
+        <Link href="/dashboard/pro-trader/active-trades" className="flex items-center gap-2 self-start rounded-lg bg-secondary px-5 py-2.5 text-sm font-bold text-on-secondary md:self-auto">Manage all trades <MdArrowForward /></Link>
       </div>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">

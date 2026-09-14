@@ -7,7 +7,6 @@ import {
   MdGroup,
   MdSettings,
   MdShowChart,
-  MdSensors,
   MdLogout,
   MdHistory,
 } from "react-icons/md";
@@ -23,11 +22,6 @@ const navItems = [
     name: "Dashboard",
     icon: MdDashboard,
     href: "/dashboard/pro-trader",
-  },
-  {
-    name: "Open a Trade",
-    icon: MdSensors,
-    href: "/dashboard/pro-trader/signals",
   },
   {
     name: "Active Trades",

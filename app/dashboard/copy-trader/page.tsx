@@ -7,6 +7,7 @@ import ExecuteTradeModal from "@/components/copy-trader/ExecuteTradeModal";
 import { ActiveProTrade } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import { useTradeUpdates } from "@/lib/hooks/useTradeUpdates";
+import ProfitShareCard from "@/components/copy-trader/ProfitShareCard";
 
 export default function CopyTraderPage() {
   const [selectedTrade, setSelectedTrade] = useState<ActiveProTrade | null>(null);
@@ -14,6 +15,7 @@ export default function CopyTraderPage() {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copyingBlocked, setCopyingBlocked] = useState(false);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -87,6 +89,10 @@ export default function CopyTraderPage() {
           </div>
         </header>
 
+        <ProfitShareCard
+          onStatusChange={(summary) => setCopyingBlocked(summary.withdrawalRequired)}
+        />
+
         {/* Filters */}
         <div className="bg-surface-container-low rounded-lg border border-white/5 p-3">
           <SignalFilters />
@@ -99,6 +105,7 @@ export default function CopyTraderPage() {
             loading={loading}
             error={error}
             onExecute={handleExecute} 
+            copyingBlocked={copyingBlocked}
           />
         </div>
       </main>

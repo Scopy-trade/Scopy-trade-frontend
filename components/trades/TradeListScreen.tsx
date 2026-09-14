@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { ActiveProTrade, TradeOwner } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import { adminTradeService } from "@/lib/api/admin";
@@ -27,7 +27,17 @@ function exchangeName(trade: ActiveProTrade): string {
     : "Exchange";
 }
 
-export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: Mode }) {
+export default function TradeListScreen({
+  scope,
+  mode,
+  headerActions,
+  refreshKey = 0,
+}: {
+  scope: Scope;
+  mode: Mode;
+  headerActions?: ReactNode;
+  refreshKey?: number;
+}) {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
   const [selected, setSelected] = useState<ActiveProTrade | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +65,7 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [load]);
+  }, [load, refreshKey]);
 
   useEffect(() => {
     if (mode !== "active") return;
@@ -106,9 +116,12 @@ export default function TradeListScreen({ scope, mode }: { scope: Scope; mode: M
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-6 px-2 py-4 md:px-6">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-100">{title}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-slate-400">{description}</p>
+      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-100">{title}</h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-400">{description}</p>
+        </div>
+        {headerActions}
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">
