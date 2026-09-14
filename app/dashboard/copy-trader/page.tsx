@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState, useEffect } from "react";
-import SignalFilters from "@/components/copy-trader/SignalFilters";
 import SignalGrid from "@/components/copy-trader/SignalGrid";
 import ExecuteTradeModal from "@/components/copy-trader/ExecuteTradeModal";
 import { ActiveProTrade } from "@/lib";
@@ -98,11 +97,6 @@ export default function CopyTraderPage() {
         <ProfitShareCard
           onStatusChange={handleProfitShareStatus}
         />
-
-        {/* Filters */}
-        <div className="bg-surface-container-low rounded-lg border border-white/5 p-3">
-          <SignalFilters />
-        </div>
 
         {/* Signal Grid / Terminal Data */}
         <div className="bg-surface-container-low rounded-lg border border-white/5 overflow-hidden flex-1">

@@ -78,12 +78,6 @@ export default function ExecuteTradeModal({
           <button type="button" onClick={onClose} className="p-2 text-slate-400 hover:text-white"><MdClose size={22} /></button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-[#0b1326] mb-6">
-          <div><p className="text-[10px] text-slate-500">ENTRY</p><p className="font-mono font-bold">{trade.entryFillPrice || trade.entryPrice}</p></div>
-          <div><p className="text-[10px] text-slate-500">TAKE PROFIT</p><p className="font-mono font-bold text-secondary">{trade.tp}</p></div>
-          <div><p className="text-[10px] text-slate-500">STOP LOSS</p><p className="font-mono font-bold text-tertiary">{trade.sl}</p></div>
-        </div>
-
         {error && <p className="mb-4 p-3 rounded-lg bg-tertiary/10 text-tertiary text-sm">{error}</p>}
 
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Connected exchange</label>

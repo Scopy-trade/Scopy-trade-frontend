@@ -59,21 +59,6 @@ function TradeCard({
         </div>
       </div>
 
-      <dl className="grid grid-cols-3 gap-3 py-4 border-y border-white/5 mb-4">
-        <div>
-          <dt className="text-[9px] text-slate-500 uppercase">Entry</dt>
-          <dd className="text-xs font-mono text-slate-200 mt-1">{trade.entryFillPrice || trade.entryPrice}</dd>
-        </div>
-        <div>
-          <dt className="text-[9px] text-slate-500 uppercase">Take profit</dt>
-          <dd className="text-xs font-mono text-secondary mt-1">{trade.tp}</dd>
-        </div>
-        <div>
-          <dt className="text-[9px] text-slate-500 uppercase">Stop loss</dt>
-          <dd className="text-xs font-mono text-tertiary mt-1">{trade.sl}</dd>
-        </div>
-      </dl>
-
       <div className="flex items-center justify-between mb-4 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1"><MdPeople /> {trade.copiers ?? 0} copiers</span>
         <span>{new Date(trade.createdAt).toLocaleString()}</span>
