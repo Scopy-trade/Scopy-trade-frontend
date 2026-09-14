@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 
 const exchanges = ["Binance Global", "OKX", "Coinbase", "Bybit"];
 
@@ -8,6 +9,7 @@ export default function SetupConnectionForm() {
   const [selectedExchange, setSelectedExchange] = useState("Binance Global");
   const [apiKey, setApiKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
+  const [showSecretKey, setShowSecretKey] = useState(false);
   const [spotTrading, setSpotTrading] = useState(true);
   const [readBalance, setReadBalance] = useState(true);
 
@@ -76,23 +78,42 @@ export default function SetupConnectionForm() {
         {/* Secret Key */}
         <div>
           <label
+            htmlFor="setup-secret-key"
             className="block text-xs font-bold uppercase tracking-widest mb-2"
             style={{ color: "#c5c6ce" }}
           >
             Secret Key
           </label>
-          <input
-            type="password"
-            value={secretKey}
-            onChange={(e) => setSecretKey(e.target.value)}
-            placeholder="••••••••••••••••••••"
-            className="w-full rounded-lg p-3 outline-none transition-all"
-            style={{
-              backgroundColor: "#222a3d",
-              color: "#dae2fd",
-              border: "none",
-            }}
-          />
+          <div className="relative">
+            <input
+              id="setup-secret-key"
+              type={showSecretKey ? "text" : "password"}
+              value={secretKey}
+              onChange={(e) => setSecretKey(e.target.value)}
+              placeholder="••••••••••••••••••••"
+              className="w-full rounded-lg p-3 pr-12 outline-none transition-all"
+              style={{
+                backgroundColor: "#222a3d",
+                color: "#dae2fd",
+                border: "none",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowSecretKey((visible) => !visible)}
+              aria-label={`${showSecretKey ? "Hide" : "Show"} secret key`}
+              aria-pressed={showSecretKey}
+              title={`${showSecretKey ? "Hide" : "Show"} secret key`}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4edea3]"
+              style={{ color: "#c5c6ce" }}
+            >
+              {showSecretKey ? (
+                <RiEyeCloseLine className="text-lg" aria-hidden="true" />
+              ) : (
+                <RiEyeLine className="text-lg" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Permissions */}

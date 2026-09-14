@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdSecurity, MdWarning } from "react-icons/md";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { ExchangeListItem, ConnectionSummary } from "@/lib";
 import { exchangeService } from "@/lib/api/exchanges";
 
@@ -147,6 +148,8 @@ export function ExchangeConnectionModal({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [showApiSecret, setShowApiSecret] = useState(false);
+  const [showPassphrase, setShowPassphrase] = useState(false);
 
   // Reset form when modal opens with new exchange
   useEffect(() => {
@@ -160,6 +163,8 @@ export function ExchangeConnectionModal({
       setErrors([]);
       setGeneralError(null);
       setCurrentStep("form");
+      setShowApiSecret(false);
+      setShowPassphrase(false);
     }
   }, [isOpen, exchange]);
 
@@ -351,18 +356,38 @@ export function ExchangeConnectionModal({
 
               {/* Secret Key Field */}
               <div>
-                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                <label
+                  htmlFor="exchange-api-secret"
+                  className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2"
+                >
                   Secret Key
                 </label>
-                <input
-                  type="password"
-                  value={formData.apiSecret}
-                  onChange={(e) =>
-                    handleInputChange("apiSecret", e.target.value)
-                  }
-                  placeholder="••••••••••••••••••••"
-                  className="w-full bg-surface-container-highest border-none rounded-md p-3 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all font-body placeholder:text-outline/40"
-                />
+                <div className="relative">
+                  <input
+                    id="exchange-api-secret"
+                    type={showApiSecret ? "text" : "password"}
+                    value={formData.apiSecret}
+                    onChange={(e) =>
+                      handleInputChange("apiSecret", e.target.value)
+                    }
+                    placeholder="••••••••••••••••••••"
+                    className="w-full bg-surface-container-highest border-none rounded-md p-3 pr-12 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all font-body placeholder:text-outline/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiSecret((visible) => !visible)}
+                    aria-label={`${showApiSecret ? "Hide" : "Show"} secret key`}
+                    aria-pressed={showApiSecret}
+                    title={`${showApiSecret ? "Hide" : "Show"} secret key`}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-on-surface-variant hover:text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 transition-colors"
+                  >
+                    {showApiSecret ? (
+                      <RiEyeCloseLine className="text-lg" aria-hidden="true" />
+                    ) : (
+                      <RiEyeLine className="text-lg" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 {errors.find((e) => e.field === "apiSecret") && (
                   <p className="text-xs text-error mt-1">
                     {errors.find((e) => e.field === "apiSecret")?.message}
@@ -373,18 +398,38 @@ export function ExchangeConnectionModal({
               {/* Passphrase Field (conditional) */}
               {requiresPassphrase && (
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  <label
+                    htmlFor="exchange-passphrase"
+                    className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2"
+                  >
                     Passphrase
                   </label>
-                  <input
-                    type="password"
-                    value={formData.passphrase}
-                    onChange={(e) =>
-                      handleInputChange("passphrase", e.target.value)
-                    }
-                    placeholder="Enter your API passphrase"
-                    className="w-full bg-surface-container-highest border-none rounded-md p-3 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all font-body placeholder:text-outline/40"
-                  />
+                  <div className="relative">
+                    <input
+                      id="exchange-passphrase"
+                      type={showPassphrase ? "text" : "password"}
+                      value={formData.passphrase}
+                      onChange={(e) =>
+                        handleInputChange("passphrase", e.target.value)
+                      }
+                      placeholder="Enter your API passphrase"
+                      className="w-full bg-surface-container-highest border-none rounded-md p-3 pr-12 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all font-body placeholder:text-outline/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassphrase((visible) => !visible)}
+                      aria-label={`${showPassphrase ? "Hide" : "Show"} passphrase`}
+                      aria-pressed={showPassphrase}
+                      title={`${showPassphrase ? "Hide" : "Show"} passphrase`}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-on-surface-variant hover:text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 transition-colors"
+                    >
+                      {showPassphrase ? (
+                        <RiEyeCloseLine className="text-lg" aria-hidden="true" />
+                      ) : (
+                        <RiEyeLine className="text-lg" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                   <p className="text-xs text-on-surface-variant mt-1">
                     Required for {exchange.name} API authentication
                   </p>
