@@ -73,6 +73,12 @@ export default function CopyTraderPage() {
     setSelectedTrade(null);
   }
 
+  const handleProfitShareStatus = useCallback(
+    (summary: { withdrawalRequired: boolean }) =>
+      setCopyingBlocked(summary.withdrawalRequired),
+    [],
+  );
+
   return (
     <div className="flex-1 flex flex-col h-full bg-surface-container-lowest text-slate-300">
       <main className="flex-1 px-2 md:px-6 py-4 mx-auto w-full max-w-[1800px] space-y-4">
@@ -90,7 +96,7 @@ export default function CopyTraderPage() {
         </header>
 
         <ProfitShareCard
-          onStatusChange={(summary) => setCopyingBlocked(summary.withdrawalRequired)}
+          onStatusChange={handleProfitShareStatus}
         />
 
         {/* Filters */}

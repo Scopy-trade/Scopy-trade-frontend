@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdAccountBalanceWallet, MdLock } from "react-icons/md";
 import { ProfitShareSummary, tradeService } from "@/lib/api/trades";
 
@@ -15,7 +15,7 @@ export default function ProfitShareCard({
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     const response = await tradeService.getProfitShare();
     setSummary(response.profitShare);
     onStatusChange(response.profitShare);
@@ -24,7 +24,7 @@ export default function ProfitShareCard({
         ? current
         : response.profitShare.connections[0]?.connectionId ?? "",
     );
-  }
+  }, [onStatusChange]);
 
   useEffect(() => {
     void load()
@@ -34,7 +34,7 @@ export default function ProfitShareCard({
       void load().catch(() => undefined);
     }, 15_000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [load]);
 
   async function approve() {
     if (!connectionId) return;

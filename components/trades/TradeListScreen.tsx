@@ -55,16 +55,19 @@ export default function TradeListScreen({
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-    void load()
-      .catch((reason) => {
-        if (!cancelled) setError(reason instanceof Error ? reason.message : "Failed to load trades.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
+    const timeout = window.setTimeout(() => {
+      void load()
+        .catch((reason) => {
+          if (!cancelled) setError(reason instanceof Error ? reason.message : "Failed to load trades.");
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
   }, [load, refreshKey]);
 
   useEffect(() => {
