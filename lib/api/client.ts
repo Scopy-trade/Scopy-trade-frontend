@@ -121,6 +121,7 @@ attachResponseInterceptor(adminAxios, {
 
 interface ErrorResponseData {
   message?: string;
+  detail?: string;
   error?: string;
   errors?: string[];
   hint?: string;
@@ -131,6 +132,7 @@ function extractErrorMessage(error: unknown, fallback: string): string {
     const data = error.response?.data as ErrorResponseData | undefined;
 
     return (
+      data?.detail ??
       data?.message ??
       data?.errors?.join(" ") ??
       data?.error ??
