@@ -10,7 +10,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   const { account } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-[#060e20]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 sm:px-8 py-4">
+    <header className="sticky top-0 z-30 flex w-full items-center justify-between border-b border-white/5 bg-[#060e20]/80 px-4 py-4 backdrop-blur-xl sm:px-8 lg:hidden">
       {/* Left */}
       <div className="flex items-center gap-4 flex-1">
         {/* Mobile hamburger */}
@@ -21,7 +21,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <span className="material-symbols-outlined">menu</span>
         </button>
 
-        <h1 className="hidden text-base font-black text-[#dae2fd] whitespace-nowrap font-[Manrope,sans-serif] sm:block sm:text-lg lg:hidden">
+        <h1 className="hidden text-base font-black text-[#dae2fd] whitespace-nowrap font-[Manrope,sans-serif] sm:block sm:text-lg">
           Admin Console
         </h1>
 

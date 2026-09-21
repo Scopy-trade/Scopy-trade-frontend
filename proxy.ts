@@ -10,20 +10,15 @@ function hasExpectedTokenType(token: string, type: "user_access" | "admin_access
   }
 }
 
-export async function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
   const userToken = request.cookies.get("user_token")?.value;
-
   const adminToken = request.cookies.get("admin_token")?.value;
 
   const isUserDashboard = pathname.startsWith("/dashboard");
   const isUserAuthPage = pathname === "/login" || pathname === "/register";
-
   const isAdminDashboard = pathname.startsWith("/admin/dashboard");
-  const isAdminAuthPage = pathname === "/admin/login";
 
-  // USER FLOW
   if (isUserDashboard || isUserAuthPage) {
     const isUserAuthenticated = userToken
       ? hasExpectedTokenType(userToken, "user_access")
@@ -36,23 +31,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ADMIN FLOW
-  if (isAdminDashboard || isAdminAuthPage) {
+  if (isAdminDashboard) {
     const isAdminAuthenticated = adminToken
       ? hasExpectedTokenType(adminToken, "admin_access")
       : false;
 
-    if (isAdminDashboard && !isAdminAuthenticated) {
+    if (!isAdminAuthenticated) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
-
-    if (isAdminAuthPage && isAdminAuthenticated) {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    }
-
-    return NextResponse.next();
   }
 
+  // Never redirect away from the login page based only on an optimistic JWT
+  // decode. The API performs the authoritative session-version check.
   return NextResponse.next();
 }
 

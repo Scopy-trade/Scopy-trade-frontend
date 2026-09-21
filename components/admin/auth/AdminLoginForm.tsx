@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   RiMailLine,
   RiLockLine,
@@ -12,7 +11,6 @@ import {
 import { authAPI } from "@/lib/api/client";
 
 export default function AdminLoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,9 +25,9 @@ export default function AdminLoginForm() {
     try {
       await authAPI.adminLogin({ email, password });
       window.location.href = "/admin/dashboard";
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Admin login error:", err);
-      setError(err.message || "Access denied. Please check your credentials.");
+      setError(err instanceof Error ? err.message : "Access denied. Please check your credentials.");
       setIsLoading(false);
     }
   }

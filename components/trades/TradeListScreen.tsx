@@ -60,11 +60,12 @@ export default function TradeListScreen({
   const [result, setResult] = useState<"" | "profit" | "loss" | "breakeven">("");
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setSearch(searchInput.trim()), 350);
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 350);
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
-
-  useEffect(() => setPage(1), [search, pair, status, direction, tradeOrigin, result, mode]);
 
   const load = useCallback(async () => {
     if (scope === "admin") {
@@ -92,9 +93,9 @@ export default function TradeListScreen({
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     const timeout = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       void load()
         .catch((reason) => {
           if (!cancelled) setError(reason instanceof Error ? reason.message : "Failed to load trades.");
@@ -154,6 +155,7 @@ export default function TradeListScreen({
       : mode === "active" ? "Monitor the live positions you copied from pro traders." : "Review your completed copied trades and profit settlements.";
 
   const resetFilters = () => {
+    setPage(1);
     setSearchInput("");
     setSearch("");
     setPair("");
@@ -187,11 +189,11 @@ export default function TradeListScreen({
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-base text-slate-500">search</span>
               <input className={`${controlClass} w-full pl-9`} value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Owner, trader ID or trade ID" />
             </label>
-            <select aria-label="Trading pair" className={controlClass} value={pair} onChange={(event) => setPair(event.target.value)}><option value="">All pairs</option>{TRADE_PAIRS.map((item) => <option key={item} value={item}>{item.replace("USDT", "/USDT")}</option>)}</select>
-            <select aria-label="Trade status" className={controlClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All {mode} statuses</option>{(mode === "active" ? ["pending", "filled"] : ["closed", "cancelled", "failed"]).map((item) => <option key={item} value={item}>{item[0].toUpperCase() + item.slice(1)}</option>)}</select>
-            <select aria-label="Trade direction" className={controlClass} value={direction} onChange={(event) => setDirection(event.target.value as "" | "buy" | "sell")}><option value="">Buy & sell</option><option value="buy">Buy</option><option value="sell">Sell</option></select>
-            <select aria-label="Trade type" className={controlClass} value={tradeOrigin} onChange={(event) => setTradeOrigin(event.target.value as "" | "pro" | "copy")}><option value="">All trade types</option><option value="pro">Pro trader trade</option><option value="copy">Copied trade</option></select>
-            {mode === "history" ? <select aria-label="Trade result" className={controlClass} value={result} onChange={(event) => setResult(event.target.value as "" | "profit" | "loss" | "breakeven")}><option value="">All results</option><option value="profit">Profit</option><option value="loss">Loss</option><option value="breakeven">Breakeven</option></select> : <button type="button" disabled={!hasFilters} onClick={resetFilters} className="min-h-10 rounded-lg border border-white/10 px-3 text-xs font-bold text-slate-400 transition-colors hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-40">Clear filters</button>}
+            <select aria-label="Trading pair" className={controlClass} value={pair} onChange={(event) => { setPair(event.target.value); setPage(1); }}><option value="">All pairs</option>{TRADE_PAIRS.map((item) => <option key={item} value={item}>{item.replace("USDT", "/USDT")}</option>)}</select>
+            <select aria-label="Trade status" className={controlClass} value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }}><option value="">All {mode} statuses</option>{(mode === "active" ? ["pending", "filled"] : ["closed", "cancelled", "failed"]).map((item) => <option key={item} value={item}>{item[0].toUpperCase() + item.slice(1)}</option>)}</select>
+            <select aria-label="Trade direction" className={controlClass} value={direction} onChange={(event) => { setDirection(event.target.value as "" | "buy" | "sell"); setPage(1); }}><option value="">Buy & sell</option><option value="buy">Buy</option><option value="sell">Sell</option></select>
+            <select aria-label="Trade type" className={controlClass} value={tradeOrigin} onChange={(event) => { setTradeOrigin(event.target.value as "" | "pro" | "copy"); setPage(1); }}><option value="">All trade types</option><option value="pro">Pro trader trade</option><option value="copy">Copied trade</option></select>
+            {mode === "history" ? <select aria-label="Trade result" className={controlClass} value={result} onChange={(event) => { setResult(event.target.value as "" | "profit" | "loss" | "breakeven"); setPage(1); }}><option value="">All results</option><option value="profit">Profit</option><option value="loss">Loss</option><option value="breakeven">Breakeven</option></select> : <button type="button" disabled={!hasFilters} onClick={resetFilters} className="min-h-10 rounded-lg border border-white/10 px-3 text-xs font-bold text-slate-400 transition-colors hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-40">Clear filters</button>}
           </div>
           {mode === "history" && <div className="mt-3 flex justify-end"><button type="button" disabled={!hasFilters} onClick={resetFilters} className="text-xs font-bold text-slate-400 transition-colors hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-40">Clear filters</button></div>}
         </section>

@@ -43,11 +43,12 @@ export default function EarningsDashboardPage() {
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setSearch(searchInput.trim()), 350);
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 350);
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
-
-  useEffect(() => setPage(1), [category, search, pair, direction, feeStatus, dateFrom, dateTo]);
 
   const load = useCallback(async () => {
     const response = await adminTradeService.getEarnings({
@@ -68,15 +69,18 @@ export default function EarningsDashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-    void load()
-      .catch((reason) => { if (!cancelled) setError(reason instanceof Error ? reason.message : "Failed to load earnings."); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+    const timeout = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
+      void load()
+        .catch((reason) => { if (!cancelled) setError(reason instanceof Error ? reason.message : "Failed to load earnings."); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, 0);
+    return () => { cancelled = true; window.clearTimeout(timeout); };
   }, [load]);
 
   const resetFilters = () => {
+    setPage(1);
     setSearchInput(""); setSearch(""); setPair(""); setDirection("");
     setFeeStatus(""); setDateFrom(""); setDateTo("");
   };
@@ -97,15 +101,15 @@ export default function EarningsDashboardPage() {
 
       <section className="rounded-2xl border border-white/5 bg-[#131b2e] p-4">
         <div className="mb-4 flex gap-2 border-b border-white/5">
-          {(["actual", "prospective"] as Category[]).map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setFeeStatus(""); }} className={`border-b-2 px-4 py-3 text-sm font-bold capitalize transition-colors ${category === item ? "border-[#4edea3] text-[#4edea3]" : "border-transparent text-[#8f9098] hover:text-[#dae2fd]"}`}>{item} earnings</button>)}
+          {(["actual", "prospective"] as Category[]).map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setFeeStatus(""); setPage(1); }} className={`border-b-2 px-4 py-3 text-sm font-bold capitalize transition-colors ${category === item ? "border-[#4edea3] text-[#4edea3]" : "border-transparent text-[#8f9098] hover:text-[#dae2fd]"}`}>{item} earnings</button>)}
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-7">
           <label className="relative xl:col-span-2"><span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#8f9098]">search</span><input className={`${inputClass} w-full pl-9`} value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Copy trader, pro trader or trade ID" /></label>
-          <select aria-label="Trading pair" className={inputClass} value={pair} onChange={(event) => setPair(event.target.value)}><option value="">All pairs</option>{TRADE_PAIRS.map((item) => <option key={item} value={item}>{item.replace("USDT", "/USDT")}</option>)}</select>
-          <select aria-label="Trade direction" className={inputClass} value={direction} onChange={(event) => setDirection(event.target.value as "" | "buy" | "sell")}><option value="">Buy & sell</option><option value="buy">Buy</option><option value="sell">Sell</option></select>
-          {category === "prospective" ? <select aria-label="Collection status" className={inputClass} value={feeStatus} onChange={(event) => setFeeStatus(event.target.value)}><option value="">All collection states</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="failed">Failed</option></select> : <div className="flex min-h-10 items-center rounded-lg border border-white/5 px-3 text-xs text-[#8f9098]">Collected fees only</div>}
-          <input aria-label="From date" title="From date" type="date" className={inputClass} value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
-          <input aria-label="To date" title="To date" type="date" className={inputClass} value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+          <select aria-label="Trading pair" className={inputClass} value={pair} onChange={(event) => { setPair(event.target.value); setPage(1); }}><option value="">All pairs</option>{TRADE_PAIRS.map((item) => <option key={item} value={item}>{item.replace("USDT", "/USDT")}</option>)}</select>
+          <select aria-label="Trade direction" className={inputClass} value={direction} onChange={(event) => { setDirection(event.target.value as "" | "buy" | "sell"); setPage(1); }}><option value="">Buy & sell</option><option value="buy">Buy</option><option value="sell">Sell</option></select>
+          {category === "prospective" ? <select aria-label="Collection status" className={inputClass} value={feeStatus} onChange={(event) => { setFeeStatus(event.target.value); setPage(1); }}><option value="">All collection states</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="failed">Failed</option></select> : <div className="flex min-h-10 items-center rounded-lg border border-white/5 px-3 text-xs text-[#8f9098]">Collected fees only</div>}
+          <input aria-label="From date" title="From date" type="date" className={inputClass} value={dateFrom} onChange={(event) => { setDateFrom(event.target.value); setPage(1); }} />
+          <input aria-label="To date" title="To date" type="date" className={inputClass} value={dateTo} onChange={(event) => { setDateTo(event.target.value); setPage(1); }} />
         </div>
         <div className="mt-3 flex items-center justify-between"><p className="text-xs text-[#8f9098]">{pagination.total.toLocaleString()} matching records</p><button type="button" disabled={!hasFilters} onClick={resetFilters} className="text-xs font-bold text-[#8f9098] hover:text-[#dae2fd] disabled:cursor-not-allowed disabled:opacity-40">Clear filters</button></div>
       </section>
