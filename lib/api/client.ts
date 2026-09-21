@@ -288,7 +288,7 @@ class AuthAPI {
 
     const normalizedRole = user.role.trim();
 
-    if (normalizedRole === "Pro Trader") {
+    if (normalizedRole === "ProTrader") {
       return "/dashboard/pro-trader";
     }
 
@@ -323,6 +323,7 @@ class AuthAPI {
 
       localStorage.setItem("admin", JSON.stringify(admin));
       localStorage.setItem("adminEmail", credentials.email);
+      localStorage.setItem("adminLastActivityAt", String(Date.now()));
 
       return admin;
     } catch (error) {
@@ -362,6 +363,7 @@ class AuthAPI {
   async adminLogout(): Promise<void> {
     localStorage.removeItem("admin");
     localStorage.removeItem("adminEmail");
+    localStorage.removeItem("adminLastActivityAt");
 
     try {
       await adminAxios.post("/auth/logout");

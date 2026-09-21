@@ -51,13 +51,13 @@ export const adminUserService = {
   },
 
   banUser(userId: string, reason?: string) {
-    return adminApi.post<UserActionResponse>(`/dashboard/users/${userId}/suspend`, {
+    return adminApi.patch<UserActionResponse>(`/dashboard/users/${userId}/suspend`, {
       reason,
     });
   },
 
   unbanUser(userId: string) {
-    return adminApi.post<UserActionResponse>(
+    return adminApi.patch<UserActionResponse>(
       `/dashboard/users/${userId}/activate`,
     );
   },

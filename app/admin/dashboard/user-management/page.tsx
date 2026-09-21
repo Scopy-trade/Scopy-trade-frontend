@@ -1,571 +1,489 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { GetUserResponse, UserManagementUser } from "@/lib";
 import { adminUserService } from "@/lib/api/admin";
 
 type UserStatus = "active" | "suspended" | "waitlist";
-type UserRole = "Pro Trader" | "Copy Trader";
+type UserRole = "ProTrader" | "CopyTrader";
+type RoleFilter = "all" | UserRole;
+type StatusFilter = "all" | UserStatus;
 
-interface User {
+interface TableUser extends UserManagementUser {
   id: string;
-  ID: string;
   name: string;
   initials: string;
   role: UserRole;
   status: UserStatus;
-  trades: string;
-  lastActive: string;
-  location: string;
-  roi?: string;
-  roiPositive?: boolean;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  hasOnboarded?: boolean;
+  activeTradeCount: number;
+  lastActivityAt: string | null;
 }
 
-type Filter = "All Users" | "Pro Trader" | "Copy Trader";
+const roleFilters: Array<{ value: RoleFilter; label: string }> = [
+  { value: "all", label: "All Users" },
+  { value: "ProTrader", label: "Pro Trader" },
+  { value: "CopyTrader", label: "Copy Trader" },
+];
 
 const statusStyle: Record<UserStatus, string> = {
   active: "text-[#4edea3]",
   suspended: "text-[#ffb4ab]",
-  waitlist: "text-[#8f9098]",
+  waitlist: "text-amber-300",
 };
+
 const statusDot: Record<UserStatus, string> = {
-  active: "bg-[#4edea3] animate-pulse",
+  active: "bg-[#4edea3]",
   suspended: "bg-[#ffb4ab]",
-  waitlist: "bg-[#8f9098]",
+  waitlist: "bg-amber-300",
 };
+
 const roleStyle: Record<UserRole, string> = {
-  "Pro Trader": "bg-[#00311f]/40 text-[#4edea3] border border-[#4edea3]/20",
-  "Copy Trader": "bg-[#002371]/40 text-[#b6c4ff] border border-[#b6c4ff]/20",
+  ProTrader: "bg-[#00311f]/40 text-[#4edea3] border-[#4edea3]/20",
+  CopyTrader: "bg-[#002371]/40 text-[#b6c4ff] border-[#b6c4ff]/20",
 };
 
 function getInitials(name: string): string {
   return name
     .split(" ")
-    .map((n) => n[0])
+    .map((part) => part[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 }
 
-function getRandomColor(index: number): string {
-  const colors = [
-    "bg-[#002371]/30 text-[#b6c4ff] border-[#b6c4ff]/10",
-    "bg-[#5d001b]/20 text-[#ffb2b9] border-[#ffb2b9]/10",
-    "bg-[#171f33] text-[#8f9098] border-white/5",
-    "bg-[#00311f]/30 text-[#4edea3] border-[#4edea3]/10",
-  ];
-  return colors[index % colors.length];
+function formatDate(value?: string | null): string {
+  if (!value) return "No trade activity";
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
-/* ── Stat Card ── */
+function formatRole(role?: string): string {
+  return role === "ProTrader" ? "Pro Trader" : "Copy Trader";
+}
+
 function MiniStat({
   label,
   value,
   icon,
   sub,
-  subColor = "text-[#4edea3]",
 }: {
   label: string;
-  value: string;
+  value: number;
   icon: string;
   sub: string;
-  subColor?: string;
 }) {
   return (
-    <div className="bg-[#131b2e] border border-white/5 p-4 sm:p-5 rounded-2xl relative overflow-hidden group">
-      <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-        <span className="material-symbols-outlined text-4xl text-[#dae2fd]">
-          {icon}
-        </span>
-      </div>
-      <p className="text-[9px] text-[#8f9098] font-bold tracking-widest uppercase">
+    <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-[#131b2e] p-4 sm:p-5">
+      <span className="material-symbols-outlined absolute right-3 top-3 text-4xl text-[#dae2fd]/10">
+        {icon}
+      </span>
+      <p className="text-[9px] font-bold uppercase tracking-widest text-[#8f9098]">
         {label}
       </p>
-      <h3 className="text-2xl font-black text-[#dae2fd] mt-1.5 font-[Manrope,sans-serif]">
-        {value}
-      </h3>
-      <p className={`text-[10px] mt-1 ${subColor}`}>{sub}</p>
+      <h3 className="mt-1.5 text-2xl font-black text-[#dae2fd]">{value}</h3>
+      <p className="mt-1 text-[10px] text-[#8f9098]">{sub}</p>
+    </div>
+  );
+}
+
+function UserDetailsModal({
+  details,
+  loading,
+  error,
+  actionLoading,
+  onClose,
+  onToggleStatus,
+}: {
+  details: GetUserResponse["data"] | null;
+  loading: boolean;
+  error: string | null;
+  actionLoading: boolean;
+  onClose: () => void;
+  onToggleStatus: (user: UserManagementUser) => void;
+}) {
+  const user = details?.user;
+  const status = (user?.status || "waitlist") as UserStatus;
+  const name = user
+    ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email
+    : "User details";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+    >
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-[#131b2e] shadow-2xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[#131b2e] px-5 py-4">
+          <div>
+            <h3 className="text-lg font-black text-[#dae2fd]">{name}</h3>
+            {user && <p className="text-xs text-[#8f9098]">{user.email}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close user details"
+            className="rounded-lg p-2 text-[#8f9098] hover:bg-white/5 hover:text-white"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex min-h-72 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#4edea3] border-t-transparent" />
+          </div>
+        ) : error ? (
+          <div className="p-10 text-center text-sm text-[#ffb4ab]">{error}</div>
+        ) : user && details ? (
+          <div className="space-y-6 p-5 sm:p-6">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                ["Custom user ID", user.traderID || "Not assigned"],
+                ["Role", formatRole(user.role)],
+                ["Status", status],
+                ["Joined", formatDate(user.createdAt)],
+                ["Last trade activity", formatDate(details.tradeStats.lastActivityAt)],
+                ["Email verified", user.isVerified ? "Yes" : "No"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl bg-[#0b1326] p-3">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#8f9098]">
+                    {label}
+                  </p>
+                  <p className="mt-1 break-words text-sm font-semibold capitalize text-[#dae2fd]">
+                    {String(value)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {[
+                ["Total trades", details.tradeStats.totalTrades],
+                ["Active", details.tradeStats.activeTrades],
+                ["Closed", details.tradeStats.closedTrades],
+                ["Profitable", details.tradeStats.profitableTrades],
+                ["Losing", details.tradeStats.losingTrades],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl border border-white/5 bg-[#171f33] p-3 text-center">
+                  <p className="text-xl font-black text-[#dae2fd]">{value}</p>
+                  <p className="text-[9px] uppercase tracking-wide text-[#8f9098]">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <h4 className="mb-3 text-sm font-bold text-[#dae2fd]">Recent trade activity</h4>
+              {details.recentTrades.length ? (
+                <div className="overflow-x-auto rounded-xl border border-white/5">
+                  <table className="w-full min-w-[520px] text-left text-xs">
+                    <thead className="bg-[#0b1326] text-[9px] uppercase tracking-wider text-[#8f9098]">
+                      <tr>
+                        <th className="px-3 py-2.5">Pair</th>
+                        <th className="px-3 py-2.5">Direction</th>
+                        <th className="px-3 py-2.5">Origin</th>
+                        <th className="px-3 py-2.5">Status</th>
+                        <th className="px-3 py-2.5">Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {details.recentTrades.map((trade) => (
+                        <tr key={trade._id} className="text-[#c5c6ce]">
+                          <td className="px-3 py-3 font-semibold text-[#dae2fd]">{trade.pair}</td>
+                          <td className="px-3 py-3 uppercase">{trade.direction}</td>
+                          <td className="px-3 py-3 capitalize">{trade.tradeOrigin}</td>
+                          <td className="px-3 py-3 capitalize">{trade.status}</td>
+                          <td className="px-3 py-3">{formatDate(trade.updatedAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="rounded-xl bg-[#0b1326] p-5 text-center text-xs text-[#8f9098]">
+                  This user has no trade activity yet.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end border-t border-white/5 pt-4">
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => onToggleStatus(user)}
+                className={`rounded-lg px-4 py-2 text-xs font-bold disabled:opacity-50 ${
+                  status === "active"
+                    ? "bg-[#93000a]/30 text-[#ffb4ab] hover:bg-[#93000a]/50"
+                    : "bg-[#00311f] text-[#4edea3] hover:bg-[#00472d]"
+                }`}
+              >
+                {actionLoading ? "Updating..." : status === "active" ? "Suspend user" : "Activate user"}
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
 
 export default function UserManagementPage() {
-  const [filter, setFilter] = useState<Filter>("All Users");
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<TableUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    totalUsers: "0",
-    activeNow: "0",
-    pendingKYC: "0",
-    bannedAccounts: "0",
-  });
+  const [stats, setStats] = useState({ totalUsers: 0, activeUsers: 0, newUsers: 0, suspendedUsers: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [details, setDetails] = useState<GetUserResponse["data"] | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const itemsPerPage = 10;
-
-  // Fetch users from API
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const roleParam = filter === "All Users" ? undefined : filter;
       const response = await adminUserService.getAllUsers({
         page: currentPage,
-        limit: itemsPerPage,
+        limit: 10,
         search: search || undefined,
-        role: roleParam,
+        role: roleFilter === "all" ? undefined : roleFilter,
+        status: statusFilter === "all" ? undefined : statusFilter,
       });
-
-      const formattedUsers: User[] = response.users.map((user, index) => ({
-        id: user._id || user.id,
-        ID: user.traderID || user._id?.slice(-7) || `UID${index + 1}`,
-        name:
-          user.name ||
-          `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-          user.email,
-        initials: user.initials || getInitials(user.name || user.email),
-        role: (user.role === "CopyTrader"
-          ? "Copy Trader"
-          : user.role || "Copy Trader") as UserRole,
-        status: (user.status as UserStatus) || "active",
-        trades: user.trades || "0 Trades",
-        lastActive:
-          user.lastActive ||
-          new Date(user.updatedAt || Date.now()).toLocaleDateString(),
-        location: user.location || "Unknown",
-        roi: user.roi || "0%",
-        roiPositive: user.roiPositive ?? true,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        hasOnboarded: user.hasOnboarded,
-      }));
-
-      setUsers(formattedUsers);
-      setTotalUsersCount(response.pages);
-      setTotalPages(Math.ceil(response.pages / itemsPerPage));
-    } catch (err) {
-      console.error("Failed to fetch users:", err);
-      setError(err instanceof Error ? err.message : "Failed to load users");
+      setUsers(
+        response.users.map((user) => {
+          const name = `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email;
+          return {
+            ...user,
+            id: user._id || user.id,
+            name,
+            initials: getInitials(name),
+            role: (user.role || "CopyTrader") as UserRole,
+            status: (user.status || "waitlist") as UserStatus,
+            activeTradeCount: user.activeTradeCount || 0,
+            lastActivityAt: user.lastActivityAt || null,
+          };
+        }),
+      );
+      setStats(response.stats);
+      setTotalUsersCount(response.total);
+      setTotalPages(Math.max(response.pages, 1));
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Failed to load users");
       setUsers([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, roleFilter, search, statusFilter]);
 
-  // Handle user actions
-  const handleBanUser = async (userId: string) => {
-    if (!confirm("Are you sure you want to ban this user?")) return;
-    setActionLoading(userId);
-    try {
-      await adminUserService.banUser(userId);
-      await fetchUsers();
-    } catch (err) {
-      console.error("Failed to ban user:", err);
-      alert(err instanceof Error ? err.message : "Failed to ban user");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleUnbanUser = async (userId: string) => {
-    if (!confirm("Are you sure you want to unban this user?")) return;
-    setActionLoading(userId);
-    try {
-      await adminUserService.unbanUser(userId);
-      await fetchUsers();
-    } catch (err) {
-      console.error("Failed to unban user:", err);
-      alert(err instanceof Error ? err.message : "Failed to unban user");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // Debounced search
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (currentPage === 1) {
-        fetchUsers();
-      } else {
-        setCurrentPage(1);
-      }
-    }, 500);
+    const timeoutId = setTimeout(() => void fetchUsers(), 350);
     return () => clearTimeout(timeoutId);
-  }, [search, filter]);
+  }, [fetchUsers]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [currentPage]);
+  const openDetails = useCallback(async (userId: string) => {
+    setSelectedUserId(userId);
+    setOpenMenuId(null);
+    setDetails(null);
+    setDetailsError(null);
+    setDetailsLoading(true);
+    try {
+      const response = await adminUserService.getUserById(userId);
+      setDetails(response.data);
+    } catch (detailError) {
+      setDetailsError(detailError instanceof Error ? detailError.message : "Failed to load user details");
+    } finally {
+      setDetailsLoading(false);
+    }
+  }, []);
 
-  const paginate = (page: number) => {
-    setCurrentPage(page);
-  };
+  const toggleUserStatus = useCallback(async (user: UserManagementUser) => {
+    const isActive = user.status === "active";
+    if (!window.confirm(`${isActive ? "Suspend" : "Activate"} this user?`)) return;
+    const userId = user._id || user.id;
+    setActionLoading(userId);
+    try {
+      if (isActive) await adminUserService.banUser(userId);
+      else await adminUserService.unbanUser(userId);
+      await fetchUsers();
+      if (selectedUserId === userId) await openDetails(userId);
+    } catch (actionError) {
+      window.alert(actionError instanceof Error ? actionError.message : "Failed to update user status");
+    } finally {
+      setActionLoading(null);
+    }
+  }, [fetchUsers, openDetails, selectedUserId]);
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-[1600px] mx-auto">
-      {/* Heading */}
+    <div className="mx-auto max-w-[1600px] space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-xl sm:text-2xl font-black text-[#dae2fd] font-[Manrope,sans-serif]">
-          User Management
-        </h2>
-        <p className="text-xs text-[#8f9098] mt-1">
-          Manage all platform users · {totalUsersCount} total users
-        </p>
+        <h2 className="text-xl font-black text-[#dae2fd] sm:text-2xl">User Management</h2>
+        <p className="mt-1 text-xs text-[#8f9098]">Manage all platform users · {totalUsersCount} matching users</p>
       </div>
 
-      {/* Mini stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <MiniStat
-          label="Total Users"
-          value={stats.totalUsers}
-          icon="groups"
-          sub="↑ +4.2% this week"
-        />
-        <MiniStat
-          label="Active Now"
-          value={stats.activeNow}
-          icon="sensors"
-          sub="Live sessions"
-        />
-        <MiniStat
-          label="Pending KYC"
-          value={stats.pendingKYC}
-          icon="verified_user"
-          sub="⚠ Needs review"
-          subColor="text-[#ffb2b9]"
-        />
-        <MiniStat
-          label="Banned Accounts"
-          value={stats.bannedAccounts}
-          icon="block"
-          sub="↓ −2 today"
-          subColor="text-[#8f9098]"
-        />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <MiniStat label="Total Users" value={stats.totalUsers} icon="groups" sub="All registered accounts" />
+        <MiniStat label="Active Users" value={stats.activeUsers} icon="sensors" sub="Users with an open trade" />
+        <MiniStat label="New Users" value={stats.newUsers} icon="person_add" sub="Joined this month" />
+        <MiniStat label="Suspended Users" value={stats.suspendedUsers} icon="block" sub="Currently suspended" />
       </div>
 
-      {/* Table card */}
-      <div className="bg-[#131b2e] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Controls */}
-        <div className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/5">
-          {/* Filter tabs */}
-          <div className="flex items-center gap-1 bg-[#060e20] p-1 rounded-xl">
-            {(["All Users", "Pro Trader", "Copy Trader"] as Filter[]).map(
-              (f) => (
-                <button
-                  key={f}
-                  onClick={() => {
-                    setFilter(f);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all whitespace-nowrap ${
-                    filter === f
-                      ? "bg-[#4edea3] text-[#003824] shadow-lg"
-                      : "text-[#8f9098] hover:text-[#dae2fd]"
-                  }`}
-                >
-                  {f}
-                </button>
-              ),
-            )}
+      <div className="overflow-hidden rounded-2xl border border-white/5 bg-[#131b2e] shadow-2xl">
+        <div className="flex flex-col gap-4 border-b border-white/5 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-[#060e20] p-1">
+            {roleFilters.map((filter) => (
+              <button
+                key={filter.value}
+                type="button"
+                onClick={() => { setRoleFilter(filter.value); setCurrentPage(1); }}
+                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all ${
+                  roleFilter === filter.value ? "bg-[#4edea3] text-[#003824]" : "text-[#8f9098] hover:text-[#dae2fd]"
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
           </div>
 
-          {/* Search + Filter btn */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:flex-initial sm:w-56">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#44474d] text-base">
-                search
-              </span>
+          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#44474d]">search</span>
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search name or UID..."
-                className="w-full bg-[#0b1326] border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-[#dae2fd] placeholder:text-[#44474d] focus:outline-none focus:ring-1 focus:ring-[#4edea3]/20"
+                onChange={(event) => { setSearch(event.target.value); setCurrentPage(1); }}
+                placeholder="Search name, email or ID..."
+                className="w-full rounded-xl border border-white/10 bg-[#0b1326] py-2 pl-9 pr-3 text-xs text-[#dae2fd] outline-none focus:ring-1 focus:ring-[#4edea3]/30"
               />
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-2 bg-[#171f33] border border-white/5 text-[#c5c6ce] text-xs font-semibold rounded-xl hover:bg-[#222a3d] transition-all">
-              <span className="material-symbols-outlined text-base">
-                filter_alt
-              </span>
-              <span className="hidden sm:inline">Filter</span>
-            </button>
+            <select
+              aria-label="Filter users by status"
+              value={statusFilter}
+              onChange={(event) => { setStatusFilter(event.target.value as StatusFilter); setCurrentPage(1); }}
+              className="rounded-xl border border-white/10 bg-[#0b1326] px-3 py-2 text-xs text-[#c5c6ce] outline-none focus:ring-1 focus:ring-[#4edea3]/30"
+            >
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="waitlist">Waitlist</option>
+              <option value="suspended">Suspended</option>
+            </select>
           </div>
         </div>
 
-        {/* Table — scrollable on mobile */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left min-w-[640px]">
+          <table className="w-full min-w-[900px] text-left">
             <thead>
-              <tr className="bg-[#171f33]/60 text-[9px] uppercase tracking-[0.15em] text-[#8f9098] font-bold border-b border-white/5">
-                <th className="px-4 sm:px-6 py-4">User Identity</th>
-                <th className="px-4 sm:px-6 py-4">Role</th>
-                <th className="px-4 sm:px-6 py-4">Status</th>
-                <th className="px-4 sm:px-6 py-4">Trades / Activity</th>
-                <th className="px-4 sm:px-6 py-4">Performance</th>
-                <th className="px-4 sm:px-6 py-4">Last Active</th>
-                <th className="px-4 sm:px-6 py-4 text-center">Actions</th>
+              <tr className="border-b border-white/5 bg-[#171f33]/60 text-[9px] font-bold uppercase tracking-[0.15em] text-[#8f9098]">
+                <th className="px-4 py-4 sm:px-6">User</th>
+                <th className="px-4 py-4">Custom user ID</th>
+                <th className="px-4 py-4">Role</th>
+                <th className="px-4 py-4">Status</th>
+                <th className="px-4 py-4">Active trades</th>
+                <th className="px-4 py-4">Last activity</th>
+                <th className="px-4 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-4 sm:px-6 py-16 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="w-8 h-8 border-2 border-[#4edea3] border-t-transparent rounded-full animate-spin" />
-                      <p className="text-sm text-[#8f9098]">Loading users...</p>
-                    </div>
-                  </td>
-                </tr>
+                <tr><td colSpan={7} className="px-4 py-16 text-center text-sm text-[#8f9098]">Loading users...</td></tr>
               ) : error ? (
-                <tr>
-                  <td colSpan={7} className="px-4 sm:px-6 py-16 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <span className="material-symbols-outlined text-4xl text-[#ffb4ab]">
-                        error
-                      </span>
-                      <p className="text-sm text-[#ffb4ab]">{error}</p>
-                      <button
-                        onClick={fetchUsers}
-                        className="px-4 py-2 bg-[#171f33] text-[#dae2fd] text-xs font-bold rounded-lg hover:bg-[#222a3d]"
-                      >
-                        Retry
-                      </button>
+                <tr><td colSpan={7} className="px-4 py-16 text-center text-sm text-[#ffb4ab]">{error}</td></tr>
+              ) : users.length === 0 ? (
+                <tr><td colSpan={7} className="px-4 py-16 text-center text-sm text-[#8f9098]">No users found.</td></tr>
+              ) : users.map((user) => (
+                <tr
+                  key={user.id}
+                  tabIndex={0}
+                  onClick={() => void openDetails(user.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") void openDetails(user.id);
+                  }}
+                  className={`cursor-pointer transition-colors hover:bg-[#171f33]/50 focus:bg-[#171f33]/50 focus:outline-none ${user.status === "suspended" ? "bg-[#93000a]/5" : ""}`}
+                >
+                  <td className="px-4 py-4 sm:px-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#b6c4ff]/10 bg-[#002371]/30 text-xs font-black text-[#b6c4ff]">
+                        {user.initials}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#dae2fd]">{user.name}</p>
+                        <p className="text-[10px] text-[#8f9098]">{user.email}</p>
+                      </div>
                     </div>
                   </td>
-                </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 sm:px-6 py-16 text-center">
-                    <span className="material-symbols-outlined text-4xl text-[#44474d]">
-                      manage_search
+                  <td className="px-4 py-4 font-mono text-xs text-[#c5c6ce]">{user.traderID || "—"}</td>
+                  <td className="px-4 py-4">
+                    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${roleStyle[user.role]}`}>
+                      {formatRole(user.role)}
                     </span>
-                    <p className="text-sm text-[#8f9098] mt-3">
-                      No users found.
-                    </p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold capitalize ${statusStyle[user.status]}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${statusDot[user.status]}`} />{user.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-xs font-bold text-[#dae2fd]">{user.activeTradeCount}</td>
+                  <td className="px-4 py-4 text-xs text-[#c5c6ce]">{formatDate(user.lastActivityAt)}</td>
+                  <td className="relative px-4 py-4 text-center" onClick={(event) => event.stopPropagation()}>
+                    <button
+                      type="button"
+                      aria-label={`Actions for ${user.name}`}
+                      aria-expanded={openMenuId === user.id}
+                      onClick={() => setOpenMenuId((current) => current === user.id ? null : user.id)}
+                      className="rounded-lg p-1.5 text-[#8f9098] hover:bg-white/5 hover:text-[#dae2fd]"
+                    >
+                      <span className="material-symbols-outlined">more_horiz</span>
+                    </button>
+                    {openMenuId === user.id && (
+                      <div className="absolute right-4 top-12 z-20 w-40 overflow-hidden rounded-xl border border-white/10 bg-[#171f33] p-1 text-left shadow-2xl">
+                        <button type="button" onClick={() => void openDetails(user.id)} className="w-full rounded-lg px-3 py-2 text-left text-xs text-[#dae2fd] hover:bg-white/5">User details</button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === user.id}
+                          onClick={() => { setOpenMenuId(null); void toggleUserStatus(user); }}
+                          className={`w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-white/5 disabled:opacity-50 ${user.status === "active" ? "text-[#ffb4ab]" : "text-[#4edea3]"}`}
+                        >
+                          {user.status === "active" ? "Suspend" : "Activate"}
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
-              ) : (
-                users.map((user, index) => (
-                  <tr
-                    key={user.id}
-                    className={`transition-colors group ${
-                      user.status === "suspended"
-                        ? "bg-[#93000a]/5 hover:bg-[#93000a]/10 opacity-70"
-                        : "hover:bg-[#171f33]/40"
-                    }`}
-                  >
-                    {/* Identity */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center border flex-shrink-0 ${getRandomColor(index)}`}
-                        >
-                          <span className="text-xs font-black">
-                            {user.initials}
-                          </span>
-                        </div>
-                        <div>
-                          <p
-                            className={`text-sm font-bold text-[#dae2fd] group-hover:text-[#4edea3] transition-colors ${
-                              user.status === "suspended" ? "line-through" : ""
-                            }`}
-                          >
-                            {user.name}
-                          </p>
-                          <p className="text-[10px] text-[#8f9098] font-mono">
-                            ID: {user.ID}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Role */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <select
-                        value={user.role}
-                        disabled={actionLoading === user.id}
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer ${roleStyle[user.role]} ${
-                          actionLoading === user.id
-                            ? "opacity-50 cursor-wait"
-                            : ""
-                        }`}
-                      >
-                        <option value="Pro Trader">Pro Trader</option>
-                        <option value="Copy Trader">Copy Trader</option>
-                      </select>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div
-                        className={`flex items-center gap-1.5 text-[11px] font-semibold ${statusStyle[user.status]}`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${statusDot[user.status]}`}
-                        />
-                        {user.status}
-                      </div>
-                    </td>
-
-                    {/* Trades */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <p className="text-xs text-[#dae2fd] font-medium">
-                        {user.trades}
-                      </p>
-                    </td>
-
-                    {/* Performance */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <p
-                        className={`text-xs font-bold ${
-                          user.roiPositive ? "text-[#4edea3]" : "text-[#ffb4ab]"
-                        }`}
-                      >
-                        {user.roi}
-                      </p>
-                    </td>
-
-                    {/* Last Active */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <p className="text-xs text-[#dae2fd]">
-                        {user.lastActive}
-                      </p>
-                      <p className="text-[10px] text-[#8f9098]">
-                        {user.location}
-                      </p>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="flex items-center justify-center gap-1.5">
-                        {user.status === "suspended" ? (
-                          <button
-                            onClick={() => handleUnbanUser(user.id)}
-                            disabled={actionLoading === user.id}
-                            className="px-3 py-1 bg-[#222a3d] border border-white/10 text-[10px] font-bold rounded-lg text-[#dae2fd] hover:bg-[#2d3449] transition-all disabled:opacity-50"
-                          >
-                            {actionLoading === user.id ? "..." : "Restore"}
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              title="Edit"
-                              className="p-1.5 hover:bg-[#171f33] rounded-lg text-[#8f9098] hover:text-[#4edea3] transition-all"
-                            >
-                              <span className="material-symbols-outlined text-lg">
-                                edit_note
-                              </span>
-                            </button>
-                            <button
-                              title="View"
-                              className="p-1.5 hover:bg-[#171f33] rounded-lg text-[#8f9098] hover:text-[#b6c4ff] transition-all"
-                            >
-                              <span className="material-symbols-outlined text-lg">
-                                open_in_new
-                              </span>
-                            </button>
-                            <button
-                              onClick={() => handleBanUser(user.id)}
-                              disabled={actionLoading === user.id}
-                              title="Ban"
-                              className="p-1.5 hover:bg-[#93000a]/20 rounded-lg text-[#8f9098] hover:text-[#ffb4ab] transition-all disabled:opacity-50"
-                            >
-                              <span className="material-symbols-outlined text-lg">
-                                block
-                              </span>
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
 
           {!loading && !error && users.length > 0 && (
-            <div className="px-4 sm:px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-white/5 px-4 py-4 sm:flex-row sm:px-6">
               <p className="text-xs text-[#8f9098]">
-                Showing{" "}
-                <span className="text-[#dae2fd] font-bold">
-                  {(currentPage - 1) * itemsPerPage + 1}–
-                  {Math.min(currentPage * itemsPerPage, totalUsersCount)}
-                </span>{" "}
-                of{" "}
-                <span className="text-[#dae2fd] font-bold">
-                  {totalUsersCount}
-                </span>{" "}
-                users
+                Showing <span className="font-bold text-[#dae2fd]">{(currentPage - 1) * 10 + 1}–{Math.min(currentPage * 10, totalUsersCount)}</span> of <span className="font-bold text-[#dae2fd]">{totalUsersCount}</span> users
               </p>
               <div className="flex items-center gap-1">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-1.5 text-[#8f9098] disabled:opacity-30 hover:text-[#4edea3] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-lg">
-                    chevron_left
-                  </span>
-                </button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum: number;
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => paginate(pageNum)}
-                      className={`w-8 h-8 flex items-center justify-center text-xs font-bold rounded-lg transition-colors ${
-                        currentPage === pageNum
-                          ? "bg-[#4edea3] text-[#003824]"
-                          : "text-[#8f9098] hover:bg-[#171f33]"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-                {totalPages > 5 && currentPage < totalPages - 2 && (
-                  <>
-                    <span className="text-[#44474d] px-1 text-xs">...</span>
-                    <button
-                      onClick={() => paginate(totalPages)}
-                      className="w-8 h-8 flex items-center justify-center text-xs font-bold rounded-lg text-[#8f9098] hover:bg-[#171f33] transition-colors"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="p-1.5 text-[#8f9098] disabled:opacity-30 hover:text-[#4edea3] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-lg">
-                    chevron_right
-                  </span>
-                </button>
+                <button type="button" onClick={() => setCurrentPage((page) => page - 1)} disabled={currentPage === 1} className="p-1.5 text-[#8f9098] disabled:opacity-30"><span className="material-symbols-outlined">chevron_left</span></button>
+                <span className="px-3 text-xs text-[#c5c6ce]">Page {currentPage} of {totalPages}</span>
+                <button type="button" onClick={() => setCurrentPage((page) => page + 1)} disabled={currentPage === totalPages} className="p-1.5 text-[#8f9098] disabled:opacity-30"><span className="material-symbols-outlined">chevron_right</span></button>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {selectedUserId && (
+        <UserDetailsModal
+          details={details}
+          loading={detailsLoading}
+          error={detailsError}
+          actionLoading={actionLoading === selectedUserId}
+          onClose={() => { setSelectedUserId(null); setDetails(null); }}
+          onToggleStatus={(user) => void toggleUserStatus(user)}
+        />
+      )}
     </div>
   );
 }

@@ -155,7 +155,7 @@ export interface RegisterData {
   sponsored?: boolean;
 }
 
-export type UserRole = "CopyTrader" | "Pro Trader";
+export type UserRole = "CopyTrader" | "ProTrader";
 
 export interface User {
   id?: string;
@@ -241,6 +241,11 @@ export interface UserManagementUser extends User {
   roiPositive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  activeTradeCount?: number;
+  totalTradeCount?: number;
+  closedTradeCount?: number;
+  lastActivityAt?: string | null;
+  isVerified?: boolean;
 }
 
 export interface UsersResponse {
@@ -249,7 +254,14 @@ export interface UsersResponse {
   users: UserManagementUser[];
   page: number;
   limit: number;
+  total: number;
   pages: number;
+  stats: {
+    totalUsers: number;
+    activeUsers: number;
+    newUsers: number;
+    suspendedUsers: number;
+  };
 }
 
 export interface UserActionResponse {
@@ -264,6 +276,25 @@ export interface GetUserResponse {
   success: boolean;
   data: {
     user: UserManagementUser;
+    tradeStats: {
+      totalTrades: number;
+      activeTrades: number;
+      closedTrades: number;
+      profitableTrades: number;
+      losingTrades: number;
+      lastActivityAt: string | null;
+    };
+    recentTrades: Array<{
+      _id: string;
+      pair: string;
+      direction: "buy" | "sell";
+      status: "pending" | "filled" | "closed" | "cancelled" | "failed";
+      tradeOrigin: "pro" | "copy";
+      tradeResult?: "profit" | "loss" | "breakeven" | null;
+      createdAt: string;
+      updatedAt: string;
+      closedAt?: string | null;
+    }>;
   };
 }
 

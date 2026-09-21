@@ -24,6 +24,8 @@ interface AuthProviderProps {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const ADMIN_INACTIVITY_MS = 20 * 60 * 1000;
+const ADMIN_ACTIVITY_STORAGE_KEY = "adminLastActivityAt";
 
 function normalizeRole(role?: string) {
   return role?.replace(/\s+/g, "").toLowerCase();
@@ -77,6 +79,67 @@ export function AuthProvider({
 
     router.replace(loginPath);
   }, [loginPath, router, scope]);
+
+  useEffect(() => {
+    if (scope !== "admin" || !account) return;
+
+    let inactivityTimer: ReturnType<typeof setTimeout>;
+    let lastRecordedAt = 0;
+
+    const scheduleLogout = () => {
+      clearTimeout(inactivityTimer);
+      const storedActivity = Number(
+        localStorage.getItem(ADMIN_ACTIVITY_STORAGE_KEY),
+      );
+      const lastActivity = Number.isFinite(storedActivity) && storedActivity > 0
+        ? storedActivity
+        : Date.now();
+      const remaining = ADMIN_INACTIVITY_MS - (Date.now() - lastActivity);
+
+      if (remaining <= 0) {
+        void logout();
+        return;
+      }
+      inactivityTimer = setTimeout(() => void logout(), remaining);
+    };
+
+    const recordActivity = () => {
+      const now = Date.now();
+      if (now - lastRecordedAt < 1000) return;
+      lastRecordedAt = now;
+      localStorage.setItem(ADMIN_ACTIVITY_STORAGE_KEY, String(now));
+      scheduleLogout();
+    };
+
+    const syncActivity = (event: StorageEvent) => {
+      if (event.key === ADMIN_ACTIVITY_STORAGE_KEY) scheduleLogout();
+    };
+
+    if (!localStorage.getItem(ADMIN_ACTIVITY_STORAGE_KEY)) {
+      localStorage.setItem(ADMIN_ACTIVITY_STORAGE_KEY, String(Date.now()));
+    }
+    scheduleLogout();
+
+    const activityEvents: Array<keyof WindowEventMap> = [
+      "pointerdown",
+      "pointermove",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ];
+    activityEvents.forEach((eventName) =>
+      window.addEventListener(eventName, recordActivity, { passive: true }),
+    );
+    window.addEventListener("storage", syncActivity);
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      activityEvents.forEach((eventName) =>
+        window.removeEventListener(eventName, recordActivity),
+      );
+      window.removeEventListener("storage", syncActivity);
+    };
+  }, [account, logout, scope]);
 
   const value = useMemo<AuthContextValue | null>(() => {
     if (!account) return null;

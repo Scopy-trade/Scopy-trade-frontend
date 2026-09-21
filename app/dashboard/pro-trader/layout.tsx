@@ -102,7 +102,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider requiredRole="Pro Trader">
+    <AuthProvider requiredRole="ProTrader">
       <ProTraderDashboardShell>{children}</ProTraderDashboardShell>
     </AuthProvider>
   );

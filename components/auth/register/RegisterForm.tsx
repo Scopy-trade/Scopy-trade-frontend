@@ -41,7 +41,7 @@ const roleOptions: RoleOption[] = [
     Icon: RiUserFollowLine,
   },
   {
-    value: "Pro Trader",
+    value: "ProTrader",
     label: "Pro Trader",
     description: "Publish signals",
     Icon: RiLineChartLine,
