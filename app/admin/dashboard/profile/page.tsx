@@ -61,8 +61,7 @@ const SESSIONS = [
 
 const PERMISSIONS = [
   { label: "User Management", granted: true },
-  { label: "Signal Governance", granted: true },
-  { label: "Financial Controls", granted: true },
+  { label: "Earnings Oversight", granted: true },
   { label: "Withdrawal Approval", granted: true },
   { label: "System Configuration", granted: true },
   { label: "Audit Log Export", granted: true },

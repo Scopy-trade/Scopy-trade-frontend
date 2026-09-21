@@ -21,7 +21,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <span className="material-symbols-outlined">menu</span>
         </button>
 
-        <h1 className="text-base sm:text-lg font-black text-[#dae2fd] whitespace-nowrap font-[Manrope,sans-serif] hidden sm:block">
+        <h1 className="hidden text-base font-black text-[#dae2fd] whitespace-nowrap font-[Manrope,sans-serif] sm:block sm:text-lg lg:hidden">
           Admin Console
         </h1>
 

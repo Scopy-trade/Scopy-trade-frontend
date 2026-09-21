@@ -54,6 +54,7 @@ export interface TradeOwner {
 
 export interface ActiveProTrade {
   _id: string;
+  tradeId?: string;
   userId: TradeOwner | string;
   pair: string;
   direction: "buy" | "sell";

@@ -3,26 +3,89 @@ import {
   UsersResponse,
   GetUserResponse,
   UserActionResponse,
-  Signal,
-  DeleteSignalResponse,
-  GetAllSignalsResponse,
 } from "..";
 import { adminApi } from "./client";
 import { ActiveProTrade } from "..";
 
+export interface AdminTradeFilters {
+  status?: string;
+  page?: number;
+  limit?: number;
+  pair?: string;
+  direction?: "buy" | "sell" | "";
+  tradeOrigin?: "pro" | "copy" | "";
+  result?: "profit" | "loss" | "breakeven" | "";
+  search?: string;
+}
+
+export interface AdminEarning {
+  _id: string;
+  tradeId?: string;
+  pair: string;
+  direction: "buy" | "sell";
+  platformFee: string;
+  feeStatus: "pending" | "processing" | "collected" | "failed";
+  closedAt?: string | null;
+  settlementCompletedAt?: string | null;
+  settlementTransactionId?: string | null;
+  userId: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    traderID?: string;
+    email?: string;
+  } | string;
+  sourceTradeId?: {
+    _id: string;
+    tradeId?: string;
+    userId?: {
+      _id: string;
+      firstName?: string;
+      lastName?: string;
+      traderID?: string;
+    } | string;
+  } | string | null;
+}
+
+export interface AdminEarningsResponse {
+  success: boolean;
+  earnings: AdminEarning[];
+  summary: {
+    actualAmount: number;
+    prospectiveAmount: number;
+    actualCount: number;
+    prospectiveCount: number;
+  };
+  pagination: { total: number; page: number; limit: number; pages: number };
+}
+
 export const adminTradeService = {
-  getTrades(status: "all" | "active" | "history" = "all", page = 1) {
+  getTrades(filters: AdminTradeFilters = {}) {
     return adminApi.get<{
       success: boolean;
       trades: ActiveProTrade[];
       pagination: { total: number; page: number; limit: number; pages: number };
-    }>("/dashboard/trades", { params: { status, page } });
+    }>("/dashboard/trades", { params: { ...filters } });
   },
 
   getTrade(tradeId: string) {
     return adminApi.get<{ success: boolean; trade: ActiveProTrade }>(
       `/dashboard/trades/${tradeId}`,
     );
+  },
+
+  getEarnings(params?: {
+    category?: "actual" | "prospective";
+    page?: number;
+    limit?: number;
+    pair?: string;
+    direction?: "buy" | "sell" | "";
+    feeStatus?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }) {
+    return adminApi.get<AdminEarningsResponse>("/dashboard/earnings", { params });
   },
 };
 
@@ -68,28 +131,5 @@ export const adminUserService = {
 
   getDashboardStats() {
     return adminApi.get<DashboardStatsResponse>("/dashboard/stats");
-  },
-};
-
-export const adminSignalService = {
-  getAll(params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    status?: string;
-  }) {
-    return adminApi.get<GetAllSignalsResponse>("/dashboard/signals", {
-      params,
-    });
-  },
-
-  getById(signalId: string) {
-    return adminApi.get<Signal>(`/dashboard/signals/${signalId}`);
-  },
-
-  delete(signalId: string) {
-    return adminApi.delete<DeleteSignalResponse>(
-      `/dashboard/signals/${signalId}`,
-    );
   },
 };
