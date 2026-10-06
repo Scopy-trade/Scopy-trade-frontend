@@ -18,7 +18,7 @@ const navItems = [
   { label: "Earnings", href: "/admin/dashboard/earnings", icon: "monitoring" },
   {
     label: "Withdrawals",
-    href: "/admin/dashboard/withdrawal",
+    href: "/admin/dashboard/withdrawals",
     icon: "account_balance",
   },
 ];

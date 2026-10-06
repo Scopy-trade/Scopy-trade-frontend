@@ -6,6 +6,24 @@ import {
 } from "..";
 import { adminApi } from "./client";
 import { ActiveProTrade } from "..";
+import type { Withdrawal } from "./withdrawals";
+
+export interface AdminWithdrawal extends Withdrawal {
+  userId: string;
+  proTrader: { _id: string; firstName: string; lastName: string; email: string; traderID: string } | null;
+  reconciliationReason: string | null;
+}
+export const adminWithdrawalService = {
+  list(page: number, status?: string) {
+    return adminApi.get<{ rows: AdminWithdrawal[]; page: number; pages: number; total: number }>("/dashboard/pro/withdrawals", { params: { page, ...(status ? { status } : {}) } });
+  },
+  get(id: string) {
+    return adminApi.get<{ withdrawal: AdminWithdrawal }>(`/dashboard/pro/withdrawals/${encodeURIComponent(id)}`);
+  },
+  reconcile(id: string) {
+    return adminApi.post<{ withdrawal: AdminWithdrawal; idempotent: boolean; message: string }>(`/dashboard/pro/withdrawals/${encodeURIComponent(id)}/reconcile`, {});
+  },
+};
 
 export interface AdminTradeFilters {
   status?: string;
