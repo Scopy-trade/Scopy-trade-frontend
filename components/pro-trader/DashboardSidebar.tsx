@@ -34,11 +34,6 @@ const navItems = [
     href: "/dashboard/pro-trader/trade-history",
   },
   {
-    name: "Market Terminal",
-    icon: MdShowChart,
-    href: "/dashboard/pro-trader/market-terminal",
-  },
-  {
     name: "Earnings & Withdrawals",
     icon: MdGroup,
     href: "/dashboard/pro-trader/earnings",
