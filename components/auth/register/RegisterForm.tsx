@@ -121,7 +121,9 @@ export default function RegisterForm() {
         role,
         sponsored: role === "CopyTrader" ? sponsored : undefined,
       });
-      window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+      // Temporarily skip email verification and go directly to the waitlist.
+      // window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+      window.location.href = "/waitlist?registered=true";
     } catch (err: unknown) {
       let msg = "Registration failed. Please try again.";
       if (
