@@ -191,7 +191,7 @@ export default function CopyTraderSidebar({
             title={isCollapsed && !isMobile ? "Exchange Settings" : undefined}
             className={`
               w-full flex py-3 rounded-xl
-              bg-linear-to-r from-secondary to-secondary-container
+              bg-secondary
               text-on-secondary font-bold text-sm
               transition-transform active:scale-95
               shadow-lg shadow-secondary/10

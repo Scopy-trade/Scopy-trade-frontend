@@ -21,7 +21,7 @@ export default function EarningsHeader({
       <div className="flex items-center gap-3">
         <button
           onClick={onWithdrawClick}
-          className="px-4 py-2 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-bold text-sm tracking-tight active:scale-[0.98] transition-transform shadow-lg shadow-secondary/20 whitespace-nowrap"
+          className="px-4 py-2 rounded-lg bg-secondary text-on-secondary font-bold text-sm tracking-tight active:scale-[0.98] transition-transform shadow-lg shadow-secondary/20 whitespace-nowrap"
         >
           Withdraw Funds
         </button>

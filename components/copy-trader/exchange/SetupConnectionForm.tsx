@@ -1,5 +1,7 @@
 "use client";
 
+import { RiKey2Line, RiCheckLine, RiCloseLine } from "react-icons/ri";
+
 import { useState } from "react";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 
@@ -22,7 +24,7 @@ export default function SetupConnectionForm() {
         className="text-xl font-bold mb-6 flex items-center gap-2"
         style={{ fontFamily: "Manrope, sans-serif" }}
       >
-        <span style={{ color: "#b6c4ff" }}>🔑</span>
+        <span style={{ color: "#b6c4ff" }}><RiKey2Line aria-hidden="true" className="inline-block align-middle" /></span>
         Setup Connection
       </h2>
 
@@ -136,7 +138,7 @@ export default function SetupConnectionForm() {
                 onClick={() => setSpotTrading(!spotTrading)}
               >
                 {spotTrading && (
-                  <span className="text-xs font-bold" style={{ color: "#003824" }}>✓</span>
+                  <span className="text-xs font-bold" style={{ color: "#003824" }}><RiCheckLine aria-hidden="true" className="inline-block align-middle" /></span>
                 )}
               </div>
               <span className="text-sm font-medium">Enable Spot Trading</span>
@@ -153,7 +155,7 @@ export default function SetupConnectionForm() {
                 onClick={() => setReadBalance(!readBalance)}
               >
                 {readBalance && (
-                  <span className="text-xs font-bold" style={{ color: "#003824" }}>✓</span>
+                  <span className="text-xs font-bold" style={{ color: "#003824" }}><RiCheckLine aria-hidden="true" className="inline-block align-middle" /></span>
                 )}
               </div>
               <span className="text-sm font-medium">Read-Only Balance access</span>
@@ -165,7 +167,7 @@ export default function SetupConnectionForm() {
                 className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "#5d001b", border: "1px solid #ffb2b9" }}
               >
-                <span className="text-xs font-bold" style={{ color: "#ffb2b9" }}>✕</span>
+                <span className="text-xs font-bold" style={{ color: "#ffb2b9" }}><RiCloseLine aria-hidden="true" className="inline-block align-middle" /></span>
               </div>
               <span
                 className="text-sm font-medium"
@@ -181,7 +183,7 @@ export default function SetupConnectionForm() {
         <button
           className="w-full py-4 rounded-lg font-bold text-sm uppercase tracking-widest transition-all hover:opacity-90 active:scale-[0.98]"
           style={{
-            background: "linear-gradient(to right, #4edea3, #00a572)",
+            backgroundColor: "#4edea3",
             color: "#003824",
           }}
         >

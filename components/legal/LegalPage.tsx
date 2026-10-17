@@ -38,17 +38,6 @@ export default function LegalPage({
       <TopNavBar />
 
       <main className="relative overflow-hidden px-6 pb-24 pt-32 lg:px-16 lg:pt-40">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px]">
-          <div className="absolute left-1/2 top-10 h-72 w-[760px] -translate-x-1/2 rounded-full bg-emerald-500/[0.06] blur-[140px]" />
-          <div
-            className="absolute inset-0 opacity-[0.025]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px)",
-              backgroundSize: "64px 64px",
-            }}
-          />
-        </div>
 
         <div className="relative mx-auto max-w-7xl">
           <nav

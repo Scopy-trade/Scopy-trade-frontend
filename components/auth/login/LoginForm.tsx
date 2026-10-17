@@ -200,7 +200,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full button-solid text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

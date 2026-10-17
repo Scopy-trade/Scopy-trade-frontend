@@ -20,7 +20,7 @@ export default function RegisterPage() {
 
       {/* Bottom progress indicator */}
       <div className="h-1 bg-surface-container-lowest w-full relative">
-        <div className="absolute left-0 top-0 h-full w-1/3 progress-gradient" />
+        <div className="absolute left-0 top-0 h-full w-1/3 progress-solid" />
       </div>
     </div>
   );

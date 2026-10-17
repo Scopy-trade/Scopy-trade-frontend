@@ -19,11 +19,6 @@ const features = [
 export default function WaitlistBrandingPanel() {
   return (
     <div className="hidden md:flex md:w-1/2 relative flex-col justify-between p-10 lg:p-14 bg-[var(--color-surface-container)] overflow-hidden">
-      {/* Ambient glows */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-[var(--color-secondary)]/10 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-[var(--color-primary)]/10 rounded-full blur-[120px]" />
-      </div>
 
       {/* Background image */}
       <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
@@ -35,16 +30,6 @@ export default function WaitlistBrandingPanel() {
           unoptimized
         />
       </div>
-
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #4edea3 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
 
       {/* Top: Logo */}
       <div className="relative z-10">
@@ -78,13 +63,7 @@ export default function WaitlistBrandingPanel() {
           style={{ fontFamily: "var(--font-headline)" }}
         >
           Be Among the{" "}
-          <span
-            className="text-transparent bg-clip-text"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, var(--color-secondary), var(--color-primary))",
-            }}
-          >
+          <span className="text-secondary">
             First
           </span>{" "}
           to Trade

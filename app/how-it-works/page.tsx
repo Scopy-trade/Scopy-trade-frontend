@@ -136,23 +136,9 @@ export default function HowItWorksPage() {
         <section
           className="relative flex flex-col justify-center items-center px-8 py-28 text-center overflow-hidden"
           style={{
-            backgroundImage:
-              "radial-gradient(at 0% 0%, rgba(182,196,255,0.10) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(78,222,163,0.06) 0, transparent 50%)",
+            backgroundColor: "#0b1326",
           }}
         >
-          {/* Subtle grid texture */}
-          <div
-            className="absolute inset-0 opacity-[0.025] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-
-          {/* Glow blobs — positioned differently from landing hero */}
-          <div className="absolute left-0 top-0 w-72 h-72 bg-[#b6c4ff]/8 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute right-0 bottom-0 w-64 h-64 bg-[#4edea3]/6 rounded-full blur-[80px] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl mx-auto space-y-6">
             {/* Badge */}
@@ -336,8 +322,7 @@ export default function HowItWorksPage() {
                   href="/register?role=provider"
                   className="block w-full text-center py-4 rounded-xl font-bold transition-all active:scale-[0.98] shadow-xl text-[#003824]"
                   style={{
-                    background:
-                      "linear-gradient(135deg, #4edea3 0%, #00a572 100%)",
+                    backgroundColor: "#4edea3",
                   }}
                 >
                   Apply as Strategist
@@ -349,8 +334,6 @@ export default function HowItWorksPage() {
 
         {/* ── Security Architecture ─────────────────────────────────────────── */}
         <section className="bg-[#131b2e] py-24 relative overflow-hidden">
-          {/* Decorative blob */}
-          <div className="absolute -right-40 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#b6c4ff]/5 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
             {/* Left: copy */}
@@ -413,7 +396,6 @@ export default function HowItWorksPage() {
 
             {/* Right: visual terminal card */}
             <div className="relative group">
-              <div className="absolute -inset-4 bg-[#b6c4ff]/8 rounded-3xl blur-3xl group-hover:bg-[#b6c4ff]/14 transition-all duration-700 pointer-events-none" />
               <div
                 className="relative rounded-3xl p-8 border border-white/[0.08]"
                 style={{
@@ -512,8 +494,7 @@ export default function HowItWorksPage() {
                     <div
                       className="h-full rounded-full w-2/3 animate-pulse"
                       style={{
-                        background:
-                          "linear-gradient(90deg, #b6c4ff 0%, #4edea3 100%)",
+                        backgroundColor: "#b6c4ff",
                       }}
                     />
                   </div>
@@ -549,8 +530,7 @@ export default function HowItWorksPage() {
                 href="/register"
                 className="px-10 py-5 rounded-xl font-bold text-[#003824] shadow-2xl hover:scale-105 transition-all active:scale-95"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #4edea3 0%, #00a572 100%)",
+                  backgroundColor: "#4edea3",
                 }}
               >
                 Start Copying Now

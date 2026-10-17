@@ -49,7 +49,7 @@ export default function VerifyEmailForm() {
       {message && <p className="mt-5 rounded-xl bg-[var(--color-secondary)]/10 p-3 text-sm text-[var(--color-secondary)]">{message}</p>}
       <form onSubmit={verify} className="mt-6 space-y-4">
         <input aria-label="Verification code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} placeholder="000000" className="w-full rounded-xl bg-[var(--color-surface-container-highest)] px-4 py-4 text-center text-2xl font-bold tracking-[0.45em] text-[var(--color-on-surface)] outline-none focus:ring-2 focus:ring-[var(--color-secondary)]/30" />
-        <button disabled={loading || otp.length !== 6} className="button-gradient w-full rounded-xl py-3.5 font-bold text-[var(--color-on-secondary)] disabled:opacity-50">{loading ? "Verifying..." : "Verify email"}</button>
+        <button disabled={loading || otp.length !== 6} className="button-solid w-full rounded-xl py-3.5 font-bold text-[var(--color-on-secondary)] disabled:opacity-50">{loading ? "Verifying..." : "Verify email"}</button>
       </form>
       <div className="mt-5 flex justify-between text-sm"><button type="button" onClick={resend} disabled={loading || !email} className="font-bold text-[var(--color-secondary)] disabled:opacity-50">Resend code</button><Link href="/register" className="text-[var(--color-on-surface-variant)] hover:underline">Start again</Link></div>
     </div>

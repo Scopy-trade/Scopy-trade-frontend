@@ -1,5 +1,7 @@
 "use client";
 
+import { RiFlashlightLine, RiEditLine, RiCloseLine } from "react-icons/ri";
+
 const availableExchanges = [
   { id: "okx", name: "OKX Terminal" },
   { id: "coinbase", name: "Coinbase Pro" },
@@ -20,7 +22,7 @@ export default function ActiveConnections() {
         className="text-xl font-bold mb-6 flex items-center gap-2"
         style={{ fontFamily: "Manrope, sans-serif" }}
       >
-        <span style={{ color: "#4edea3" }}>⚡</span>
+        <span style={{ color: "#4edea3" }}><RiFlashlightLine aria-hidden="true" className="inline-block align-middle" /></span>
         Active Connections
       </h2>
 
@@ -54,16 +56,18 @@ export default function ActiveConnections() {
         </div>
         <div className="flex gap-3">
           <button
+            aria-label="Edit connection"
             className="p-2 rounded-lg transition-all hover:opacity-80"
             style={{ backgroundColor: "#222a3d", color: "#c5c6ce" }}
           >
-            ✎
+            <RiEditLine aria-hidden="true" className="inline-block align-middle" />
           </button>
           <button
+            aria-label="Disconnect exchange"
             className="p-2 rounded-lg transition-all hover:opacity-80"
             style={{ backgroundColor: "#222a3d", color: "#ffb2b9" }}
           >
-            ✕
+            <RiCloseLine aria-hidden="true" className="inline-block align-middle" />
           </button>
         </div>
       </div>

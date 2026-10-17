@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  RiLightbulbLine,
   RiMailOpenLine,
   RiCheckboxCircleLine,
   RiArrowRightLine,
@@ -160,7 +161,7 @@ export default function WaitlistContent() {
           {/* CTA */}
           <div className="bg-[var(--color-secondary)]/5 border border-[var(--color-secondary)]/20 rounded-xl p-4 mb-6">
             <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
-              💡 Tip:
+              <RiLightbulbLine aria-hidden="true" className="inline-block align-middle" /> Tip:
             </p>
             <p className="text-sm text-[var(--color-on-surface)]">
               Add our email to your contacts to ensure you don't miss our launch
@@ -172,7 +173,7 @@ export default function WaitlistContent() {
           <div className="space-y-3">
             <Link
               href="/"
-              className="w-full mb-5 button-gradient text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mb-5 button-solid text-[var(--color-on-secondary)] font-bold py-3.5 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               <span>Return to Home</span>
               <RiArrowRightLine className="text-lg" />
