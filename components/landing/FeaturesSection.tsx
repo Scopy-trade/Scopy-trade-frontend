@@ -81,7 +81,7 @@ const accentMap: Record<
 export default function FeaturesSection() {
   return (
     <section className="py-32 relative px-6 lg:px-16 bg-[#0b1326]">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
 
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
@@ -115,10 +115,6 @@ export default function FeaturesSection() {
                 key={title}
                 className="group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 overflow-hidden"
               >
-                {/* Hover glow */}
-                <div
-                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${colors.bg} blur-xl`}
-                />
 
                 <div className="relative z-10">
                   {/* Tag */}

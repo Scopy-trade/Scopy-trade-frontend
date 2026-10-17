@@ -42,7 +42,7 @@ export default function ContactPage() {
             Institutional Portal
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold font-headline tracking-tighter mb-6 leading-[1.1]">
-            Global <span className="gradient-text">Support</span> &amp; <br />
+            Global <span className="text-accent">Support</span> &amp; <br />
             Institutional Inquiries.
           </h1>
           <p className="max-w-2xl text-on-surface-variant text-lg leading-relaxed font-light">
@@ -135,7 +135,7 @@ export default function ContactPage() {
                 className={`w-full md:w-auto px-10 py-4 font-extrabold rounded-lg shadow-xl transition-all active:scale-[0.98] uppercase tracking-widest text-sm ${
                   submitState === "success"
                     ? "bg-primary-container text-on-primary-container"
-                    : "bg-gradient-to-r from-secondary to-secondary-container text-on-secondary shadow-secondary/10 hover:shadow-secondary/20"
+                    : "bg-secondary text-on-secondary shadow-secondary/10 hover:shadow-secondary/20"
                 } ${submitState === "loading" ? "opacity-50 pointer-events-none" : ""}`}
               >
                 {submitLabel}
@@ -226,7 +226,7 @@ export default function ContactPage() {
 
         {/* Atmospheric Map Section */}
         <section className="mt-24 rounded-2xl overflow-hidden relative h-[400px] group bg-surface-container-high">
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent z-10" />
+          <div className="absolute inset-0 bg-surface-container-lowest/60 z-10" />
           <div className="absolute inset-0 z-0 opacity-40 grayscale group-hover:opacity-60 group-hover:grayscale-0 transition-all duration-1000">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

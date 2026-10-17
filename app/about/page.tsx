@@ -136,20 +136,6 @@ export default function AboutPage() {
       <main className="pt-28">
         {/* ─── HERO ─────────────────────────────────────────────── */}
         <section className="relative py-24 px-6 lg:px-16 overflow-hidden min-h-[600px]">
-          {/* Background decorations */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className="absolute inset-0 opacity-[0.025]"
-              style={{
-                backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)
-                `,
-                backgroundSize: "60px 60px",
-              }}
-            />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-emerald-500/6 rounded-full blur-[150px]" />
-          </div>
 
           <div className="max-w-7xl mx-auto relative z-10">
             {/* Breadcrumb */}
@@ -215,7 +201,7 @@ export default function AboutPage() {
               {/* Right: illustrative terminal visual */}
               <div className="relative">
                 {/* Outer glow */}
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-white/[0.07] to-transparent pointer-events-none" />
+                <div className="absolute -inset-px rounded-2xl bg-white/[0.07] pointer-events-none" />
 
                 <div className="relative bg-[#0D1117] rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl shadow-black/60">
                   {/* Terminal titlebar */}
@@ -240,7 +226,7 @@ export default function AboutPage() {
                     {/* Company summary card */}
                     <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5">
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-teal-600/20 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-400/20 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
                           <svg
                             width="22"
                             height="22"
@@ -347,12 +333,12 @@ export default function AboutPage() {
 
         {/* ─── MISSION STATEMENT ───────────────────────────────── */}
         <section className="py-24 px-6 lg:px-16 relative">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Large pull quote */}
               <div className="relative">
-                <div className="absolute -left-4 top-0 bottom-0 w-px bg-gradient-to-b from-emerald-500/40 to-transparent" />
+                <div className="absolute -left-4 top-0 bottom-0 w-px bg-emerald-500/40" />
                 <p
                   className="text-3xl md:text-4xl font-black text-white leading-[1.15] pl-8"
                   style={{
@@ -413,7 +399,7 @@ export default function AboutPage() {
 
         {/* ─── VALUES ───────────────────────────────────────────── */}
         <section className="py-24 px-6 lg:px-16 relative bg-[#060A0E]">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
           <div className="max-w-7xl mx-auto">
             <div className="mb-14">
               <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-4">
@@ -458,7 +444,7 @@ export default function AboutPage() {
 
         {/* ─── TEAM ─────────────────────────────────────────────── */}
         <section className="py-24 px-6 lg:px-16 relative">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
           <div className="max-w-7xl mx-auto">
             <div className="mb-14">
               <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-4">
@@ -517,7 +503,7 @@ export default function AboutPage() {
 
         {/* ─── JOIN US CTA ──────────────────────────────────────── */}
         {/* <section className="py-24 px-6 lg:px-16 relative">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-500 mb-5">
               Join the Mission

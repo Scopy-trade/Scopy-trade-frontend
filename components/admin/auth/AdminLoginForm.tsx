@@ -134,7 +134,7 @@ export default function AdminLoginForm() {
           type="submit"
           disabled={isLoading}
           className="
-            w-full button-gradient text-[var(--color-on-secondary)]
+            w-full button-solid text-[var(--color-on-secondary)]
             font-bold py-3.5 rounded-lg mt-4
             shadow-lg shadow-[var(--color-secondary)]/10
             hover:opacity-90 active:scale-[0.98]

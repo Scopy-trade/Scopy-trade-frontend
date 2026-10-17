@@ -8,15 +8,6 @@ export default function CtaSection() {
           className="relative rounded-[2.5rem] overflow-hidden p-16 text-center border border-[#b6c4ff]/20"
           style={{ background: "#002371" }}
         >
-          {/* Radial glow */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(circle at center, rgba(182,196,255,0.10) 0%, transparent 70%)",
-            }}
-          />
-
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2
               className="text-5xl font-black tracking-tight mb-8 text-[#dae2fd]"

@@ -44,7 +44,7 @@ export default function SponsoredTraderModal({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-[var(--color-surface-container-highest)] rounded-2xl max-w-md w-full shadow-2xl border border-[var(--color-outline)]/10 overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-[var(--color-secondary)]/10 to-[var(--color-tertiary)]/10 border-b border-[var(--color-outline)]/10 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-[var(--color-secondary)]/10 border-b border-[var(--color-outline)]/10 p-6 flex items-center justify-between">
           <div>
             <h3
               className="text-xl font-bold text-[var(--color-on-surface)]"
@@ -137,7 +137,7 @@ export default function SponsoredTraderModal({
           <button
             onClick={onAccept}
             disabled={!understood}
-            className="flex-1 button-gradient text-[var(--color-on-secondary)] font-semibold py-3 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 button-solid text-[var(--color-on-secondary)] font-semibold py-3 rounded-xl shadow-lg shadow-[var(--color-secondary)]/15 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <span>Accept & Continue</span>
             <RiCheckLine />

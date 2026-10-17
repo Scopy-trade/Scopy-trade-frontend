@@ -3,7 +3,7 @@ import { MdSecurity } from "react-icons/md";
 
 export default function SecurityBanner() {
   return (
-    <div className="mt-12 p-8 rounded-xl bg-gradient-to-br from-surface-container to-surface-container-high flex flex-col md:flex-row items-center justify-between border border-white/5">
+    <div className="mt-12 p-8 rounded-xl bg-surface-container flex flex-col md:flex-row items-center justify-between border border-white/5">
       <div className="flex items-center mb-6 md:mb-0">
         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mr-6">
           <MdSecurity className="text-primary text-2xl" />
