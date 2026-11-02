@@ -15,7 +15,7 @@ const navItems = [
   },
   { label: "Active Trades", href: "/admin/dashboard/active-trades", icon: "show_chart" },
   { label: "Trade History", href: "/admin/dashboard/trade-history", icon: "history" },
-  { label: "Trade Audit", href: "/admin/dashboard/logs", icon: "receipt_long" },
+  { label: "Audit Logs", href: "/admin/dashboard/logs", icon: "receipt_long" },
   { label: "Earnings", href: "/admin/dashboard/earnings", icon: "monitoring" },
   {
     label: "Withdrawals",

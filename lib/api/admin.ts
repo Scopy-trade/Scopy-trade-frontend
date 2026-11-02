@@ -8,6 +8,33 @@ import { adminApi } from "./client";
 import { ActiveProTrade } from "..";
 import type { Withdrawal } from "./withdrawals";
 
+export type AuditPerson = string | { _id: string; firstName?: string; lastName?: string; email?: string } | null;
+export interface AuditLogEntry {
+  _id: string;
+  action: string;
+  timestamp: string;
+  admin?: AuditPerson;
+  userId?: AuditPerson;
+  targetId?: string;
+  targetType?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  details?: unknown;
+}
+export interface AuditLogsResponse {
+  logs: AuditLogEntry[];
+  page: number;
+  limit: number;
+  pages: number;
+  total: number;
+  actions: string[];
+}
+export const adminAuditLogService = {
+  list(params: { page?: number; limit?: number; search?: string; action?: string; dateFrom?: string; dateTo?: string }) {
+    return adminApi.get<AuditLogsResponse>("/dashboard/audit-logs", { params });
+  },
+};
+
 export interface AdminWithdrawal extends Withdrawal {
   userId: string;
   proTrader: { _id: string; firstName: string; lastName: string; email: string; traderID: string } | null;
