@@ -150,8 +150,8 @@ const sections: LegalSection[] = [
       <>
         <p>
           Under the current fee model, SCopyTrade charges 20% of the realised
-          profit on a profitable copied trade. Of that amount, 15% is the
-          platform share and 5% is credited to the source pro trader. A copied
+          profit on a profitable copied trade. Of that amount, 10% is the
+          platform share and 10% is credited to the source pro trader. A copied
           trade classified as a loss or breakeven does not incur this performance
           fee. We may initiate settlement in USDT from the connected exchange
           account to the disclosed settlement wallet.

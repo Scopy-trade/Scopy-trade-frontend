@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import RankProgress from "@/components/pro-trader/RankProgress";
 import { useCallback, useEffect, useState } from "react";
 import { MdArrowForward, MdPendingActions, MdShowChart } from "react-icons/md";
 import { ActiveProTrade } from "@/lib";
@@ -78,6 +79,8 @@ export default function ProTraderDashboard() {
         </div>
         <Link href="/dashboard/pro-trader/active-trades" className="flex items-center gap-2 self-start rounded-lg bg-secondary px-5 py-2.5 text-sm font-bold text-on-secondary md:self-auto">Manage all trades <MdArrowForward /></Link>
       </div>
+
+      <RankProgress />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-white/5 bg-surface-container p-5"><MdShowChart className="mb-3 text-2xl text-secondary" /><p className="text-xs uppercase text-slate-500">Active trades</p><p className="mt-1 text-3xl font-bold">{activeTrades.length}</p></div>

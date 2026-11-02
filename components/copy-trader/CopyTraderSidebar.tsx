@@ -26,10 +26,12 @@ interface SidebarProps {
 
 const navItems = [
   {
-    name: "Signal Factory",
+    name: "Discover Traders",
     icon: MdSensors,
     href: "/dashboard/copy-trader",
   },
+  { name: "Traders I?m Copying", icon: MdSensors, href: "/dashboard/copy-trader/copying" },
+  { name: "Copy Notifications", icon: MdSensors, href: "/dashboard/copy-trader/notifications" },
   {
     name: "Active Trades",
     icon: MdShowChart,

@@ -130,8 +130,8 @@ const sections: LegalSection[] = [
       <>
         <p>
           Under the current product model, a profitable copied trade is charged
-          a performance fee equal to 20% of its realised profit: 15% is retained
-          by SCopyTrade and 5% is credited to the source pro trader. No
+          a performance fee equal to 20% of its realised profit: 10% is retained
+          by SCopyTrade and 10% is credited to the source pro trader. No
           performance fee is charged by SCopyTrade on a losing or breakeven
           copied trade. The platform may use the connected exchange API to
           settle an applicable fee in USDT to the configured settlement wallet.

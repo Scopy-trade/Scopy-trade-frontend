@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import BrandLogo from "@/components/brand/BrandLogo";
 
 const navItems = [
+  { label: "Rank Bonuses", href: "/admin/dashboard/rank-awards", icon: "workspace_premium" },
   { label: "Overview", href: "/admin/dashboard", icon: "dashboard" },
   {
     label: "User Management",

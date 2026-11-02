@@ -23,6 +23,8 @@ const navItems = [
     icon: MdDashboard,
     href: "/dashboard/pro-trader",
   },
+  { name: "Ranks & Benefits", icon: MdGroup, href: "/dashboard/pro-trader/ranks" },
+  { name: "Your Copiers", icon: MdGroup, href: "/dashboard/pro-trader/copiers" },
   {
     name: "Active Trades",
     icon: MdShowChart,
