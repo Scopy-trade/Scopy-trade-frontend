@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdSecurity, MdWarning } from "react-icons/md";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { RiExchangeLine, RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { ExchangeListItem, ConnectionSummary } from "@/lib";
 import { exchangeService } from "@/lib/api/exchanges";
 
@@ -49,7 +49,7 @@ const exchangeInstructions: Record<
       "Complete security verification (2FA/SMS)",
       "Copy the API Key and Secret Key immediately (Secret won't be shown again)",
       "Enable the following permissions: Enable Spot & Margin Trading",
-      "⚠️ DO NOT enable Withdrawals - this is for security",
+      "DO NOT enable Withdrawals - this is for security",
       "Click 'Save' to confirm permissions",
     ],
     warnings: [
@@ -255,12 +255,7 @@ export function ExchangeConnectionModal({
         <div className="flex items-center justify-between p-6 border-b border-outline/20 bg-surface-container-highest">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">
-                {exchange.id === "binance" && "🔵"}
-                {exchange.id === "bybit" && "🟣"}
-                {exchange.id === "okx" && "🔴"}
-                {exchange.id === "bitget" && "🟠"}
-              </span>
+              <RiExchangeLine aria-hidden="true" className="text-2xl text-secondary" />
             </div>
             <div>
               <h2 className="text-xl font-bold font-headline">
@@ -452,7 +447,7 @@ export function ExchangeConnectionModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-6 py-4 rounded-md font-bold text-sm bg-linear-to-r from-secondary to-secondary-container text-on-secondary shadow-lg shadow-secondary/20 hover:shadow-secondary/40 active:scale-[0.98] transition-all uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full mt-6 py-4 rounded-md font-bold text-sm bg-secondary text-on-secondary shadow-lg shadow-secondary/20 hover:shadow-secondary/40 active:scale-[0.98] transition-all uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -500,6 +495,7 @@ export function ExchangeConnectionModal({
                           {index + 1}
                         </span>
                         <span className="text-on-surface leading-relaxed">
+                          {step.startsWith("DO NOT") && <MdWarning aria-hidden="true" className="inline-block mr-1 text-error" />}
                           {step}
                         </span>
                       </li>

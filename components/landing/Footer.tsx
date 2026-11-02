@@ -122,7 +122,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom shimmer */}
-      <div className="w-full h-1 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
+      <div className="w-full h-1 bg-emerald-400/20" />
     </footer>
   );
 }

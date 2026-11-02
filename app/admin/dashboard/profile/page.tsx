@@ -97,16 +97,7 @@ export default function ProfilePage() {
       {/* Top identity card */}
       <div className="bg-[#131b2e] border border-white/5 rounded-2xl overflow-hidden">
         {/* Banner */}
-        <div className="h-24 sm:h-32 bg-gradient-to-r from-[#002371] via-[#00311f] to-[#0b1326] relative">
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, #4edea3 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
-            }}
-          />
-        </div>
+        <div className="h-24 sm:h-32 bg-[#002371] relative" />
 
         <div className="px-6 sm:px-8 pb-6 sm:pb-8">
           {/* Avatar row */}

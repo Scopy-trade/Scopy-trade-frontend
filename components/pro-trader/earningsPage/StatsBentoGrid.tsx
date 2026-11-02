@@ -31,7 +31,7 @@ export default function StatsBentoGrid({
         </div>
         <button
           onClick={onWithdrawClick}
-          className="py-3 sm:py-4 mx-auto px-8 sm:px-10 mt-3 rounded-lg bg-gradient-to-r from-secondary to-secondary-container text-on-secondary font-bold text-sm tracking-tight active:scale-[0.98] transition-transform shadow-lg shadow-secondary/20 w-full sm:w-auto"
+          className="py-3 sm:py-4 mx-auto px-8 sm:px-10 mt-3 rounded-lg bg-secondary text-on-secondary font-bold text-sm tracking-tight active:scale-[0.98] transition-transform shadow-lg shadow-secondary/20 w-full sm:w-auto"
         >
           Request Payout
         </button>

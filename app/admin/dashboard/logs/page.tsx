@@ -458,7 +458,7 @@ export default function LogsPage() {
               </h3>
             </div>
             <div className="h-2 bg-[#060e20] rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-[#b6c4ff] to-[#4edea3] w-[78%] rounded-full" />
+              <div className="h-full bg-[#b6c4ff] w-[78%] rounded-full" />
             </div>
             <div className="flex justify-between mt-2 text-[10px] text-[#8f9098] font-mono">
               <span>Ingress: 4.2 GB/s</span>

@@ -1,3 +1,4 @@
+import { RiShieldCheckLine } from "react-icons/ri";
 export default function SecurityBanner() {
   return (
     <div
@@ -8,7 +9,7 @@ export default function SecurityBanner() {
         className="p-3 rounded-lg flex-shrink-0"
         style={{ backgroundColor: "#002371", color: "#b6c4ff" }}
       >
-        <span className="text-3xl">🛡</span>
+        <span className="text-3xl"><RiShieldCheckLine aria-hidden="true" className="inline-block align-middle" /></span>
       </div>
       <div>
         <h4

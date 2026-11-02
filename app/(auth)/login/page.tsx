@@ -34,7 +34,7 @@ export default function LoginPage() {
       </main>
 
       <div className="h-1 bg-[var(--color-surface-container-lowest)] w-full relative">
-        <div className="absolute left-0 top-0 h-full w-1/3 progress-gradient" />
+        <div className="absolute left-0 top-0 h-full w-1/3 progress-solid" />
       </div>
     </div>
   );

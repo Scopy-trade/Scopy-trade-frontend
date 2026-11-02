@@ -401,7 +401,7 @@ async function makeRequest<T>(
       if (data.success !== true) {
         throw new Error(data.message ?? `Request to ${endpoint} failed`);
       }
-      return data as T; // ✅ return the whole flat response
+      return data as T; // return the whole flat response
     })
     .catch((error: unknown) => {
       if (error instanceof Error && !axios.isAxiosError(error)) throw error;

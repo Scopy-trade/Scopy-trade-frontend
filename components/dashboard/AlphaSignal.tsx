@@ -44,7 +44,7 @@ export default function AlphaSignal() {
             className="h-full rounded-full"
             style={{
               width: "84%",
-              background: "linear-gradient(to right, #b6c4ff, #4edea3)",
+              backgroundColor: "#b6c4ff",
             }}
           />
         </div>

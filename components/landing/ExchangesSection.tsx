@@ -145,7 +145,7 @@ export default function ExchangesSection() {
               </svg>
             </div>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1326] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-[#0b1326]/60" />
 
             <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
               <div

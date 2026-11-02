@@ -100,26 +100,19 @@ h3,
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* ── Gradient text ── */
-.text-gradient {
-  background: linear-gradient(to right, #4edea3, #00a572);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ── Accent text ── */
+.text-accent {
+  color: var(--color-secondary);
 }
 
-/* ── Button gradient ── */
-.button-gradient {
-  background: linear-gradient(to bottom right, #4edea3, #00a572);
+/* ── Solid button ── */
+.button-solid {
+  background-color: var(--color-secondary);
 }
 
-/* ── Progress bar gradient ── */
-.progress-gradient {
-  background: linear-gradient(
-    to right,
-    var(--color-primary),
-    var(--color-secondary)
-  );
+/* ── Solid progress bar ── */
+.progress-solid {
+  background-color: var(--color-secondary);
 }
 
 /* ── Trading card glow ── */
@@ -149,8 +142,7 @@ h3,
 }
 .skeleton-pulse {
   animation: skeletonPulse 1.8s ease-in-out infinite;
-  background: linear-gradient(90deg, #222a3d 0%, #2d3449 50%, #222a3d 100%);
-  background-size: 200% 100%;
+  background-color: var(--color-surface-container-high);
   border-radius: 4px;
 }
 
@@ -183,5 +175,5 @@ h3,
 
 /* ── Tonal transition ── */
 .tonal-transition {
-  background: linear-gradient(to bottom, #0b1326, #060e20);
+  background-color: var(--color-surface);
 }

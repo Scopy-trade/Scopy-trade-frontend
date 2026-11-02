@@ -4,6 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
+  RiStarFill,
   RiArrowLeftLine,
   RiShieldCheckLine,
   RiLineChartLine,
@@ -31,12 +32,7 @@ const steps = [
 
 export default function BrandingPanel() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 xl:p-14 bg-surface-container-low] overflow-hidden">
-      {/* Ambient glows */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/4 -left-1/4 w-150 h-150 bg-secondary-container/40 rounded-full blur-[140px]" />
-        <div className="absolute -bottom-1/4 -right-1/4 w-150 h-150 bg-primary-container/40 rounded-full blur-[140px]" />
-      </div>
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 xl:p-14 bg-surface-container-low overflow-hidden">
 
       {/* Background decorative image */}
       <div className="absolute inset-0 z-0 opacity-[0.06] pointer-events-none">
@@ -49,16 +45,6 @@ export default function BrandingPanel() {
           fetchPriority="high"
         />
       </div>
-
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 opacity-[0.035] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #4edea3 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
 
       {/* Top: Logo */}
       <div className="relative z-10">
@@ -84,7 +70,7 @@ export default function BrandingPanel() {
           className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight mb-5 text-[var(--color-on-surface)]"
           style={{ fontFamily: "var(--font-headline)" }}
         >
-          Enter the <span className="text-gradient">Sovereign</span> Era of
+          Enter the <span className="text-accent">Sovereign</span> Era of
           Trading.
         </h1>
 
@@ -146,7 +132,7 @@ export default function BrandingPanel() {
             <div className="ml-auto flex gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <span key={i} className="text-[var(--color-secondary)] text-xs">
-                  ★
+                  <RiStarFill aria-hidden="true" className="inline-block align-middle" />
                 </span>
               ))}
             </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { RiDownloadLine, RiFilter3Line } from "react-icons/ri";
+
 import { useState } from "react";
 
 export default function TradeHistoryFilters() {
@@ -56,16 +58,18 @@ export default function TradeHistoryFilters() {
       {/* Export and Filter buttons */}
       <div className="ml-auto flex gap-2">
         <button
+          aria-label="Export trade history"
           className="p-2 rounded-lg transition-all hover:opacity-80"
           style={{ backgroundColor: "#222a3d", color: "#c5c6ce" }}
         >
-          ⬇
+          <RiDownloadLine aria-hidden="true" className="inline-block align-middle" />
         </button>
         <button
+          aria-label="Filter trade history"
           className="p-2 rounded-lg transition-all hover:opacity-80"
           style={{ backgroundColor: "#222a3d", color: "#c5c6ce" }}
         >
-          ☰
+          <RiFilter3Line aria-hidden="true" className="inline-block align-middle" />
         </button>
       </div>
     </div>

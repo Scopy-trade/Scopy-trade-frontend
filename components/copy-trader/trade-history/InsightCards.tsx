@@ -1,3 +1,4 @@
+import { RiLineChartLine, RiShieldCheckLine } from "react-icons/ri";
 export default function InsightCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -10,7 +11,7 @@ export default function InsightCards() {
           className="p-3 rounded-lg flex-shrink-0"
           style={{ backgroundColor: "#222a3d", color: "#4edea3" }}
         >
-          <span className="text-2xl">📈</span>
+          <span className="text-2xl"><RiLineChartLine aria-hidden="true" className="inline-block align-middle" /></span>
         </div>
         <div>
           <h4
@@ -36,7 +37,7 @@ export default function InsightCards() {
           className="p-3 rounded-lg flex-shrink-0"
           style={{ backgroundColor: "#002371", color: "#b6c4ff" }}
         >
-          <span className="text-2xl">🛡</span>
+          <span className="text-2xl"><RiShieldCheckLine aria-hidden="true" className="inline-block align-middle" /></span>
         </div>
         <div>
           <h4

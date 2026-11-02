@@ -1,3 +1,4 @@
+import { RiAlertLine } from "react-icons/ri";
 import { ReactNode } from "react";
 
 /* ── Stat Card ── */
@@ -11,7 +12,7 @@ function StatCard({
 }: {
   label: string;
   value: string;
-  sub: string;
+  sub: ReactNode;
   subColor?: string;
   icon: string;
   iconBg?: string;
@@ -131,7 +132,7 @@ export default function OverviewPage() {
         <StatCard
           label="Verification Pending"
           value="48"
-          sub="⚠ Manual review required"
+          sub={<><RiAlertLine aria-hidden="true" /> Manual review required</>}
           subColor="text-[#ffb2b9]"
           icon="verified_user"
           iconBg="text-[#ffb2b9]"
@@ -235,7 +236,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Governance Banner */}
-      <div className="bg-gradient-to-br from-[#131b2e] to-[#0f1a2e] border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+      <div className="bg-[#131b2e] border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
         <div className="w-14 h-14 rounded-2xl bg-[#00311f] border border-[#4edea3]/20 flex items-center justify-center flex-shrink-0">
           <span className="material-symbols-outlined text-[#4edea3] text-2xl">
             shield

@@ -61,7 +61,7 @@ export default function TopNavBar() {
                   {label}
                   {/* Active underline */}
                   {active && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 rounded-full bg-linear-to-r from-emerald-400 to-teal-400" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 rounded-full bg-emerald-400" />
                   )}
                 </Link>
               );
