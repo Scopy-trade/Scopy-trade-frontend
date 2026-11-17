@@ -7,11 +7,11 @@ export function WithdrawalStatusBadge({ status }: { status: Withdrawal["status"]
 
 export default function WithdrawalDetails({ row }: { row: Withdrawal }) {
   const fields = [
-    ["Withdrawal ID", row._id], ["Request ID", row.requestId || "Unavailable (legacy withdrawal)"],
+    ["Withdrawal ID", row._id], ["Request ID", row.requestId || "Unavailable"],
     ["Amount", `${row.amount} USDT`], ["Destination / TRON", row.address],
     ["Created", new Date(row.createdAt).toLocaleString()],
     ["Completed", row.completedAt ? new Date(row.completedAt).toLocaleString() : "Not completed"],
-    ["Funds", row.fundsReserved ? "Reserved pending resolution" : row.status === "FAILED" ? "Returned to available balance" : row.status === "COMPLETED" ? "Paid; balance remains deducted" : "Legacy record — reservation unavailable"],
+    ["Funds", row.fundsReserved ? "Reserved pending resolution" : row.status === "FAILED" ? "Returned to available balance" : row.status === "COMPLETED" ? "Paid; balance remains deducted" : "Reservation unavailable"],
   ];
   return <div className="space-y-4 text-sm">
     <WithdrawalStatusBadge status={row.status} />

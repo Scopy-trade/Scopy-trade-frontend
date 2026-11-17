@@ -168,7 +168,6 @@ export interface User {
   traderID?: string;
   hasOnboarded?: boolean;
   status?: "active" | "suspended" | "waitlist";
-  proEarningsBalance?: number;
 }
 
 export interface AuthResponse {

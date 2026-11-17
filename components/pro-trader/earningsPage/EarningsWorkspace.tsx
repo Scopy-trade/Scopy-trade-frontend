@@ -6,7 +6,7 @@ import { userApi } from "@/lib/api/client";
 import type { Withdrawal } from "@/lib/api/withdrawals";
 import WithdrawalRecords from "./WithdrawalRecords";
 
-type Summary = { legacyBalance: string; accountId: string; available: string; earned: string; reserved: string; withdrawalAddress: string | null; walletUnlocksAt: string | null; liveEnabled: boolean; };
+type Summary = { accountId: string; available: string; earned: string; reserved: string; withdrawalAddress: string | null; walletUnlocksAt: string | null; liveEnabled: boolean; };
 type Earning = { _id: string; tradeId: string; pair: string; closedAt: string; realizedPnl: string; platformFee: string; proTraderShare: string; proTraderCreditStatus: string; feeStatus: string; };
 type Page<T> = { rows: T[]; page: number; pages: number };
 type Pending = { submitted?: boolean; amount: string; key: string };
@@ -131,7 +131,6 @@ export default function EarningsWorkspace({ initialTab = "earnings" }: { initial
     </header>
     {error && <div role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300">{error} <button className="ml-2 underline" onClick={() => void refresh()}>Retry</button></div>}
     {notice && <div role="status" className="flex items-center gap-3 rounded-xl bg-secondary/10 p-4 text-sm text-secondary"><MdCheckCircle />{notice}<button aria-label="Dismiss notification" className="ml-auto" onClick={() => setNotice("")}><MdClose /></button></div>}
-    {Number(summary?.legacyBalance || 0) > 0 && <p className="rounded-xl border border-amber-400/20 p-4 text-sm text-amber-200">Previous balance: {summary?.legacyBalance} USDT. Historical credits and payouts require reconciliation before this amount can be released into the new live balance.</p>}
     <section aria-label="Earnings summary" className="grid gap-4 sm:grid-cols-3">
       {[["Available to withdraw", summary?.available, "Collected earnings ready for payout"], ["Collected earnings", summary?.earned, "Your credited 5% share"], ["Withdrawals in progress", summary?.reserved, "Reserved until the transfer is resolved"]].map(([label, value, detail], index) => <div key={label} className={`rounded-2xl border p-6 ${index === 0 ? "border-secondary/20 bg-secondary/5" : "border-white/5 bg-surface-container-low"}`}><p className="text-sm text-on-surface-variant">{label}</p><p className="mt-4 break-all text-3xl font-bold tabular-nums text-on-surface">{value ?? "--"} <span className="text-xs font-medium text-on-surface-variant">USDT</span></p><p className="mt-3 text-xs text-on-surface-variant">{detail}</p></div>)}
     </section>

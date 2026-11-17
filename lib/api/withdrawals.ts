@@ -1,4 +1,4 @@
-export type WithdrawalStatus = "QUEUED" | "SIGNED" | "COMPLETED" | "FAILED" | "REVIEW" | "LEGACY_SUBMITTED";
+export type WithdrawalStatus = "QUEUED" | "SIGNED" | "COMPLETED" | "FAILED" | "REVIEW";
 export interface Withdrawal {
   _id: string;
   requestId?: string;
