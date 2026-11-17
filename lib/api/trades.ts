@@ -17,11 +17,8 @@ export interface ProfitShareSummary {
   threshold: string;
   withdrawalRequired: boolean;
   processing: boolean;
-  connections: Array<{
-    connectionId: string;
-    exchange: string;
-    label: string;
-  }>;
+  settlementRequired: boolean;
+  settlement: { _id: string; amount: string; memo: string; destinationAddress: string; status: string } | null;
 }
 
 interface TradeMutationResponse {
@@ -102,13 +99,9 @@ export const tradeService = {
     );
   },
 
-  approveProfitShareWithdrawal(exchangeConnectionId: string) {
-    return userApi.post<{
-      success: boolean;
-      message: string;
-      profitShare: ProfitShareSummary;
-    }>("/copy-trader/dashboard/profit-share/approve", {
-      exchangeConnectionId,
-    });
+  verifySettlement(settlementId: string, transactionHash: string, signature?: string) {
+    return userApi.post<{ success: boolean; message: string; profitShare: ProfitShareSummary }>(
+      "/copy-trader/dashboard/profit-share/verify", { settlementId, transactionHash, ...(signature ? { signature } : {}) },
+    );
   },
 };

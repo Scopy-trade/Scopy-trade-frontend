@@ -16,7 +16,7 @@ export default function RankAwardsPage() {
   async function verify(award: Award) {
     if (!window.confirm(`Confirm that platform earnings have been verified for this level ${award.level} award, and credit the $${award.bonus} bonus to the trader's configured payout balance?`)) return;
     setBusy(award._id); setError("");
-    try { const result = await adminApi.post<{ message: string; mode: string }>(`/dashboard/pro/rank-awards/${award._id}/verify`, { platformEarningsVerified: true }); setNotice(`${result.message} Payout mode: ${result.mode}.`); await load(); }
+    try { const result = await adminApi.post<{ message: string }>(`/dashboard/pro/rank-awards/${award._id}/verify`, { platformEarningsVerified: true }); setNotice(result.message); await load(); }
     catch (err) { setError(err instanceof Error ? err.message : "Could not verify bonus."); }
     finally { setBusy(""); }
   }

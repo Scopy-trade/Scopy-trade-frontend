@@ -1,106 +1,64 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { MdAccountBalanceWallet, MdLock } from "react-icons/md";
 import { ProfitShareSummary, tradeService } from "@/lib/api/trades";
 
-export default function ProfitShareCard({
-  onStatusChange,
-}: {
-  onStatusChange: (summary: ProfitShareSummary) => void;
-}) {
+export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (summary: ProfitShareSummary) => void }) {
   const [summary, setSummary] = useState<ProfitShareSummary | null>(null);
-  const [connectionId, setConnectionId] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
+  const [hash, setHash] = useState("");
+  const [signature, setSignature] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
   const load = useCallback(async () => {
-    const response = await tradeService.getProfitShare();
-    setSummary(response.profitShare);
-    onStatusChange(response.profitShare);
-    setConnectionId((current) =>
-      response.profitShare.connections.some((item) => item.connectionId === current)
-        ? current
-        : response.profitShare.connections[0]?.connectionId ?? "",
-    );
+    const result = await tradeService.getProfitShare();
+    setSummary(result.profitShare);
+    onStatusChange(result.profitShare);
   }, [onStatusChange]);
-
   useEffect(() => {
-    void load()
-      .catch((error) => setMessage(error instanceof Error ? error.message : "Unable to load profit share."))
-      .finally(() => setLoading(false));
-    const interval = window.setInterval(() => {
-      void load().catch(() => undefined);
-    }, 15_000);
-    return () => window.clearInterval(interval);
-  }, [load]);
-
-  async function approve() {
-    if (!connectionId) return;
-    setSubmitting(true);
-    setMessage(null);
-    try {
-      const response = await tradeService.approveProfitShareWithdrawal(connectionId);
-      setSummary(response.profitShare);
-      onStatusChange(response.profitShare);
-      setMessage(response.message);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Withdrawal approval failed.");
-      await load().catch(() => undefined);
-    } finally {
-      setSubmitting(false);
+    async function refresh() {
+      try { await load(); }
+      catch { setMessage("Settlement details are unavailable. Please refresh to try again."); }
     }
+    void refresh();
+    const timer = window.setInterval(() => { if (!document.hidden) void refresh(); }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [load]);
+  async function verify() {
+    if (!summary?.settlement) return;
+    setBusy(true);
+    try {
+      const result = await tradeService.verifySettlement(summary.settlement._id, hash.trim(), signature.trim());
+      setSummary(result.profitShare);
+      onStatusChange(result.profitShare);
+      setHash(""); setSignature(""); setMessage(result.message);
+      window.dispatchEvent(new Event("notifications-updated"));
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Payment could not be verified yet."); }
+    finally { setBusy(false); }
   }
-
-  const amount = Number(summary?.pendingAmount ?? 0);
-  const required = summary?.withdrawalRequired ?? false;
-
-  return (
-    <section className={`rounded-xl border p-5 ${required ? "border-amber-400/30 bg-amber-400/10" : "border-white/5 bg-surface-container-low"}`}>
-      <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
-        <div className="flex items-start gap-3">
-          <div className={`rounded-lg p-2.5 ${required ? "bg-amber-400/15 text-amber-300" : "bg-secondary/10 text-secondary"}`}>
-            {required ? <MdLock size={22} /> : <MdAccountBalanceWallet size={22} />}
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Accrued platform profit share</p>
-            <p className="mt-1 text-2xl font-bold text-slate-100">{amount.toFixed(2)} USDT</p>
-            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-400">
-              This is the cumulative 20% platform share from your profitable copied trades. It remains in your exchange wallet until it reaches {summary?.threshold ?? "10.00"} USDT.
-            </p>
-            {required && <p className="mt-2 text-sm font-semibold text-amber-300">Approve collection to unlock copying new trades.</p>}
-            {message && <p role="status" className="mt-2 text-xs text-slate-300">{message}</p>}
-          </div>
-        </div>
-
-        {required && (
-          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
-            <select
-              aria-label="Exchange used for profit-share withdrawal"
-              value={connectionId}
-              onChange={(event) => setConnectionId(event.target.value)}
-              disabled={loading || submitting}
-              className="min-w-52 rounded-lg border border-white/10 bg-surface-container-highest px-3 py-2.5 text-sm text-slate-100"
-            >
-              {!summary?.connections.length && <option value="">No active exchange</option>}
-              {summary?.connections.map((connection) => (
-                <option key={connection.connectionId} value={connection.connectionId}>
-                  {connection.label || connection.exchange}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              disabled={!connectionId || submitting || summary?.processing}
-              onClick={() => void approve()}
-              className="rounded-lg bg-secondary px-4 py-2.5 text-sm font-bold text-on-secondary disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {submitting || summary?.processing ? "Processing…" : "Approve withdrawal"}
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
-  );
+  const invoice = summary?.settlement;
+  const required = summary?.settlementRequired || !!invoice;
+  const input = "w-full rounded-lg border border-white/15 bg-surface-container-highest px-3 py-2 text-sm text-slate-100";
+  return <section className={`space-y-4 rounded-xl border p-5 ${required ? "border-amber-400/30 bg-amber-400/10" : "border-white/10"}`}>
+    <div><h2 className="text-sm font-bold text-slate-300">Profit-share settlement</h2>
+      <p className="mt-1 text-2xl font-bold">{Number(summary?.pendingAmount || 0).toFixed(2)} USDT accrued</p>
+      <p className="mt-2 text-sm text-slate-400">20% of profitable copied trades: 10% for the pro trader and 10% for the platform. Settlement is due at {summary?.threshold || "10.00"} USDT.</p>
+      {required && <p className="mt-2 text-amber-300">New copied trades are paused until your payment is confirmed.</p>}
+    </div>
+    {invoice && <div className="space-y-4 rounded-lg border border-white/10 p-4">
+      <p className="text-sm">Send exactly <strong>{invoice.amount} USDT</strong> using <strong>TRON (TRC-20)</strong>. Keep TRX available in your sending wallet for network fees.</p>
+      <label className="block space-y-1 text-xs text-slate-400"><span>Receiving wallet</span><input readOnly value={invoice.destinationAddress} onFocus={event => event.target.select()} className={input} /></label>
+      <label className="block space-y-1 text-xs text-slate-400"><span>Payment memo - include this exact text</span><input readOnly value={invoice.memo} onFocus={event => event.target.select()} className={input} /></label>
+      <p className="text-xs text-slate-400">We check for payment automatically. If your payment is not detected, paste its transaction hash below. This invoice amount stays fixed; fees from trades closing later may require another settlement.</p>
+      <form className="space-y-3" onSubmit={event => { event.preventDefault(); void verify(); }}>
+        <label className="block space-y-1 text-xs text-slate-400"><span>Transaction hash</span><input required pattern="[a-fA-F0-9]{64}" maxLength={64} value={hash} onChange={event => setHash(event.target.value)} className={input} placeholder="64-character TRON transaction hash" /></label>
+        <details className="text-xs text-slate-400"><summary className="cursor-pointer">My wallet did not include a memo</summary>
+          <p className="my-2">Sign this message with the wallet that sent the payment: <code className="break-all text-slate-200">ScopyTrade settlement {invoice._id}</code>. Paste the message signature below. Contact support if your wallet or exchange cannot sign messages. A transaction hash alone cannot prove ownership of a payment without a memo.</p>
+          <label className="block space-y-1"><span>Sending wallet message signature</span><input value={signature} maxLength={200} onChange={event => setSignature(event.target.value)} className={input} /></label>
+        </details>
+        <button disabled={busy || !hash.trim()} className="rounded-lg bg-secondary px-4 py-2 text-sm font-bold text-on-secondary disabled:opacity-50">{busy ? "Verifying..." : "Verify payment"}</button>
+      </form>
+    </div>}
+    {required && !invoice && <p className="text-sm text-amber-300">Your settlement needs review. Please contact support before sending payment.</p>}
+    {message && <p role="status" className="text-sm text-slate-300">{message}</p>}
+  </section>;
 }
