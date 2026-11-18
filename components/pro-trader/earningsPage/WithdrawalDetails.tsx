@@ -8,10 +8,15 @@ export function WithdrawalStatusBadge({ status }: { status: Withdrawal["status"]
 export default function WithdrawalDetails({ row }: { row: Withdrawal }) {
   const fields = [
     ["Withdrawal ID", row._id], ["Request ID", row.requestId || "Unavailable"],
-    ["Amount", `${row.amount} USDT`], ["Destination / TRON", row.address],
+    ["Total reserved", `${row.amount} USDT`],
+    ["Wallet payout", `${row.payoutAmount ?? row.amount} USDT${row.status === "FAILED" ? " (not paid)" : ""}`],
+    ["Network fee reserve", `${row.networkFeeReserve ?? "0.000000"} USDT`],
+    ["Actual network fee", row.networkFee == null ? "Awaiting chain confirmation" : `${row.networkFee} USDT`],
+    ["Balance refund", row.refundedAmount == null ? "Awaiting resolution" : `${row.refundedAmount} USDT`],
+    ["Additional network cost", `${row.additionalNetworkFee ?? "0.000000"} USDT`], ["Destination / TRON", row.address],
     ["Created", new Date(row.createdAt).toLocaleString()],
     ["Completed", row.completedAt ? new Date(row.completedAt).toLocaleString() : "Not completed"],
-    ["Funds", row.fundsReserved ? "Reserved pending resolution" : row.status === "FAILED" ? "Returned to available balance" : row.status === "COMPLETED" ? "Paid; balance remains deducted" : "Reservation unavailable"],
+    ["Funds", row.fundsReserved ? "Reserved pending resolution" : row.status === "FAILED" ? "Unsent funds refunded after consumed network fees" : row.status === "COMPLETED" ? "Payout sent; unused fee reserve returned" : "Reservation unavailable"],
   ];
   return <div className="space-y-4 text-sm">
     <WithdrawalStatusBadge status={row.status} />

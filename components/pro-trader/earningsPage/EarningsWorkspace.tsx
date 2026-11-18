@@ -6,10 +6,10 @@ import { userApi } from "@/lib/api/client";
 import type { Withdrawal } from "@/lib/api/withdrawals";
 import WithdrawalRecords from "./WithdrawalRecords";
 
-type Summary = { accountId: string; available: string; earned: string; reserved: string; withdrawalAddress: string | null; walletUnlocksAt: string | null; liveEnabled: boolean; };
+type Summary = { accountId: string; available: string; earned: string; reserved: string; withdrawalAddress: string | null; walletUnlocksAt: string | null; liveEnabled: boolean; networkFeeOwed?: string; };
 type Earning = { _id: string; tradeId: string; pair: string; closedAt: string; realizedPnl: string; platformFee: string; proTraderShare: string; proTraderCreditStatus: string; feeStatus: string; };
 type Page<T> = { rows: T[]; page: number; pages: number };
-type Pending = { submitted?: boolean; amount: string; key: string };
+type Pending = { submitted?: boolean; amount: string; key: string; quote?: Withdrawal };
 const base = "/pro-trader/dashboard";
 const button = "inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-5 py-3 text-sm font-bold text-on-secondary transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40";
 const input = "w-full rounded-xl border border-white/10 bg-surface-container-highest px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-secondary/60 disabled:opacity-60";
@@ -89,10 +89,12 @@ export default function EarningsWorkspace({ initialTab = "earnings" }: { initial
     setBusy(true); setDialogError("");
     try {
       if (!pending) {
-        const next = { amount, key: crypto.randomUUID() };
-        await userApi.post(base + "/withdraw/request-otp", { amount }, { headers: { "Idempotency-Key": next.key } });
+        const next: Pending = { amount, key: crypto.randomUUID() };
+        const result = await userApi.post<{ quote: Withdrawal }>(base + "/withdraw/request-otp", { amount }, { headers: { "Idempotency-Key": next.key } });
+        next.quote = result.quote;
         sessionStorage.setItem(storageKey, JSON.stringify(next)); setPending(next);
       } else {
+        if (!pending.quote) throw new Error("Resend the verification code to get a network fee quote before confirming.");
         const attempted = { ...pending, submitted: true };
         setPending(attempted); sessionStorage.setItem(storageKey, JSON.stringify(attempted));
         const result = await userApi.post<{ message?: string }>(base + "/withdraw", { amount: pending.amount, otp }, { headers: { "Idempotency-Key": pending.key } });
@@ -107,7 +109,9 @@ export default function EarningsWorkspace({ initialTab = "earnings" }: { initial
     if (!pending) return;
     setBusy(true); setDialogError("");
     try {
-      await userApi.post(base + "/withdraw/request-otp", { amount: pending.amount }, { headers: { "Idempotency-Key": pending.key } });
+      const result = await userApi.post<{ quote: Withdrawal }>(base + "/withdraw/request-otp", { amount: pending.amount }, { headers: { "Idempotency-Key": pending.key } });
+      const updated = { ...pending, quote: result.quote };
+      setPending(updated); sessionStorage.setItem(storageKey, JSON.stringify(updated)); setOtp("");
       setDialogError("A new verification code has been sent.");
     } catch (err) { setDialogError(message(err)); } finally { setBusy(false); }
   }
@@ -130,6 +134,7 @@ export default function EarningsWorkspace({ initialTab = "earnings" }: { initial
       <button className={button} onClick={openWithdrawal} disabled={!summary?.withdrawalAddress || Number(summary?.available || 0) <= 0 || !!locked}><MdArrowDownward size={18} />Withdraw USDT</button>
     </header>
     {error && <div role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300">{error} <button className="ml-2 underline" onClick={() => void refresh()}>Retry</button></div>}
+    {Number(summary?.networkFeeOwed || 0) > 0 && <p className="rounded-xl bg-amber-400/10 p-4 text-sm text-amber-200">Outstanding network fees: {summary?.networkFeeOwed} USDT. Future credits cover these fees before becoming withdrawable.</p>}
     {notice && <div role="status" className="flex items-center gap-3 rounded-xl bg-secondary/10 p-4 text-sm text-secondary"><MdCheckCircle />{notice}<button aria-label="Dismiss notification" className="ml-auto" onClick={() => setNotice("")}><MdClose /></button></div>}
     <section aria-label="Earnings summary" className="grid gap-4 sm:grid-cols-3">
       {[["Available to withdraw", summary?.available, "Collected earnings ready for payout"], ["Collected earnings", summary?.earned, "Your credited 5% share"], ["Withdrawals in progress", summary?.reserved, "Reserved until the transfer is resolved"]].map(([label, value, detail], index) => <div key={label} className={`rounded-2xl border p-6 ${index === 0 ? "border-secondary/20 bg-secondary/5" : "border-white/5 bg-surface-container-low"}`}><p className="text-sm text-on-surface-variant">{label}</p><p className="mt-4 break-all text-3xl font-bold tabular-nums text-on-surface">{value ?? "--"} <span className="text-xs font-medium text-on-surface-variant">USDT</span></p><p className="mt-3 text-xs text-on-surface-variant">{detail}</p></div>)}
@@ -148,9 +153,9 @@ export default function EarningsWorkspace({ initialTab = "earnings" }: { initial
       <div className="flex items-center justify-between border-t border-white/5 px-6 py-4 text-xs text-on-surface-variant"><span>Page {page} of {pages}</span><div className="flex gap-4"><button disabled={page <= 1 || loading} onClick={() => setPage(p => p - 1)} className="disabled:opacity-30">Previous</button><button disabled={page >= pages || loading} onClick={() => setPage(p => p + 1)} className="disabled:opacity-30">Next</button></div></div>
     </section>
     <p className="max-w-3xl text-xs leading-6 text-on-surface-variant">For every 100 USDT of copied-trade profit, the copier keeps 80 USDT, you earn 5 USDT, and the platform retains 15 USDT. Earnings pending collection are not withdrawable. Network uncertainty may require a review; the amount stays reserved until resolved.</p>
-    <dialog ref={dialog} onCancel={e => { if (busy) e.preventDefault(); else setOpen(false); }} onClose={() => setOpen(false)} aria-labelledby="withdraw-title" className="fixed inset-0 m-auto w-[calc(100%_-_2rem)] max-w-lg rounded-2xl border border-white/10 bg-surface-container p-0 text-on-surface shadow-2xl backdrop:bg-black/70">
+    <dialog ref={dialog} onCancel={e => { if (busy) e.preventDefault(); else setOpen(false); }} onClose={() => setOpen(false)} aria-labelledby="withdraw-title" className="fixed inset-0 m-auto w-[calc(100%_-_2rem)] max-w-lg max-h-[90dvh] overflow-y-auto rounded-2xl border border-white/10 bg-surface-container p-0 text-on-surface shadow-2xl backdrop:bg-black/70">
       <div className="flex items-center justify-between border-b border-white/5 p-6"><h2 id="withdraw-title" className="text-xl font-bold">Withdraw USDT</h2><button disabled={busy} aria-label="Close withdrawal" onClick={() => setOpen(false)}><MdClose size={24} /></button></div>
-      <form onSubmit={submitWithdrawal} className="space-y-5 p-6"><p className="text-sm text-on-surface-variant">Available: <strong className="text-secondary">{summary?.available} USDT</strong></p><p className="break-all rounded-xl bg-white/5 p-3 font-mono text-xs">TRON / {summary?.withdrawalAddress}</p>{dialogError && <p role="alert" className="text-sm text-amber-200">{dialogError}</p>}<label className="block space-y-2 text-sm"><span>Amount (USDT)</span><input className={input} value={amount} onChange={e => setAmount(e.target.value)} disabled={!!pending || busy} inputMode="decimal" pattern="(0|[1-9][0-9]*)(\.[0-9]{1,6})?" required placeholder="0.000000" /></label>{pending && <label className="block space-y-2 text-sm"><span>Email verification code</span><input className={input} value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ""))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoComplete="one-time-code" /><span className="block text-xs leading-5 text-on-surface-variant">The code confirms this exact amount, wallet, withdrawal request. If a response is lost, retry this request.</span></label>}<button className={button + " w-full"} disabled={busy}>{busy ? "Please wait..." : pending ? "Confirm withdrawal" : "Send verification code"}</button>{pending && !pending.submitted && <button type="button" disabled={busy} onClick={() => { sessionStorage.removeItem(storageKey); setPending(null); setOtp(""); }} className="w-full text-sm text-on-surface-variant">Change amount</button>}{pending && <button type="button" disabled={busy} onClick={() => void resendCode()} className="w-full text-sm text-secondary">Resend code for this request</button>}<p className="text-xs leading-5 text-on-surface-variant">Transfers are sent as USDT on TRON. Completed blockchain transfers cannot be reversed.</p></form>
+      <form onSubmit={submitWithdrawal} className="space-y-5 p-6"><p className="text-sm text-on-surface-variant">Available: <strong className="text-secondary">{summary?.available} USDT</strong></p><p className="break-all rounded-xl bg-white/5 p-3 font-mono text-xs">TRON / {summary?.withdrawalAddress}</p>{dialogError && <p role="alert" className="text-sm text-amber-200">{dialogError}</p>}<label className="block space-y-2 text-sm"><span>Total debit (USDT)</span><input className={input} value={amount} onChange={e => setAmount(e.target.value)} disabled={!!pending || busy} inputMode="decimal" pattern="(0|[1-9][0-9]*)(\.[0-9]{1,6})?" required placeholder="0.000000" /></label>{pending?.quote && <div className="space-y-2 rounded-xl bg-white/5 p-4 text-sm"><p>Total reserved: <strong>{pending.quote.amount} USDT</strong></p><p>Network fee reserve: <strong>{pending.quote.networkFeeReserve} USDT</strong></p><p>Your wallet receives: <strong className="text-secondary">{pending.quote.payoutAmount} USDT</strong></p><p className="text-xs leading-5 text-on-surface-variant">Unused fee reserve returns to your balance after confirmation. A failed transaction may still consume network fees. Any confirmed excess cost remains payable from your balance.</p></div>}{pending && !pending.quote && <p className="text-sm text-amber-200">Resend the code to receive the network fee quote.</p>}{pending && <label className="block space-y-2 text-sm"><span>Email verification code</span><input className={input} value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ""))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoComplete="one-time-code" /><span className="block text-xs leading-5 text-on-surface-variant">The code confirms this total debit, payout, network fee reserve, wallet, and withdrawal request. If a response is lost, retry this request.</span></label>}<button className={button + " w-full"} disabled={busy || (!!pending && !pending.quote)}>{busy ? "Please wait..." : pending ? "Confirm withdrawal" : "Send verification code"}</button>{pending && !pending.submitted && <button type="button" disabled={busy} onClick={() => { sessionStorage.removeItem(storageKey); setPending(null); setOtp(""); }} className="w-full text-sm text-on-surface-variant">Change amount</button>}{pending && <button type="button" disabled={busy} onClick={() => void resendCode()} className="w-full text-sm text-secondary">Resend code for this request</button>}<p className="text-xs leading-5 text-on-surface-variant">Network fees are deducted from your entered amount. Transfers are sent as USDT on TRON. Completed blockchain transfers cannot be reversed.</p></form>
     </dialog>
   </div>;
 }

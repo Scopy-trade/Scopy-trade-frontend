@@ -99,9 +99,9 @@ export const tradeService = {
     );
   },
 
-  verifySettlement(settlementId: string, transactionHash: string, signature?: string) {
+  verifySettlement(settlementId: string, transactionHash: string) {
     return userApi.post<{ success: boolean; message: string; profitShare: ProfitShareSummary }>(
-      "/copy-trader/dashboard/profit-share/verify", { settlementId, transactionHash, ...(signature ? { signature } : {}) },
+      "/copy-trader/dashboard/profit-share/verify", { settlementId, transactionHash },
     );
   },
 };

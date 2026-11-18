@@ -6,7 +6,6 @@ import { ProfitShareSummary, tradeService } from "@/lib/api/trades";
 export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (summary: ProfitShareSummary) => void }) {
   const [summary, setSummary] = useState<ProfitShareSummary | null>(null);
   const [hash, setHash] = useState("");
-  const [signature, setSignature] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const load = useCallback(async () => {
@@ -27,10 +26,10 @@ export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (s
     if (!summary?.settlement) return;
     setBusy(true);
     try {
-      const result = await tradeService.verifySettlement(summary.settlement._id, hash.trim(), signature.trim());
+      const result = await tradeService.verifySettlement(summary.settlement._id, hash.trim());
       setSummary(result.profitShare);
       onStatusChange(result.profitShare);
-      setHash(""); setSignature(""); setMessage(result.message);
+      setHash(""); setMessage(result.message);
       window.dispatchEvent(new Event("notifications-updated"));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Payment could not be verified yet."); }
     finally { setBusy(false); }
@@ -45,16 +44,13 @@ export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (s
       {required && <p className="mt-2 text-amber-300">New copied trades are paused until your payment is confirmed.</p>}
     </div>
     {invoice && <div className="space-y-4 rounded-lg border border-white/10 p-4">
-      <p className="text-sm">Send exactly <strong>{invoice.amount} USDT</strong> using <strong>TRON (TRC-20)</strong>. Keep TRX available in your sending wallet for network fees.</p>
+      <p className="text-sm">Send exactly <strong>{invoice.amount} USDT</strong> using <strong>TRON (TRC-20)</strong>. You pay all network and exchange transfer fees separately. Ensure the full invoice amount arrives; keep TRX in your wallet for gas.</p>
       <label className="block space-y-1 text-xs text-slate-400"><span>Receiving wallet</span><input readOnly value={invoice.destinationAddress} onFocus={event => event.target.select()} className={input} /></label>
-      <label className="block space-y-1 text-xs text-slate-400"><span>Payment memo - include this exact text</span><input readOnly value={invoice.memo} onFocus={event => event.target.select()} className={input} /></label>
-      <p className="text-xs text-slate-400">We check for payment automatically. If your payment is not detected, paste its transaction hash below. This invoice amount stays fixed; fees from trades closing later may require another settlement.</p>
+      <label className="block space-y-1 text-xs text-slate-400"><span>Payment memo - include if your wallet supports it</span><input readOnly value={invoice.memo} onFocus={event => event.target.select()} className={input} /></label>
+      <p className="text-xs text-slate-400">Payments with the invoice memo are checked automatically. If your wallet or exchange cannot include a memo, submit the transaction hash below. This invoice amount stays fixed; fees from trades closing later may require another settlement.</p>
       <form className="space-y-3" onSubmit={event => { event.preventDefault(); void verify(); }}>
-        <label className="block space-y-1 text-xs text-slate-400"><span>Transaction hash</span><input required pattern="[a-fA-F0-9]{64}" maxLength={64} value={hash} onChange={event => setHash(event.target.value)} className={input} placeholder="64-character TRON transaction hash" /></label>
-        <details className="text-xs text-slate-400"><summary className="cursor-pointer">My wallet did not include a memo</summary>
-          <p className="my-2">Sign this message with the wallet that sent the payment: <code className="break-all text-slate-200">ScopyTrade settlement {invoice._id}</code>. Paste the message signature below. Contact support if your wallet or exchange cannot sign messages. A transaction hash alone cannot prove ownership of a payment without a memo.</p>
-          <label className="block space-y-1"><span>Sending wallet message signature</span><input value={signature} maxLength={200} onChange={event => setSignature(event.target.value)} className={input} /></label>
-        </details>
+        <label className="block space-y-1 text-xs text-slate-400"><span>Transaction hash</span><input required pattern="(0[xX])?[a-fA-F0-9]{64}" maxLength={66} value={hash} onChange={event => setHash(event.target.value)} className={input} placeholder="64-character TRON transaction hash" /></label>
+        <p className="text-xs text-slate-400">No wallet signature is needed. A valid payment without a memo is credited to the first account that successfully submits and claims its hash.</p>
         <button disabled={busy || !hash.trim()} className="rounded-lg bg-secondary px-4 py-2 text-sm font-bold text-on-secondary disabled:opacity-50">{busy ? "Verifying..." : "Verify payment"}</button>
       </form>
     </div>}
