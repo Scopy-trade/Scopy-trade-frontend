@@ -15,21 +15,10 @@ interface AvailableIntegrationProps {
 export function AvailableIntegration({
   name,
   id,
-  logo,
   requiresPassphrase,
   fields,
   onConnect,
 }: AvailableIntegrationProps) {
-  const getLogoUrl = (exchangeId: string) => {
-    // You can add actual logo URLs here
-    const logos: Record<string, string> = {
-      binance: "/logos/binance.svg",
-      bybit: "/logos/bybit.svg",
-      okx: "/logos/okx.svg",
-      bitget: "/logos/bitget.svg",
-    };
-    return logos[exchangeId] || `/logos/${exchangeId}.svg`;
-  };
 
   return (
     <div className="bg-surface-container-highest rounded-lg p-4 hover:bg-surface-container-highest/80 transition-colors">

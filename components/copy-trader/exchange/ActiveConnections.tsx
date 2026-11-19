@@ -4,9 +4,8 @@ import { RiFlashlightLine, RiEditLine, RiCloseLine } from "react-icons/ri";
 
 const availableExchanges = [
   { id: "okx", name: "OKX Terminal" },
-  { id: "coinbase", name: "Coinbase Pro" },
+  { id: "bitget", name: "Bitget Futures" },
   { id: "bybit", name: "Bybit Derivatives" },
-  { id: "kraken", name: "Kraken" },
 ];
 
 export default function ActiveConnections() {
@@ -39,7 +38,7 @@ export default function ActiveConnections() {
             B
           </div>
           <div>
-            <h3 className="font-bold text-lg">Binance Global</h3>
+            <h3 className="font-bold text-lg">Bybit</h3>
             <div className="flex items-center gap-2 mt-1">
               <span
                 className="w-2 h-2 rounded-full"

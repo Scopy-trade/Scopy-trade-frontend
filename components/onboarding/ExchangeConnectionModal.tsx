@@ -39,29 +39,6 @@ const exchangeInstructions: Record<
     requiredPermissions: string[];
   }
 > = {
-  binance: {
-    title: "Binance API Setup Guide",
-    steps: [
-      "Log in to your Binance account",
-      "Go to API Management (hover over profile icon → API Management)",
-      "Click 'Create API' and select 'System generated'",
-      "Enter a label for your API key (e.g., 'Trading Bot')",
-      "Complete security verification (2FA/SMS)",
-      "Copy the API Key and Secret Key immediately (Secret won't be shown again)",
-      "Enable the following permissions: Enable Spot & Margin Trading",
-      "DO NOT enable Withdrawals - this is for security",
-      "Click 'Save' to confirm permissions",
-    ],
-    warnings: [
-      "Never share your Secret Key with anyone",
-      "Store your Secret Key in a secure password manager",
-      "Enable IP whitelisting for extra security",
-      "Regularly rotate your API keys",
-    ],
-    docsUrl:
-      "https://www.binance.com/en/support/faq/how-to-create-api-keys-on-binance-360002502072",
-    requiredPermissions: ["Enable Spot & Margin Trading", "Read Only"],
-  },
   bybit: {
     title: "Bybit API Setup Guide",
     steps: [
@@ -70,7 +47,7 @@ const exchangeInstructions: Record<
       "Click 'Create New Key'",
       "Select 'API Key with limited access'",
       "Enter a name for your API key",
-      "Set permissions: Enable 'Read-Write' for Spot and/or Derivatives trading",
+      "Set permissions: Enable Read-Write for derivatives Orders and Positions",
       "Complete security verification (2FA/email code)",
       "Copy both API Key and Secret (Secret shown only once)",
       "Save your API Secret in a secure location",
@@ -82,7 +59,7 @@ const exchangeInstructions: Record<
       "Keep your API Secret confidential",
     ],
     docsUrl: "https://bybit-exchange.github.io/docs/v5/intro",
-    requiredPermissions: ["Spot Trade", "Derivatives Trade", "Read-Write"],
+    requiredPermissions: ["Derivatives Orders", "Derivatives Positions", "Read-Write"],
   },
   okx: {
     title: "OKX API Setup Guide",
@@ -114,7 +91,7 @@ const exchangeInstructions: Record<
       "Click 'Create API Key'",
       "Enter a name for your API key",
       "Set a Passphrase (memorize this - required for API calls)",
-      "Select permissions: Enable 'Spot trading' and/or 'Futures trading'",
+      "Select permissions: Enable Futures Orders and Futures Positions Read/Write",
       "Complete security verification (2FA/email)",
       "Copy API Key, Secret Key, and remember your Passphrase",
       "Store all credentials in a secure location",
@@ -126,7 +103,7 @@ const exchangeInstructions: Record<
       "Use different API keys for different services",
     ],
     docsUrl: "https://www.bitget.com/api-doc/common/intro",
-    requiredPermissions: ["Spot trading", "Futures trading"],
+    requiredPermissions: ["Futures Orders Read/Write", "Futures Positions Read/Write"],
   },
 };
 

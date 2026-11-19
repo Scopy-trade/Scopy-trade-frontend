@@ -11,7 +11,7 @@ interface Exchange {
 
 const exchanges: Exchange[] = [
   {
-    name: "Binance",
+    name: "OKX",
     accentColor: "#f3ba2f",
     apiKey: "****2b41",
     connected: true,
@@ -22,7 +22,7 @@ const exchanges: Exchange[] = [
     connected: false,
   },
   {
-    name: "Kraken",
+    name: "Bitget",
     accentColor: "#5d41ff",
     apiKey: "****88f2",
     connected: true,
