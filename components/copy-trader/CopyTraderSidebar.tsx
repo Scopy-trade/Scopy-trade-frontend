@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  MdSettings,
-  MdShowChart,
-  MdSensors,
-  MdLogout,
-} from "react-icons/md";
+import { MdSettings, MdShowChart, MdSensors, MdLogout } from "react-icons/md";
 
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 
@@ -30,8 +25,16 @@ const navItems = [
     icon: MdSensors,
     href: "/dashboard/copy-trader",
   },
-  { name: "Traders I?m Copying", icon: MdSensors, href: "/dashboard/copy-trader/copying" },
-  { name: "Copy Notifications", icon: MdSensors, href: "/dashboard/copy-trader/notifications" },
+  {
+    name: "Traders I'm Copying",
+    icon: MdSensors,
+    href: "/dashboard/copy-trader/copying",
+  },
+  {
+    name: "Copy Notifications",
+    icon: MdSensors,
+    href: "/dashboard/copy-trader/notifications",
+  },
   {
     name: "Active Trades",
     icon: MdShowChart,
