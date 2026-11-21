@@ -3,10 +3,12 @@
 
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdSecurity, MdWarning } from "react-icons/md";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 import { RiExchangeLine, RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { ExchangeListItem, ConnectionSummary } from "@/lib";
 import { exchangeService } from "@/lib/api/exchanges";
+import { exchangeConnectionGuides } from "@/lib/exchangeConnectionGuides";
+import { ServerIpWhitelist } from "./ServerIpWhitelist";
 
 interface ExchangeConnectionModalProps {
   isOpen: boolean;
@@ -26,86 +28,6 @@ interface ValidationError {
   field: string;
   message: string;
 }
-
-// Exchange-specific instructions
-const exchangeInstructions: Record<
-  string,
-  {
-    title: string;
-    steps: string[];
-    warnings: string[];
-    videoUrl?: string;
-    docsUrl: string;
-    requiredPermissions: string[];
-  }
-> = {
-  bybit: {
-    title: "Bybit API Setup Guide",
-    steps: [
-      "Log in to your Bybit account",
-      "Navigate to API Management (Account & Security → API Management)",
-      "Click 'Create New Key'",
-      "Select 'API Key with limited access'",
-      "Enter a name for your API key",
-      "Set permissions: Enable Read-Write for derivatives Orders and Positions",
-      "Complete security verification (2FA/email code)",
-      "Copy both API Key and Secret (Secret shown only once)",
-      "Save your API Secret in a secure location",
-    ],
-    warnings: [
-      "Never enable withdrawal permissions",
-      "Use IP whitelisting when possible",
-      "Regularly audit your API keys",
-      "Keep your API Secret confidential",
-    ],
-    docsUrl: "https://bybit-exchange.github.io/docs/v5/intro",
-    requiredPermissions: ["Derivatives Orders", "Derivatives Positions", "Read-Write"],
-  },
-  okx: {
-    title: "OKX API Setup Guide",
-    steps: [
-      "Log in to your OKX account",
-      "Go to API (Profile → API)",
-      "Click 'Create V5 API Key'",
-      "Enter a label for your API key",
-      "Set Passphrase (you'll need this for authentication)",
-      "Select permissions: Enable 'Trade' and 'Read'",
-      "Complete security verification (2FA/SMS)",
-      "Copy API Key, Secret Key, and save your Passphrase",
-      "Important: Store all three pieces of information",
-    ],
-    warnings: [
-      "Passphrase is required for OKX API authentication",
-      "Never enable withdrawal permissions",
-      "Store API Key, Secret, and Passphrase securely",
-      "Enable IP whitelisting for production use",
-    ],
-    docsUrl: "https://www.okx.com/docs-v5/en/#rest-api",
-    requiredPermissions: ["Trade", "Read"],
-  },
-  bitget: {
-    title: "Bitget API Setup Guide",
-    steps: [
-      "Log in to your Bitget account",
-      "Navigate to API Management (Dashboard → API)",
-      "Click 'Create API Key'",
-      "Enter a name for your API key",
-      "Set a Passphrase (memorize this - required for API calls)",
-      "Select permissions: Enable Futures Orders and Futures Positions Read/Write",
-      "Complete security verification (2FA/email)",
-      "Copy API Key, Secret Key, and remember your Passphrase",
-      "Store all credentials in a secure location",
-    ],
-    warnings: [
-      "Passphrase is mandatory for Bitget API access",
-      "Never enable withdrawal permissions",
-      "Regularly rotate your API keys",
-      "Use different API keys for different services",
-    ],
-    docsUrl: "https://www.bitget.com/api-doc/common/intro",
-    requiredPermissions: ["Futures Orders Read/Write", "Futures Positions Read/Write"],
-  },
-};
 
 export function ExchangeConnectionModal({
   isOpen,
@@ -147,7 +69,7 @@ export function ExchangeConnectionModal({
 
   if (!isOpen || !exchange) return null;
 
-  const instructions = exchangeInstructions[exchange.id];
+  const instructions = exchangeConnectionGuides[exchange.id];
   const requiresPassphrase = exchange.requiresPassphrase;
 
   const validateForm = (): boolean => {
@@ -227,15 +149,15 @@ export function ExchangeConnectionModal({
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-surface-container rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+      <div role="dialog" aria-modal="true" aria-labelledby="exchange-connection-title" className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-5xl flex-col bg-surface-container rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-outline/20 bg-surface-container-highest">
+        <div className="flex shrink-0 items-center justify-between gap-3 p-4 sm:p-6 border-b border-outline/20 bg-surface-container-highest">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center">
               <RiExchangeLine aria-hidden="true" className="text-2xl text-secondary" />
             </div>
             <div>
-              <h2 className="text-xl font-bold font-headline">
+              <h2 id="exchange-connection-title" className="text-lg sm:text-xl font-bold font-headline">
                 Connect {exchange.name}
               </h2>
               <p className="text-sm text-on-surface-variant">
@@ -247,6 +169,7 @@ export function ExchangeConnectionModal({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close exchange connection"
             className="p-2 hover:bg-surface-container-highest rounded-lg transition-colors"
           >
             <MdClose className="w-5 h-5" />
@@ -254,9 +177,9 @@ export function ExchangeConnectionModal({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col md:flex-row h-full">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain md:flex-row md:overflow-hidden">
           {/* Step Toggle - Mobile */}
-          <div className="md:hidden p-4 border-b border-outline/20">
+          <div className="md:hidden shrink-0 p-4 border-b border-outline/20">
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentStep("form")}
@@ -283,7 +206,7 @@ export function ExchangeConnectionModal({
 
           {/* Form Side */}
           <div
-            className={`flex-1 p-6 overflow-y-auto ${
+            className={`min-w-0 shrink-0 p-4 sm:p-6 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain ${
               currentStep === "form" ? "block" : "hidden md:block"
             }`}
           >
@@ -450,7 +373,7 @@ export function ExchangeConnectionModal({
 
           {/* Instructions Side */}
           <div
-            className={`flex-1 bg-surface-container-lowest p-6 overflow-y-auto border-t md:border-t-0 md:border-l border-outline/20 ${
+            className={`min-w-0 shrink-0 bg-surface-container-lowest p-4 sm:p-6 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain border-t md:border-t-0 md:border-l border-outline/20 ${
               currentStep === "instructions" ? "block" : "hidden md:block"
             }`}
           >
@@ -480,20 +403,26 @@ export function ExchangeConnectionModal({
                   </ol>
                 </div>
 
-                {/* Required Permissions */}
-                <div>
-                  <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-3">
-                    Required Permissions
+                <section>
+                  <h4 className="mb-3 text-sm font-bold uppercase tracking-widest text-on-surface-variant">
+                    Before you create the key
                   </h4>
-                  <div className="space-y-1">
-                    {instructions.requiredPermissions.map((perm, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-secondary rounded-full" />
-                        <span className="text-sm text-on-surface">{perm}</span>
+                  <p className="mb-3 text-xs leading-relaxed text-on-surface-variant">
+                    Match these settings on {exchange.name}&apos;s API creation screen.
+                    Labels can vary by account or region; the official guide below shows the exchange&apos;s screenshots.
+                  </p>
+                  <dl className="divide-y divide-outline/20 rounded-lg border border-outline/20 px-3">
+                    {instructions.fields.map((field) => (
+                      <div key={field.label} className="py-3">
+                        <dt className="text-xs font-bold text-on-surface-variant">{field.label}</dt>
+                        <dd className="mt-1 text-sm font-semibold text-on-surface">{field.value}</dd>
+                        {field.help && <dd className="mt-1 text-xs leading-relaxed text-on-surface-variant">{field.help}</dd>}
                       </div>
                     ))}
-                  </div>
-                </div>
+                  </dl>
+                </section>
+
+                <ServerIpWhitelist key={exchange.id} ipField={instructions.ipField} />
 
                 {/* Warnings */}
                 <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
@@ -522,7 +451,7 @@ export function ExchangeConnectionModal({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors"
                   >
-                    View Official Documentation
+                    View official setup guide & screenshots
                     <FaArrowRight className="w-3 h-3" />
                   </a>
                 </div>
@@ -531,8 +460,8 @@ export function ExchangeConnectionModal({
                 <div className="flex items-start gap-2 p-3 bg-info/10 rounded-lg">
                   <MdInfo className="w-4 h-4 text-info mt-0.5" />
                   <p className="text-xs text-on-surface-variant">
-                    After creating your API keys, return to the &quot;API Form&quot; tab
-                    to enter your credentials and connect your account.
+                    After creating your API keys, enter them in the API form
+                    to connect your account. On mobile, select the API Form tab above.
                   </p>
                 </div>
               </div>
@@ -549,35 +478,16 @@ export function ExchangeConnectionModal({
           </div>
         </div>
 
-        {/* Footer with navigation buttons (desktop) */}
-        <div className="hidden md:flex items-center justify-between p-4 border-t border-outline/20 bg-surface-container-highest">
-          <button
-            onClick={() =>
-              setCurrentStep(currentStep === "form" ? "instructions" : "form")
-            }
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
-          >
-            {currentStep === "form" ? (
-              <>
-                <MdInfo className="w-4 h-4" />
-                View Instructions
-              </>
-            ) : (
-              <>
-                <FaArrowLeft className="w-4 h-4" />
-                Back to Form
-              </>
-            )}
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-outline/20 bg-surface-container-highest p-4">
+          <button type="button" onClick={onClose}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high">
+            Close
           </button>
-          {currentStep === "form" && (
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="px-6 py-2 bg-secondary text-on-secondary rounded-lg font-medium text-sm hover:bg-secondary/90 transition-colors disabled:opacity-50"
-            >
-              Connect Exchange
-            </button>
-          )}
+          <button type="button" onClick={() => setCurrentStep(currentStep === "form" ? "instructions" : "form")}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-secondary hover:bg-secondary/10 md:hidden">
+            {currentStep === "form" ? "View setup guide" : "Enter API credentials"}
+          </button>
+          <p className="hidden text-xs text-on-surface-variant md:block">Create your key using the guide, then connect with the API form.</p>
         </div>
       </div>
     </div>

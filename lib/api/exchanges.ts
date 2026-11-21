@@ -3,9 +3,21 @@ import {
   ExchangeConnectionsResponse,
   SupportedExchangesResponse,
 } from "..";
-import { userApi } from "./client";
+import { api, userApi } from "./client";
 
 export const exchangeService = {
+  async getServerIps(signal?: AbortSignal): Promise<string[]> {
+    const { data } = await api.get<{ success: boolean; ips: string[] }>(
+      "/exchanges/server-ip",
+      { signal, timeout: 10000 },
+    );
+    if (!data.success || !Array.isArray(data.ips) || !data.ips.length ||
+      data.ips.some((ip) => typeof ip !== "string" || !ip.trim())) {
+      throw new Error("Server IP addresses are unavailable");
+    }
+    return data.ips;
+  },
+
   getUserExchanges() {
     return userApi.get<SupportedExchangesResponse>("/exchanges");
   },
