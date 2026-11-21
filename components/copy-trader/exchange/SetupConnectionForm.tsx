@@ -5,14 +5,14 @@ import { RiKey2Line, RiCheckLine, RiCloseLine } from "react-icons/ri";
 import { useState } from "react";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 
-const exchanges = ["Binance Global", "OKX", "Coinbase", "Bybit"];
+const exchanges = ["Bybit", "OKX", "Bitget"];
 
 export default function SetupConnectionForm() {
-  const [selectedExchange, setSelectedExchange] = useState("Binance Global");
+  const [selectedExchange, setSelectedExchange] = useState("Bybit");
   const [apiKey, setApiKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
   const [showSecretKey, setShowSecretKey] = useState(false);
-  const [spotTrading, setSpotTrading] = useState(true);
+  const [futuresTrading, setFuturesTrading] = useState(true);
   const [readBalance, setReadBalance] = useState(true);
 
   return (
@@ -127,21 +127,21 @@ export default function SetupConnectionForm() {
             Required Permissions
           </label>
           <div className="space-y-3">
-            {/* Spot Trading */}
+            {/* Futures Trading */}
             <label className="flex items-center gap-3 cursor-pointer">
               <div
                 className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all"
                 style={{
-                  backgroundColor: spotTrading ? "#4edea3" : "#222a3d",
-                  border: spotTrading ? "none" : "1px solid #44474d",
+                  backgroundColor: futuresTrading ? "#4edea3" : "#222a3d",
+                  border: futuresTrading ? "none" : "1px solid #44474d",
                 }}
-                onClick={() => setSpotTrading(!spotTrading)}
+                onClick={() => setFuturesTrading(!futuresTrading)}
               >
-                {spotTrading && (
+                {futuresTrading && (
                   <span className="text-xs font-bold" style={{ color: "#003824" }}><RiCheckLine aria-hidden="true" className="inline-block align-middle" /></span>
                 )}
               </div>
-              <span className="text-sm font-medium">Enable Spot Trading</span>
+              <span className="text-sm font-medium">Enable Futures Trading</span>
             </label>
 
             {/* Read Balance */}

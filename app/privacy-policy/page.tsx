@@ -116,7 +116,7 @@ const sections: LegalSection[] = [
         <p>We may share information with:</p>
         <ul>
           <li>
-            supported exchanges, including Binance, Bybit, OKX, and Bitget, when
+            supported exchanges, including Bybit, OKX, and Bitget, when
             needed to validate a connection or carry out an instruction;
           </li>
           <li>

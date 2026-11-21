@@ -1,40 +1,7 @@
 const exchanges = [
-  {
-    initial: "B",
-    name: "Binance",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-  },
-  {
-    initial: "O",
-    name: "OKX",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-  },
-  {
-    initial: "C",
-    name: "Coinbase",
-    color: "text-blue-300",
-    bg: "bg-blue-500/10",
-  },
-  {
-    initial: "K",
-    name: "KuCoin",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    initial: "B",
-    name: "Bybit",
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
-  },
-  {
-    initial: "G",
-    name: "Gate.io",
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
-  },
+  { initial: "B", name: "Bybit", color: "text-orange-400", bg: "bg-orange-500/10" },
+  { initial: "O", name: "OKX", color: "text-blue-400", bg: "bg-blue-500/10" },
+  { initial: "B", name: "Bitget", color: "text-emerald-400", bg: "bg-emerald-500/10" },
 ];
 
 export default function ExchangesSection() {
@@ -85,7 +52,7 @@ export default function ExchangesSection() {
             </div>
 
             <p className="text-xs text-[#8f9098] mt-4 font-medium">
-              Roadmap target: 12 additional exchange integrations
+              Supported futures exchanges: Bybit, OKX and Bitget
             </p>
           </div>
 

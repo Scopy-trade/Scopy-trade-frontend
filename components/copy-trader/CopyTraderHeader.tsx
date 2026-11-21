@@ -1,6 +1,7 @@
 "use client";
 
 import { MdAccountBalanceWallet, MdMenu } from "react-icons/md";
+import NotificationBell from "./NotificationBell";
 import BrandLogo from "@/components/brand/BrandLogo";
 import { getAccountInitials, useAuth } from "@/components/auth/AuthContext";
 
@@ -14,7 +15,7 @@ export default function CopyTraderHeader({
   const { account } = useAuth();
 
   return (
-    <header className="sticky md:hidden top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
+    <header className="sticky top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
       {/* Left Section - Mobile Menu Button */}
       <div className="flex items-center gap-3">
         {/* Mobile Menu Button - Always visible on mobile */}
@@ -31,6 +32,7 @@ export default function CopyTraderHeader({
 
       {/* Right Section - User Actions */}
       <div className="flex items-center gap-3 md:gap-5">
+        <NotificationBell />
         <button className="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full border border-white/5 hover:border-primary/20 transition-all">
           <MdAccountBalanceWallet className="text-secondary text-base" />
           <span className="font-bold text-xs tracking-tight hidden sm:inline">

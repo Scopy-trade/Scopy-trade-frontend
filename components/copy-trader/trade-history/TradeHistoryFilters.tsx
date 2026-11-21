@@ -35,10 +35,9 @@ export default function TradeHistoryFilters() {
         style={{ backgroundColor: "#222a3d", color: "#dae2fd", border: "none" }}
       >
         <option>All Exchanges</option>
-        <option>Binance</option>
         <option>Bybit</option>
         <option>OKX</option>
-        <option>Kraken</option>
+        <option>Bitget</option>
       </select>
 
       {/* Asset */}
