@@ -26,7 +26,7 @@ export default function ActiveTradesPage() {
               <MdSettings /> Exchanges
             </button>
             <button type="button" disabled={tradingPaused} title={tradingPaused ? TRADING_PAUSED_MESSAGE : undefined} onClick={() => setOpenTrade(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 font-semibold text-on-secondary disabled:cursor-not-allowed disabled:opacity-45">
-              <MdAdd size={20} /> {tradingPaused ? "Trading paused" : "Open trade"}
+              <MdAdd size={20} /> Open trade
             </button>
           </div>
         )}
