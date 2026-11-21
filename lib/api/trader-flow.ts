@@ -17,7 +17,9 @@ const copy = "/copy-trader/dashboard", pro = "/pro-trader/dashboard";
 export const traderFlow = {
   discover: (page = 1) => userApi.get<{ traders: TraderProfile[]; page: number; pages: number }>(`${copy}/traders`, { params: { page } }),
   profile: (id: string) => userApi.get<{ trader: TraderProfile }>(`${copy}/traders/${id}`),
-  start: (id: string, exchangeConnectionId: string, allocation: number) => userApi.post<{ message: string }>(`${copy}/traders/${id}/copy`, { exchangeConnectionId, allocation }),
+  start: async (id: string, exchangeConnectionId: string, allocation: number) => {
+    return userApi.post<{ message: string }>(`${copy}/traders/${id}/copy`, { exchangeConnectionId, allocation });
+  },
   stop: (id: string) => userApi.delete<{ message: string }>(`${copy}/traders/${id}/copy`),
   subscriptions: () => userApi.get<{ subscriptions: Subscription[] }>(`${copy}/subscriptions`),
   copiers: () => userApi.get<{ copiers: Copier[] }>(`${pro}/copiers`),

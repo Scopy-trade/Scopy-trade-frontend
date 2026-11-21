@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth/AuthContext";
 import CopyTraderSidebar from "@/components/copy-trader/CopyTraderSidebar";
 import CopyTraderHeader from "@/components/copy-trader/CopyTraderHeader";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
+import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
 
 function CopyTraderDashboardShell({
   children,
@@ -90,7 +91,7 @@ function CopyTraderDashboardShell({
           ${getMainMargin()}
         `}
       >
-        <div className="min-h-full flex flex-col">{children}</div>
+        <div className="min-h-full flex flex-col"><div className="px-4 pt-4 md:px-8"><TradingPauseNotice /></div>{children}</div>
       </main>
 
       <ExchangeSettingsModal

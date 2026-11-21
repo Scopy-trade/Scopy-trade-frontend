@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { GetUserResponse, UserManagementUser } from "@/lib";
 import { adminUserService } from "@/lib/api/admin";
 
-type UserStatus = "active" | "suspended" | "waitlist";
+type UserStatus = NonNullable<UserManagementUser["status"]>;
 type UserRole = "ProTrader" | "CopyTrader";
 type RoleFilter = "all" | UserRole;
 type StatusFilter = "all" | UserStatus;
@@ -27,12 +27,14 @@ const roleFilters: Array<{ value: RoleFilter; label: string }> = [
 
 const statusStyle: Record<UserStatus, string> = {
   active: "text-[#4edea3]",
+  live: "text-[#4edea3]",
   suspended: "text-[#ffb4ab]",
   waitlist: "text-amber-300",
 };
 
 const statusDot: Record<UserStatus, string> = {
   active: "bg-[#4edea3]",
+  live: "bg-[#4edea3]",
   suspended: "bg-[#ffb4ab]",
   waitlist: "bg-amber-300",
 };
@@ -213,12 +215,12 @@ function UserDetailsModal({
                 disabled={actionLoading}
                 onClick={() => onToggleStatus(user)}
                 className={`rounded-lg px-4 py-2 text-xs font-bold disabled:opacity-50 ${
-                  status === "active"
+                  (status === "active" || status === "live")
                     ? "bg-[#93000a]/30 text-[#ffb4ab] hover:bg-[#93000a]/50"
                     : "bg-[#00311f] text-[#4edea3] hover:bg-[#00472d]"
                 }`}
               >
-                {actionLoading ? "Updating..." : status === "active" ? "Suspend user" : "Activate user"}
+                {actionLoading ? "Updating..." : (status === "active" || status === "live") ? "Suspend user" : "Activate user"}
               </button>
             </div>
           </div>
@@ -305,7 +307,7 @@ export default function UserManagementPage() {
   }, []);
 
   const toggleUserStatus = useCallback(async (user: UserManagementUser) => {
-    const isActive = user.status === "active";
+    const isActive = (user.status === "active" || user.status === "live");
     if (!window.confirm(`${isActive ? "Suspend" : "Activate"} this user?`)) return;
     const userId = user._id || user.id;
     setActionLoading(userId);
@@ -370,6 +372,7 @@ export default function UserManagementPage() {
             >
               <option value="all">All statuses</option>
               <option value="active">Active</option>
+              <option value="live">Live</option>
               <option value="waitlist">Waitlist</option>
               <option value="suspended">Suspended</option>
             </select>
@@ -447,9 +450,9 @@ export default function UserManagementPage() {
                           type="button"
                           disabled={actionLoading === user.id}
                           onClick={() => { setOpenMenuId(null); void toggleUserStatus(user); }}
-                          className={`w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-white/5 disabled:opacity-50 ${user.status === "active" ? "text-[#ffb4ab]" : "text-[#4edea3]"}`}
+                          className={`w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-white/5 disabled:opacity-50 ${(user.status === "active" || user.status === "live") ? "text-[#ffb4ab]" : "text-[#4edea3]"}`}
                         >
-                          {user.status === "active" ? "Suspend" : "Activate"}
+                          {(user.status === "active" || user.status === "live") ? "Suspend" : "Activate"}
                         </button>
                       </div>
                     )}

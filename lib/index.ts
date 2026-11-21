@@ -167,7 +167,7 @@ export interface User {
   role?: UserRole;
   traderID?: string;
   hasOnboarded?: boolean;
-  status?: "active" | "suspended" | "waitlist";
+  status?: "active" | "suspended" | "waitlist" | "live";
 }
 
 export interface AuthResponse {
@@ -233,7 +233,7 @@ export interface UserManagementUser extends User {
   uid?: string;
   name?: string;
   initials?: string;
-  status?: "active" | "suspended" | "waitlist";
+  status?: "active" | "suspended" | "waitlist" | "live";
   trades?: string;
   lastActive?: string;
   location?: string;

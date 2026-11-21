@@ -1,12 +1,15 @@
 "use client";
 
+import { useTradingAvailability } from "@/lib/hooks/useTradingAvailability";
 import { useState } from "react";
 import { MdAdd, MdSettings } from "react-icons/md";
 import TradeListScreen from "@/components/trades/TradeListScreen";
 import OpenTradeModal from "@/components/pro-trader/signalsPage/OpenTradeModal";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
+import { TRADING_PAUSED_MESSAGE } from "@/lib/tradingAvailability";
 
 export default function ActiveTradesPage() {
+  const { tradingPaused } = useTradingAvailability();
   const [openTrade, setOpenTrade] = useState(false);
   const [exchangeSettings, setExchangeSettings] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -22,8 +25,8 @@ export default function ActiveTradesPage() {
             <button type="button" onClick={() => setExchangeSettings(true)} className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2.5 text-slate-300">
               <MdSettings /> Exchanges
             </button>
-            <button type="button" onClick={() => setOpenTrade(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 font-semibold text-on-secondary">
-              <MdAdd size={20} /> Open trade
+            <button type="button" disabled={tradingPaused} title={tradingPaused ? TRADING_PAUSED_MESSAGE : undefined} onClick={() => setOpenTrade(true)} className="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 font-semibold text-on-secondary disabled:cursor-not-allowed disabled:opacity-45">
+              <MdAdd size={20} /> {tradingPaused ? "Trading paused" : "Open trade"}
             </button>
           </div>
         )}

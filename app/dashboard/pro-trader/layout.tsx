@@ -4,6 +4,7 @@ import DashboardHeader from "@/components/pro-trader/DashboardHeader";
 import DashboardSidebar from "@/components/pro-trader/DashboardSidebar";
 import { useCallback, useEffect, useState } from "react";
 import { AuthProvider } from "@/components/auth/AuthContext";
+import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
 
 function ProTraderDashboardShell({
   children,
@@ -90,7 +91,7 @@ function ProTraderDashboardShell({
           pt-16 md:pt-4
         `}
       >
-        <div className="p-4 md:p-8">{children}</div>
+        <div className="p-4 md:p-8"><TradingPauseNotice />{children}</div>
       </main>
     </div>
   );

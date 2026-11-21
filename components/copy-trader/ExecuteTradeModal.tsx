@@ -1,9 +1,12 @@
 "use client";
 
+import { useTradingAvailability } from "@/lib/hooks/useTradingAvailability";
 import { useEffect, useMemo, useState } from "react";
 import { ActiveProTrade, ExchangeBalance } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import { MdClose } from "react-icons/md";
+
+import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
 
 export default function ExecuteTradeModal({
   trade,
@@ -14,6 +17,7 @@ export default function ExecuteTradeModal({
   onClose: () => void;
   onExecuted: () => void;
 }) {
+  const { tradingPaused } = useTradingAvailability();
   const [balances, setBalances] = useState<ExchangeBalance[]>([]);
   const [connectionId, setConnectionId] = useState("");
   const [balance, setBalance] = useState("");
@@ -22,6 +26,7 @@ export default function ExecuteTradeModal({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (tradingPaused) return;
     void tradeService.getBalances()
       .then((response) => {
         const usable = response.balances.filter((item) => item.status === "ok");
@@ -33,7 +38,7 @@ export default function ExecuteTradeModal({
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load exchanges"))
       .finally(() => setLoadingBalances(false));
-  }, []);
+  }, [tradingPaused]);
 
   const selected = useMemo(
     () => balances.find((item) => item.connectionId === connectionId),
@@ -78,6 +83,7 @@ export default function ExecuteTradeModal({
           <button type="button" onClick={onClose} className="p-2 text-slate-400 hover:text-white"><MdClose size={22} /></button>
         </div>
 
+        <TradingPauseNotice />
         {error && <p className="mb-4 p-3 rounded-lg bg-tertiary/10 text-tertiary text-sm">{error}</p>}
 
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Connected exchange</label>
@@ -104,11 +110,11 @@ export default function ExecuteTradeModal({
 
         <button
           type="button"
-          disabled={submitting || loadingBalances || !balances.length}
+          disabled={tradingPaused || submitting || loadingBalances || !balances.length}
           onClick={() => void confirm()}
           className="w-full mt-6 py-3.5 rounded-xl bg-secondary text-on-secondary font-bold disabled:opacity-45"
         >
-          {submitting ? "Opening copy trade..." : "Confirm copy trade"}
+          {tradingPaused ? "Trading paused" : submitting ? "Opening copy trade..." : "Confirm copy trade"}
         </button>
       </div>
     </div>

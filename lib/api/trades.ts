@@ -56,7 +56,7 @@ export const tradeService = {
     return userApi.get<{ success: boolean; trade: ActiveProTrade }>(`/trades/${tradeId}`);
   },
 
-  openProTrade(data: OpenProTradeData) {
+  async openProTrade(data: OpenProTradeData) {
     return userApi.post<TradeMutationResponse>(
       "/pro-trader/dashboard/trades",
       data,
@@ -79,7 +79,7 @@ export const tradeService = {
     );
   },
 
-  copyTrade(sourceTradeId: string, exchangeConnectionId: string, balance: number) {
+  async copyTrade(sourceTradeId: string, exchangeConnectionId: string, balance: number) {
     return userApi.post<TradeMutationResponse>("/trades", {
       sourceTradeId,
       exchangeConnectionId,
