@@ -121,9 +121,15 @@ export default function RegisterForm() {
         role,
         sponsored: role === "CopyTrader" ? sponsored : undefined,
       });
-      // Temporarily skip email verification and go directly to the waitlist.
-      // window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
-      window.location.href = "/waitlist?registered=true";
+      // Registration does not issue session cookies; sign in before connecting an exchange.
+      try {
+        await authAPI.login({ email, password });
+      } catch {
+        setError("Your account was created, but automatic sign-in failed. Please sign in to connect your exchange.");
+        setIsLoading(false);
+        return;
+      }
+      window.location.replace("/onboarding");
     } catch (err: unknown) {
       let msg = "Registration failed. Please try again.";
       if (

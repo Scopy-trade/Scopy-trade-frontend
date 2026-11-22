@@ -20,8 +20,8 @@ export default function VerifyEmailForm() {
     if (!email) return setError("Return to registration and enter your email address.");
     setLoading(true); setError(""); setMessage("");
     try {
-      const status = await authAPI.verifySignup(email, otp);
-      window.location.href = status === "waitlist" ? "/waitlist?registered=true" : "/login?registered=true";
+      await authAPI.verifySignup(email, otp);
+      window.location.href = "/login?registered=true";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verification failed");
       setLoading(false);

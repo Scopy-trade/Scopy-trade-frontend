@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import BrandingPanel from "@/components/auth/register/BrandingPanel";
 import { ExchangeSettings } from "@/components/onboarding/ExchangeSettings";
 import { exchangeService } from "@/lib/api/exchanges";
+import { authAPI } from "@/lib/api/client";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     setHasClickedContinue(true);
 
     // Check if there are connections before proceeding
@@ -56,8 +57,21 @@ export default function OnboardingPage() {
       return;
     }
 
-    // Navigate to dashboard
-    router.push("/dashboard/copy-trader");
+    setIsConnecting(true);
+    try {
+      const user = await authAPI.getUser();
+      router.push(
+        user.role === "ProTrader"
+          ? "/dashboard/pro-trader"
+          : "/dashboard/copy-trader",
+      );
+    } catch {
+      window.dispatchEvent(new CustomEvent("show-toast", {
+        detail: { message: "Could not load your account. Please try again.", type: "error" },
+      }));
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   return (
