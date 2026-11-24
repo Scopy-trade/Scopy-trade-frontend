@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ProfitShareSummary, tradeService } from "@/lib/api/trades";
 
-export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (summary: ProfitShareSummary) => void }) {
+export default function ProfitShareCard({ onStatusChange }: { onStatusChange?: (summary: ProfitShareSummary) => void }) {
   const [summary, setSummary] = useState<ProfitShareSummary | null>(null);
   const [hash, setHash] = useState("");
   const [busy, setBusy] = useState(false);
@@ -11,7 +11,7 @@ export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (s
   const load = useCallback(async () => {
     const result = await tradeService.getProfitShare();
     setSummary(result.profitShare);
-    onStatusChange(result.profitShare);
+    onStatusChange?.(result.profitShare);
   }, [onStatusChange]);
   useEffect(() => {
     async function refresh() {
@@ -28,7 +28,7 @@ export default function ProfitShareCard({ onStatusChange }: { onStatusChange: (s
     try {
       const result = await tradeService.verifySettlement(summary.settlement._id, hash.trim());
       setSummary(result.profitShare);
-      onStatusChange(result.profitShare);
+      onStatusChange?.(result.profitShare);
       setHash(""); setMessage(result.message);
       window.dispatchEvent(new Event("notifications-updated"));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Payment could not be verified yet."); }
