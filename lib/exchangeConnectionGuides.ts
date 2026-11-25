@@ -57,8 +57,10 @@ export const exchangeConnectionGuides: Record<string, ExchangeConnectionGuide> =
     docsUrl: "https://www.okx.com/help/api-faq",
   },
   bitget: {
-    title: "Create your Bitget API key",
+    title: "Set up Bitget for ScopyTrade",
     steps: [
+      "Before connecting, open Bitget USDT-M Futures. On the website, open Preference Settings > Position Mode; in the app, open the Futures menu > Futures settings > Position Mode. Select One-way Mode.",
+      "For this ScopyTrade integration, use Single-asset Mode and select Isolated margin for each USDT-M Futures pair you plan to trade.",
       "On the Bitget website, open your profile menu and choose API keys (or API). Select Create API key.",
       "Choose System-generated API key. Fill in the key configuration using the settings below.",
       "Select Next and complete the security verification requested by Bitget.",
@@ -73,7 +75,12 @@ export const exchangeConnectionGuides: Record<string, ExchangeConnectionGuide> =
       { label: "Withdrawal / Transfer", value: "Leave disabled" },
     ],
     ipField: "the IP address / Bind IP field in the key configuration form",
-    warnings: ["Choose a system-generated key; user-generated RSA keys do not work with this form.", "Never enable withdrawal or transfer access. Keep the API key, secret and passphrase secure."],
+    warnings: [
+      "Bitget defaults to Hedge Mode. ScopyTrade requires One-way Mode, Single-asset Mode and Isolated margin to open pro or copied trades. A successful API connection does not confirm these trading settings.",
+      "Changing the USDT-M Futures position mode affects all pairs in that futures account. Bitget may prevent switching while positions or pending orders exist; review them in Bitget before changing modes.",
+      "Choose a system-generated key; user-generated RSA keys do not work with this form.",
+      "Never enable withdrawal or transfer access. Keep the API key, secret and passphrase secure.",
+    ],
     docsUrl: "https://www.bitget.com/academy/trade-crypto-on-bitget-using-twm-one",
   },
 };

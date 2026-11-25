@@ -5,6 +5,7 @@ import DashboardSidebar from "@/components/pro-trader/DashboardSidebar";
 import { useCallback, useEffect, useState } from "react";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
+import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
 
 function ProTraderDashboardShell({
   children,
@@ -14,6 +15,7 @@ function ProTraderDashboardShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isExchangeModalOpen, setIsExchangeModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -78,6 +80,7 @@ function ProTraderDashboardShell({
         isMobile={isMobile}
         onToggle={handleSidebarToggle}
         onCollapse={handleSidebarCollapse}
+        onOpenExchangeSettings={() => setIsExchangeModalOpen(true)}
       />
 
       <DashboardHeader
@@ -93,6 +96,10 @@ function ProTraderDashboardShell({
       >
         <div className="p-4 md:p-8"><TradingPauseNotice />{children}</div>
       </main>
+      <ExchangeSettingsModal
+        isOpen={isExchangeModalOpen}
+        onClose={() => setIsExchangeModalOpen(false)}
+      />
     </div>
   );
 }

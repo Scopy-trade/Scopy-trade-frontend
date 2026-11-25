@@ -9,6 +9,7 @@ import {
   MdShowChart,
   MdLogout,
   MdHistory,
+  MdCable,
 } from "react-icons/md";
 
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
@@ -48,6 +49,7 @@ interface SidebarProps {
   isMobile: boolean;
   onToggle: () => void;
   onCollapse: () => void;
+  onOpenExchangeSettings: () => void;
 }
 
 export default function DashboardSidebar({
@@ -56,6 +58,7 @@ export default function DashboardSidebar({
   isMobile,
   onToggle,
   onCollapse,
+  onOpenExchangeSettings,
 }: SidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuth();
@@ -179,6 +182,18 @@ export default function DashboardSidebar({
               </Link>
             );
           })}
+          <button
+            type="button"
+            onClick={() => {
+              if (isMobile) onToggle();
+              onOpenExchangeSettings();
+            }}
+            title={isCollapsed && !isMobile ? "Exchange Settings" : undefined}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-400 hover:text-slate-100 hover:bg-surface-container transition-all duration-200 active:scale-[0.98] group ${isCollapsed && !isMobile ? "md:justify-center" : ""}`}
+          >
+            <MdCable className="text-xl transition-transform group-hover:scale-110" />
+            {(!isCollapsed || isMobile) && <span>Exchange Settings</span>}
+          </button>
         </nav>
 
         {/* Profile Button */}
