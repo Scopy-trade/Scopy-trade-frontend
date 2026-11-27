@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth/AuthContext";
 import CopyTraderSidebar from "@/components/copy-trader/CopyTraderSidebar";
 import CopyTraderHeader from "@/components/copy-trader/CopyTraderHeader";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
+import TraderAccountActions from "@/components/dashboard/TraderAccountActions";
 import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
 
 function CopyTraderDashboardShell({
@@ -71,7 +72,7 @@ function CopyTraderDashboardShell({
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-surface-container-lowest">
+    <div className="h-dvh flex flex-col overflow-hidden bg-surface-container-lowest">
       <CopyTraderSidebar
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
@@ -87,11 +88,11 @@ function CopyTraderDashboardShell({
 
       <main
         className={`
-          h-full overflow-y-auto transition-all duration-300 ease-in-out
+          min-h-0 flex-1 overflow-y-auto transition-all duration-300 ease-in-out
           ${getMainMargin()}
         `}
       >
-        <div className="min-h-full flex flex-col"><div className="px-4 pt-4 md:px-8"><TradingPauseNotice /></div>{children}</div>
+        <div className="min-h-full flex flex-col"><div className="hidden md:flex justify-end px-4 py-3 md:px-8"><TraderAccountActions scope="copy" /></div><div className="px-4 pt-4 md:px-8"><TradingPauseNotice /></div>{children}</div>
       </main>
 
       <ExchangeSettingsModal

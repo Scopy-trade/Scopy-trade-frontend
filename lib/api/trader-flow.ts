@@ -24,6 +24,6 @@ export const traderFlow = {
   subscriptions: () => userApi.get<{ subscriptions: Subscription[] }>(`${copy}/subscriptions`),
   copiers: () => userApi.get<{ copiers: Copier[] }>(`${pro}/copiers`),
   ranks: () => userApi.get<{ ranks: Rank[]; trader: TraderProfile }>(`${pro}/ranks`),
-  notifications: (page = 1) => userApi.get<{ notifications: CopyNotice[]; unread: number; pages: number }>(`${copy}/notifications`, { params: { page } }),
-  read: (id: string) => userApi.patch(`${copy}/notifications/${id}/read`),
+  notifications: (page = 1, scope: "copy" | "pro" = "copy") => userApi.get<{ notifications: CopyNotice[]; unread: number; pages: number }>(`${scope === "pro" ? pro : copy}/notifications`, { params: { page } }),
+  read: (id: string, scope: "copy" | "pro" = "copy") => userApi.patch(`${scope === "pro" ? pro : copy}/notifications/${id}/read`),
 };

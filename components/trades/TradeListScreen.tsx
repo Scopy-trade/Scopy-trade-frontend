@@ -5,6 +5,8 @@ import { ActiveProTrade, TradeOwner } from "@/lib";
 import { tradeService } from "@/lib/api/trades";
 import { adminTradeService } from "@/lib/api/admin";
 import { useTradeUpdates } from "@/lib/hooks/useTradeUpdates";
+import { useSettlementSummary } from "@/lib/hooks/useSettlementSummary";
+import Link from "next/link";
 import TradeDetailsModal from "@/components/pro-trader/signalsPage/TradeDetailsModal";
 
 type Scope = "pro" | "copy" | "admin";
@@ -46,6 +48,7 @@ export default function TradeListScreen({
   refreshKey?: number;
 }) {
   const [trades, setTrades] = useState<ActiveProTrade[]>([]);
+  const { summary: settlement, error: settlementError } = useSettlementSummary(scope === "copy" && mode === "history");
   const [selected, setSelected] = useState<ActiveProTrade | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -179,7 +182,7 @@ export default function TradeListScreen({
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-white/5 bg-surface-container-low p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Matching trades</p><p className="mt-2 text-3xl font-bold">{totals.count}</p></div>
         <div className="rounded-xl border border-white/5 bg-surface-container-low p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{mode === "active" ? "Live positions" : "Page net realized P&L"}</p><p className={`mt-2 text-3xl font-bold ${mode === "history" && totals.profit < 0 ? "text-tertiary" : "text-secondary"}`}>{mode === "active" ? totals.count : `${totals.profit.toFixed(2)} USDT`}</p></div>
-        <div className="rounded-xl border border-white/5 bg-surface-container-low p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{scope === "copy" ? "Winning trades" : "Copy executions on page"}</p><p className="mt-2 text-3xl font-bold">{scope === "copy" ? trades.filter((trade) => trade.tradeResult === "profit").length : totals.copies}</p></div>
+        {scope === "copy" && mode === "history" ? <Link href="/dashboard/copy-trader#settlement" className="rounded-xl border border-amber-400/20 bg-surface-container-low p-5 hover:border-amber-400/40"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Settlement amount owed</p><p className="mt-2 text-3xl font-bold text-amber-300">{settlementError ? "Unavailable" : settlement ? `${Number(settlement.pendingAmount).toFixed(2)} USDT` : "Loading…"}</p><p className="mt-2 text-xs text-slate-400">Accrued profit-share fees payable by you. Your trading funds remain on your exchange.</p></Link> : <div className="rounded-xl border border-white/5 bg-surface-container-low p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{scope === "copy" ? "Winning trades" : "Copy executions on page"}</p><p className="mt-2 text-3xl font-bold">{scope === "copy" ? trades.filter((trade) => trade.tradeResult === "profit").length : totals.copies}</p></div>}
       </div>
 
       {scope === "admin" && (

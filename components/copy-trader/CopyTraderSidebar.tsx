@@ -31,11 +31,6 @@ const navItems = [
     href: "/dashboard/copy-trader/copying",
   },
   {
-    name: "Copy Notifications",
-    icon: MdSensors,
-    href: "/dashboard/copy-trader/notifications",
-  },
-  {
     name: "Active Trades",
     icon: MdShowChart,
     href: "/dashboard/copy-trader/active-trades",

@@ -1,54 +1,11 @@
 "use client";
-
-import { MdAccountBalanceWallet, MdMenu } from "react-icons/md";
-import NotificationBell from "./NotificationBell";
+import { MdMenu } from "react-icons/md";
 import BrandLogo from "@/components/brand/BrandLogo";
-import { getAccountInitials, useAuth } from "@/components/auth/AuthContext";
+import TraderAccountActions from "@/components/dashboard/TraderAccountActions";
 
-interface CopyTraderHeaderProps {
-  onToggle: () => void;
-}
-
-export default function CopyTraderHeader({
-  onToggle,
-}: CopyTraderHeaderProps) {
-  const { account } = useAuth();
-
-  return (
-    <header className="sticky top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20 flex items-center justify-between px-4 md:px-8 h-16 font-headline text-sm">
-      {/* Left Section - Mobile Menu Button */}
-      <div className="flex items-center gap-3">
-        {/* Mobile Menu Button - Always visible on mobile */}
-        <button
-          onClick={onToggle}
-          className="md:hidden p-2 rounded-lg bg-surface-container hover:bg-surface-container-highest transition-all text-slate-100"
-          aria-label="Toggle sidebar"
-        >
-          <MdMenu size={20} />
-        </button>
-
-        <BrandLogo className="h-10 w-36 md:hidden" priority />
-      </div>
-
-      {/* Right Section - User Actions */}
-      <div className="flex items-center gap-3 md:gap-5">
-        <NotificationBell />
-        <button className="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full border border-white/5 hover:border-primary/20 transition-all">
-          <MdAccountBalanceWallet className="text-secondary text-base" />
-          <span className="font-bold text-xs tracking-tight hidden sm:inline">
-            $24,105.00
-          </span>
-          <span className="font-bold text-xs tracking-tight sm:hidden">
-            $24.1k
-          </span>
-        </button>
-
-        <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 cursor-pointer hover:border-primary/40 transition-all bg-surface-container-high flex items-center justify-center">
-          <span className="text-xs font-bold text-secondary">
-            {getAccountInitials(account)}
-          </span>
-        </div>
-      </div>
-    </header>
-  );
+export default function CopyTraderHeader({ onToggle }: { onToggle: () => void }) {
+  return <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/5 bg-surface-container-lowest px-4 md:hidden">
+    <div className="flex items-center gap-2"><button onClick={onToggle} aria-label="Toggle sidebar" className="rounded-lg p-2 text-slate-100"><MdMenu size={22} /></button><BrandLogo className="hidden h-9 w-24 sm:block" priority /></div>
+    <TraderAccountActions scope="copy" />
+  </header>;
 }

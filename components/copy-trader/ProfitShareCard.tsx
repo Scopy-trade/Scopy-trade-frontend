@@ -37,7 +37,7 @@ export default function ProfitShareCard({ onStatusChange }: { onStatusChange?: (
   const invoice = summary?.settlement;
   const required = summary?.settlementRequired || !!invoice;
   const input = "w-full rounded-lg border border-white/15 bg-surface-container-highest px-3 py-2 text-sm text-slate-100";
-  return <section className={`space-y-4 rounded-xl border p-5 ${required ? "border-amber-400/30 bg-amber-400/10" : "border-white/10"}`}>
+  return <section id="settlement" className={`space-y-4 rounded-xl border p-5 ${required ? "border-amber-400/30 bg-amber-400/10" : "border-white/10"}`}>
     <div><h2 className="text-sm font-bold text-slate-300">Profit-share settlement</h2>
       <p className="mt-1 text-2xl font-bold">{Number(summary?.pendingAmount || 0).toFixed(2)} USDT accrued</p>
       <p className="mt-2 text-sm text-slate-400">20% of profitable copied trades: 10% for the pro trader and 10% for the platform. Settlement is due at {summary?.threshold || "10.00"} USDT.</p>

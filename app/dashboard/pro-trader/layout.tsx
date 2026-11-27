@@ -4,6 +4,7 @@ import DashboardHeader from "@/components/pro-trader/DashboardHeader";
 import DashboardSidebar from "@/components/pro-trader/DashboardSidebar";
 import { useCallback, useEffect, useState } from "react";
 import { AuthProvider } from "@/components/auth/AuthContext";
+import TraderAccountActions from "@/components/dashboard/TraderAccountActions";
 import TradingPauseNotice from "@/components/trades/TradingPauseNotice";
 import ExchangeSettingsModal from "@/components/copy-trader/exchange/ExchangeSettingsModal";
 
@@ -73,7 +74,7 @@ function ProTraderDashboardShell({
   };
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-dvh flex flex-col overflow-hidden">
       <DashboardSidebar
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
@@ -89,12 +90,11 @@ function ProTraderDashboardShell({
 
       <main
         className={`
-          h-full overflow-y-auto transition-all duration-300 ease-in-out
+          min-h-0 flex-1 overflow-y-auto transition-all duration-300 ease-in-out
           ${getMainMargin()}
-          pt-16 md:pt-4
         `}
       >
-        <div className="p-4 md:p-8"><TradingPauseNotice />{children}</div>
+        <div className="p-4 md:p-8"><div className="hidden md:flex justify-end px-4 py-3 md:px-8"><TraderAccountActions scope="pro" /></div><TradingPauseNotice />{children}</div>
       </main>
       <ExchangeSettingsModal
         isOpen={isExchangeModalOpen}

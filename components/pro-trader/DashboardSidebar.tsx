@@ -24,7 +24,6 @@ const navItems = [
     icon: MdDashboard,
     href: "/dashboard/pro-trader",
   },
-  { name: "Ranks & Benefits", icon: MdGroup, href: "/dashboard/pro-trader/ranks" },
   { name: "Your Copiers", icon: MdGroup, href: "/dashboard/pro-trader/copiers" },
   {
     name: "Active Trades",
@@ -200,7 +199,7 @@ export default function DashboardSidebar({
         <div className="mt-4 px-4">
           <Link
             href="/dashboard/pro-trader/profile"
-            title={isCollapsed && !isMobile ? "Profile Settings" : undefined}
+            title={isCollapsed && !isMobile ? "Your profile" : undefined}
             className={`
               w-full flex py-3 rounded-xl
               bg-secondary
@@ -214,7 +213,7 @@ export default function DashboardSidebar({
           >
             <MdSettings className="text-lg" />
 
-            {(!isCollapsed || isMobile) && <span>Profile Settings</span>}
+            {(!isCollapsed || isMobile) && <span>Your profile</span>}
           </Link>
           <button
             type="button"

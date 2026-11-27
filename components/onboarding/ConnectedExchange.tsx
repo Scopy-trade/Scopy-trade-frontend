@@ -35,6 +35,13 @@ export function ConnectedExchange({
   testResult,
 }: ConnectedExchangeProps) {
   const isActive = connection.status === "Active & Synced";
+  const setup = connection.accountInfo?.isolatedMarginSetup as {
+    pairs?: Array<{ symbol: string; status: string; message?: string }>;
+  } | undefined;
+  const setupPairs = connection.exchangeId === "bitget" && Array.isArray(setup?.pairs) ? setup.pairs : [];
+  const isReady = (status: string) => status === "ready" || status === "configured";
+  const readyCount = setupPairs.filter(pair => isReady(pair.status)).length;
+  const setupMessages = [...new Set(setupPairs.filter(pair => !isReady(pair.status)).map(pair => pair.message).filter(Boolean))];
 
   const getAccountInfoDisplay = () => {
     if (!connection.accountInfo) return null;
@@ -98,7 +105,8 @@ export function ConnectedExchange({
             onClick={onTest}
             disabled={isTesting}
             className="p-2 hover:bg-surface-container rounded-lg transition-colors disabled:opacity-50"
-            title="Test Connection"
+            title={connection.exchangeId === "bitget" ? "Test Connection and Prepare Trading Pairs" : "Test Connection"}
+            aria-label={connection.exchangeId === "bitget" ? "Test Connection and Prepare Trading Pairs" : "Test Connection"}
           >
             {isTesting ? (
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -115,6 +123,24 @@ export function ConnectedExchange({
           </button>
         </div>
       </div>
+
+      {setupPairs.length > 0 && (
+        <div className="mt-4 rounded-lg bg-surface p-3">
+          <p className="text-xs font-semibold text-on-surface">
+            Isolated margin: {readyCount}/{setupPairs.length} pairs ready
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {setupPairs.map(pair => (
+              <span key={pair.symbol} title={pair.message || "Isolated margin is ready"}
+                className={`rounded px-2 py-1 text-xs ${isReady(pair.status) ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-300"}`}>
+                {pair.symbol}: {isReady(pair.status) ? "Ready" : pair.status === "blocked" ? "Blocked" : "Retry needed"}
+              </span>
+            ))}
+          </div>
+          {setupMessages.map(message => <p key={message} className="mt-2 text-xs text-amber-300">{message}</p>)}
+          {readyCount < setupPairs.length && <p className="mt-2 text-xs text-on-surface-variant">After resolving the setup messages, use the refresh button to retry.</p>}
+        </div>
+      )}
 
       {testResult && (
         <div
